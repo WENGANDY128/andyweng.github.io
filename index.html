@@ -1,224 +1,100 @@
-<!doctype html>
-<html lang="zh-CN">
+
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title data-i18n="meta_title">eindeepseek · 产品展示 | 供应链 / 独立站卖家</title>
-  <meta name="description" content="eindeepseek：专注产品展示与合作对接。上传编号图片即可自动出图；提供邮箱、WhatsApp、WeChat 与群组二维码。">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2285%22>🧭</text></svg>">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eindeepseek Supply Chain</title>
   <style>
-    :root{--bg:#0c1220;--card:#121a2a;--muted:#9fb1d1;--brand:#4cc9f0;--accent:#64dfdf;--text:#eaf2ff}
-    *{box-sizing:border-box} html{scroll-behavior:smooth}
-    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,PingFang SC,Microsoft Yahei,sans-serif}
-    a{color:var(--brand);text-decoration:none}
-    .container{max-width:1100px;margin:0 auto;padding:0 18px}
-    header{position:sticky;top:0;z-index:20;background:rgba(12,18,32,.7);backdrop-filter:blur(8px);border-bottom:1px solid #1f2a44}
-    .nav{display:flex;align-items:center;justify-content:space-between;height:64px}
-    .brand{display:flex;align-items:center;gap:10px;font-weight:700}
-    .logo{width:28px;height:28px;display:grid;place-items:center;background:linear-gradient(135deg,#4cc9f0,#64dfdf);border-radius:8px}
-    .lang-switch button{margin-left:6px}
-    .hero{padding:72px 0 32px;background:radial-gradient(1000px 500px at 80% -20%,#163057 10%,transparent 60%)}
-    .hero h1{margin:0 0 10px;font-size:36px}
-    .muted{color:var(--muted)}
-    .cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-    .btn{display:inline-block;background:linear-gradient(135deg,#4cc9f0,#64dfdf);color:#001018;padding:10px 14px;border-radius:12px;font-weight:700}
-    .btn.ghost{background:transparent;border:1px solid #4cc9f0;color:#eaf2ff}
-    section{padding:56px 0;border-top:1px solid #112038}
-    h2{margin:0 0 8px}
-    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-    .card{background:var(--card);border:1px solid #1a2743;border-radius:16px;overflow:hidden}
-    .card img{width:100%;height:220px;object-fit:cover;display:block}
-    .card .body{padding:12px}
-    .contact{display:grid;grid-template-columns:2fr 1fr;gap:16px}
-    .qr{background:#0e1626;border:1px solid #20324f;border-radius:16px;padding:12px;display:grid;place-items:center}
-    .qr img{max-width:260px;height:auto;border-radius:12px;background:#fff}
-    footer{padding:38px 0;color:var(--muted);font-size:13px}
-    @media (max-width:900px){.grid{grid-template-columns:1fr 1fr}.contact{grid-template-columns:1fr}}
-    @media (max-width:600px){.grid{grid-template-columns:1fr}.hero h1{font-size:26px}.card img{height:200px}}
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f9f9f9;
+      color: #333;
+      text-align: center;
+    }
+    header {
+      background: #ffffff;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+      color: #222;
+    }
+    .container {
+      width: 90%;
+      max-width: 1000px;
+      margin: 30px auto;
+    }
+    .product {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .product img {
+      max-width: 100%;
+      border-radius: 10px;
+    }
+    .product h2 {
+      margin-top: 15px;
+      font-size: 22px;
+      color: #444;
+    }
+    .whatsapp {
+      margin: 40px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      display: inline-block;
+    }
+    .whatsapp img {
+      max-width: 250px;
+    }
+    footer {
+      background: #f1f1f1;
+      padding: 15px;
+      font-size: 14px;
+      margin-top: 30px;
+    }
   </style>
 </head>
 <body>
-  <section id="products">
-  <h2>产品展示 / Products / Produkte</h2>
-  <div class="product-gallery">
+  <header>
+    <h1>Eindeepseek Supply Chain</h1>
+    <p>Independent Online Store · Quality Products Worldwide</p>
+  </header>
+
+  <div class="container">
+    <!-- 产品展示1 -->
     <div class="product">
-      <img src="assets/img-1.png" alt="高精度机床">
-      <p>高精度机床 / High Precision Machine Tool / Hochpräzisionsmaschine</p>
+      <img src="assets/img/1.png" alt="Product Sample">
+      <h2>Smart Portable Device</h2>
+      <p>Modern design, easy to use, and built for convenience.</p>
     </div>
+
+    <!-- 产品展示2 -->
     <div class="product">
-      <img src="assets/img-group.jpeg" alt="产品组图">
-      <p>产品组图 / Product Group / Produktgruppe</p>
+      <img src="assets/img/dbd61346-da25-486f-8f00-12fa18a92d2f.png" alt="Product Sample">
+      <h2>New Arrival</h2>
+      <p>Latest product in our collection, combining innovation and style.</p>
+    </div>
+
+    <!-- WhatsApp 群二维码 -->
+    <div class="whatsapp">
+      <h2>Join Our WhatsApp Group</h2>
+      <img src="assets/img/group.jpeg" alt="WhatsApp QR Code">
+      <p>Scan the QR code to join our Trade & Community group.</p>
     </div>
   </div>
-</section>
-<header>
-  <div class="container nav">
-    <div class="brand"><div class="logo">🧭</div><div data-i18n="brand">eindeepseek</div></div>
-    <div class="lang-switch" aria-label="Language Switch">
-      <button data-lang="zh" class="btn ghost" aria-pressed="false">中</button>
-      <button data-lang="en" class="btn ghost" aria-pressed="false">EN</button>
-      <button data-lang="de" class="btn ghost" aria-pressed="false">DE</button>
-    </div>
-  </div>
-</header>
 
-<section class="hero">
-  <div class="container">
-    <h1 data-i18n="hero_title">产品展示 & 合作对接</h1>
-    <p class="muted" data-i18n="hero_desc">我们是 eindeepseek 供应链 / 独立站卖家，专注优选产品与长期合作。此站仅用于展示产品与联系方式，不涉及货运或货代业务。</p>
-    <div class="cta">
-      <a class="btn" href="#gallery" data-i18n="cta_products">查看产品</a>
-      <a class="btn ghost" href="#contact" data-i18n="cta_contact">联系与群组</a>
-    </div>
-  </div>
-</section>
-
-<section id="gallery">
-  <div class="container">
-    <h2 data-i18n="gallery_h2">产品画廊</h2>
-    <p class="muted" data-i18n="gallery_tip">把图片上传到 <code>assets/img/</code>，命名为 <b>1.jpg</b>、<b>2.jpg</b>（或 .png/.webp；支持 001.jpg）。页面会自动加载为卡片，点击可看大图。</p>
-    <div id="cards" class="grid"></div>
-  </div>
-</section>
-
-<section id="about">
-  <div class="container">
-    <h2 data-i18n="about_h2">关于我们</h2>
-    <p class="muted" data-i18n="about_p">
-      eindeepseek 是一家面向全球客户的供应链与独立站卖家。我们精选并展示可信赖的产品，欢迎品牌方、工厂与分销商与我们建立长期合作。
-    </p>
-  </div>
-</section>
-
-<section id="contact">
-  <div class="container">
-    <h2 data-i18n="contact_h2">联系方式 & 群组</h2>
-    <div class="contact">
-      <div>
-        <p class="muted" data-i18n="contact_p">欢迎通过以下方式联系：</p>
-        <ul>
-          <li><span data-i18n="email">📮 邮箱</span>：<a href="mailto:wengandy128@gmail.com">wengandy128@gmail.com</a></li>
-          <li><span data-i18n="wa">📲 WhatsApp</span>：<a href="https://wa.me/8615888791812" target="_blank">+86 158 8879 1812</a></li>
-          <li><span data-i18n="wechat">💬 微信</span>：<b>158888791812</b></li>
-        </ul>
-        <p class="muted" data-i18n="contact_note">如需合作或询问产品信息，请附上产品名称、规格、数量与目的国家/城市。</p>
-      </div>
-      <div class="qr">
-        <div class="muted" style="margin-bottom:8px" data-i18n="qr_tip">群组二维码（把图片命名为 <code>group.jpg</code> 并放在 <code>assets/img/</code>）</div>
-        <img id="qr" src="assets/img/group.jpg" alt="Group QR">
-      </div>
-    </div>
-  </div>
-</section>
-
-<footer>
-  <div class="container">© <span id="y"></span> eindeepseek · <span data-i18n="rights">版权所有</span></div>
-</footer>
-
-<script>
-document.getElementById('y').textContent = new Date().getFullYear();
-
-// ===== i18n =====
-const I18N = {
-  zh: {
-    meta_title:"eindeepseek · 产品展示 | 供应链 / 独立站卖家",
-    brand:"eindeepseek",
-    hero_title:"产品展示 & 合作对接",
-    hero_desc:"我们是 eindeepseek 供应链 / 独立站卖家，专注优选产品与长期合作。此站仅用于展示产品与联系方式，不涉及货运或货代业务。",
-    cta_products:"查看产品",
-    cta_contact:"联系与群组",
-    gallery_h2:"产品画廊",
-    gallery_tip:"把图片上传到 assets/img/，命名为 1.jpg、2.jpg（或 .png/.webp；支持 001.jpg）。页面会自动加载为卡片，点击可看大图。",
-    about_h2:"关于我们",
-    about_p:"eindeepseek 是一家面向全球客户的供应链与独立站卖家。我们精选并展示可信赖的产品，欢迎品牌方、工厂与分销商与我们建立长期合作。",
-    contact_h2:"联系方式 & 群组",
-    contact_p:"欢迎通过以下方式联系：",
-    contact_note:"如需合作或询问产品信息，请附上产品名称、规格、数量与目的国家/城市。",
-    email:"📮 邮箱", wa:"📲 WhatsApp", wechat:"💬 微信",
-    rights:"版权所有"
-  },
-  en: {
-    meta_title:"eindeepseek · Product Showcase | Supply Chain / Independent Seller",
-    brand:"eindeepseek",
-    hero_title:"Product Showcase & Partnerships",
-    hero_desc:"We are eindeepseek, a supply chain / independent seller. This site is for product display and contact only — no freight-forwarding services are offered.",
-    cta_products:"Browse Products",
-    cta_contact:"Contact & Group",
-    gallery_h2:"Gallery",
-    gallery_tip:"Upload images to assets/img/ named 1.jpg, 2.jpg (or .png/.webp; 001.jpg supported). The page auto-generates cards; click to view full size.",
-    about_h2:"About Us",
-    about_p:"eindeepseek is a global supply chain & independent seller. We curate reliable products and welcome long-term cooperation with brands, factories and distributors.",
-    contact_h2:"Contact & Group",
-    contact_p:"Reach us via:",
-    contact_note:"For cooperation or product info, please include product name, specs, quantity and destination country/city.",
-    email:"📮 Email", wa:"📲 WhatsApp", wechat:"💬 WeChat",
-    rights:"All Rights Reserved"
-  },
-  de: {
-    meta_title:"eindeepseek · Produktausstellung | Lieferkette / unabhängiger Verkäufer",
-    brand:"eindeepseek",
-    hero_title:"Produktschau & Partnerschaften",
-    hero_desc:"Wir sind eindeepseek (Lieferkette / unabhängiger Verkäufer). Diese Seite dient nur der Produktpräsentation und Kontaktaufnahme – keine Speditionsdienste.",
-    cta_products:"Produkte ansehen",
-    cta_contact:"Kontakt & Gruppe",
-    gallery_h2:"Galerie",
-    gallery_tip:"Laden Sie Bilder in assets/img/ hoch (1.jpg, 2.jpg bzw. .png/.webp; 001.jpg möglich). Die Seite erzeugt automatisch Karten; Klick öffnet die Großansicht.",
-    about_h2:"Über uns",
-    about_p:"eindeepseek ist ein globaler Lieferkettenanbieter und unabhängiger Verkäufer. Wir kuratieren zuverlässige Produkte und begrüßen Kooperationen mit Marken, Fabriken und Distributoren.",
-    contact_h2:"Kontakt & Gruppe",
-    contact_p:"Kontaktmöglichkeiten:",
-    contact_note:"Für Anfragen bitte Produktname, Spezifikationen, Menge und Zielland/-stadt angeben.",
-    email:"📮 E‑Mail", wa:"📲 WhatsApp", wechat:"💬 WeChat",
-    rights:"Alle Rechte vorbehalten"
-  }
-};
-
-function setLang(lang){
-  const d = I18N[lang] || I18N.zh;
-  document.title = d.meta_title;
-  document.documentElement.setAttribute('lang', lang==='zh'?'zh-CN':lang);
-  document.querySelectorAll('[data-i18n]').forEach(el=>{
-    const key = el.getAttribute('data-i18n');
-    if(d[key]!==undefined) el.textContent = d[key];
-  });
-  document.querySelectorAll('.lang-switch [data-lang]').forEach(b=>{
-    b.setAttribute('aria-pressed', b.getAttribute('data-lang')===lang ? 'true':'false');
-  });
-  localStorage.setItem('lang', lang);
-}
-document.addEventListener('click', e=>{
-  const b = e.target.closest('.lang-switch [data-lang]');
-  if(b) setLang(b.getAttribute('data-lang'));
-});
-setLang(localStorage.getItem('lang')||'zh');
-
-// ===== 自动读取编号图片 =====
-const MAX=200, exts=["jpg","png","webp"]; const container=document.getElementById("cards");
-function pad3(n){return String(n).padStart(3,"0");}
-function tryLoad(src){return new Promise((res,rej)=>{const i=new Image(); i.onload=()=>res(src); i.onerror=()=>rej(); i.src=src+"?v="+Date.now();});}
-(async function(){
-  const list=[];
-  for(let i=1;i<=MAX;i++){
-    let hit=null;
-    for(const base of [`assets/img/${i}.`,`assets/img/${pad3(i)}.`]){
-      for(const ext of exts){try{await tryLoad(base+ext); hit=base+ext; break;}catch(e){}}
-      if(hit) break;
-    }
-    if(hit) list.push({i,src:hit});
-  }
-  if(!list.length){container.innerHTML='<div class="muted">尚未检测到图片：请上传到 <code>assets/img/</code>，命名为 1.jpg/2.jpg…（支持 .png/.webp 与 001.jpg）。</div>'; return;}
-  for(const it of list){
-    const card=document.createElement('div'); card.className='card';
-    const a=document.createElement('a'); a.href=it.src; a.target='_blank';
-    const img=document.createElement('img'); img.src=it.src; img.alt='产品 '+it.i;
-    a.appendChild(img);
-    const body=document.createElement('div'); body.className='body';
-    const title=document.createElement('div'); title.style.fontWeight='600'; title.textContent='产品 '+it.i;
-    const sub=document.createElement('div'); sub.className='muted'; sub.textContent=it.src.split('/').pop();
-    body.appendChild(title); body.appendChild(sub);
-    card.appendChild(a); card.appendChild(body);
-    container.appendChild(card);
-  }
-})();</script>
+  <footer>
+    <p>© 2025 Eindeepseek Supply Chain. All Rights Reserved.</p>
+  </footer>
 </body>
 </html>
