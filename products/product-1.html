@@ -1,28 +1,123 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>产品 1 · 详情</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin:0; background:#f7f8fa; color:#222; }
-    header { background:#fff; border-bottom:1px solid #ddd; padding:12px 20px; position:sticky; top:0; }
-    .container { max-width:900px; margin:0 auto; padding:20px; }
-    .card { background:#fff; border:1px solid #ddd; border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); padding:20px; margin-bottom:20px; }
-    img { max-width:100%; height:auto; }
-    footer { border-top:1px solid #ddd; text-align:center; padding:16px; font-size:13px; color:#555; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>产品 1 · 动画演示</title>
+<style>
+  :root{--bg:#f7f8fa;--card:#fff;--text:#222;--muted:#666;--border:#e8eaf0;--brand:#2b7de9}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,PingFang SC,Microsoft Yahei,sans-serif}
+  header{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--border);padding:12px 16px;font-weight:800}
+  .container{max-width:980px;margin:0 auto;padding:18px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:0 4px 16px rgba(20,30,60,.06);padding:18px;margin:14px 0}
+  /* --- slide-in animation --- */
+  .reveal{opacity:0;transform:translateY(24px);transition:all .6s cubic-bezier(.22,1,.36,1)}
+  .reveal.show{opacity:1;transform:translateY(0)}
+  /* --- carousel --- */
+  .carousel{position:relative;overflow:hidden;border-radius:12px;border:1px solid var(--border);background:#fff}
+  .track{display:flex;transition:transform .5s ease}
+  .slide{min-width:100%;display:grid;place-items:center;background:#fff}
+  .slide img{max-width:90%;max-height:460px;object-fit:contain}
+  .nav{display:flex;gap:8px;justify-content:center;margin-top:10px}
+  .dot{width:8px;height:8px;border-radius:999px;background:#cfd8ea}
+  .dot.active{background:#2b7de9}
+  .arrow{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.5);color:#fff;border:none;border-radius:8px;padding:8px 10px;cursor:pointer}
+  .arrow.left{left:8px}
+  .arrow.right{right:8px}
+  .btn{display:inline-block;background:#2b7de9;color:#fff;text-decoration:none;padding:10px 14px;border-radius:10px;font-weight:700}
+</style>
 </head>
 <body>
-  <header><strong>Eindeepseek</strong></header>
-  <main class="container">
-    <div class="card">
-      <h1>产品 1 标题</h1>
-      <img src="../assets/img/1.png" alt="产品 1" onerror="this.style.display='none'">
-      <p>这里是产品 1 的详细介绍内容。你可以在此补充多语言信息。</p>
+<header>Eindeepseek</header>
+<main class="container">
+
+  <section class="card reveal">
+    <h1>产品 1 · 动画与轮播</h1>
+    <p class="muted">下滑可以看到卡片<strong>滑入动画</strong>；上面的图片支持<strong>左右切换/拖拽</strong>。</p>
+  </section>
+
+  <section class="card reveal">
+    <div class="carousel" id="carousel">
+      <button class="arrow left" aria-label="Prev" id="prev">‹</button>
+      <button class="arrow right" aria-label="Next" id="next">›</button>
+      <div class="track" id="track">
+        <div class="slide"><img src="../assets/img/1.png" alt="图 1"></div>
+        <div class="slide"><img src="../assets/img/1b.png" alt="图 2" onerror="this.closest('.slide').style.display='none'"></div>
+        <div class="slide"><img src="../assets/img/1c.png" alt="图 3" onerror="this.closest('.slide').style.display='none'"></div>
+      </div>
     </div>
-  </main>
-  <footer>© <span id="y"></span> Eindeepseek</footer>
-<script>document.getElementById('y').textContent=new Date().getFullYear();</script>
+    <div class="nav" id="dots"></div>
+  </section>
+
+  <section class="card reveal">
+    <h2>卖点</h2>
+    <ul>
+      <li>轻巧便携，日常随身携带。</li>
+      <li>现代设计，外观简洁。</li>
+      <li>核心功能一键直达，易上手。</li>
+    </ul>
+    <a class="btn" href="mailto:wengandy128@gmail.com">咨询购买</a>
+  </section>
+
+  <section class="card reveal">
+    <h2>更多说明</h2>
+    <p>你可以将更多模块都加上 <code>reveal</code> 类名，进入视口时会自动使用<strong>滑入动画</strong>。</p>
+  </section>
+
+</main>
+
+<script>
+// slide-in on scroll
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=> e.isIntersecting && e.target.classList.add('show'));
+},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+// simple carousel with buttons + drag
+const track = document.getElementById('track');
+let index = 0;
+function slides(){ return Array.from(track.children).filter(x=>x.style.display!== 'none'); }
+function update(){
+  const s = slides();
+  if(!s.length) return;
+  if(index<0) index = s.length-1;
+  if(index>=s.length) index = 0;
+  const x = -index * 100;
+  track.style.transform = `translateX(${x}%)`;
+  // dots
+  const dots = document.getElementById('dots');
+  dots.innerHTML = s.map((_,i)=>`<div class="dot ${i===index?'active':''}" data-i="${i}"></div>`).join('');
+}
+document.getElementById('prev').onclick = ()=>{ index--; update(); };
+document.getElementById('next').onclick = ()=>{ index++; update(); };
+document.getElementById('dots').onclick = (e)=>{
+  const d = e.target.closest('.dot'); if(!d) return;
+  index = +d.dataset.i; update();
+};
+
+// drag / swipe
+let startX=0, current=0, dragging=false;
+const carousel = document.getElementById('carousel');
+carousel.addEventListener('pointerdown', e=>{
+  dragging=true; startX=e.clientX; carousel.setPointerCapture(e.pointerId);
+});
+carousel.addEventListener('pointermove', e=>{
+  if(!dragging) return;
+  const dx = e.clientX - startX;
+  const width = carousel.clientWidth;
+  track.style.transition='none';
+  track.style.transform = `translateX(${-index*100 + (dx/width)*100}%)`;
+  current = dx;
+});
+carousel.addEventListener('pointerup', e=>{
+  dragging=false; track.style.transition='transform .5s ease';
+  const width = carousel.clientWidth;
+  if(Math.abs(current) > width*0.2){ index += (current<0?1:-1); }
+  current=0; update();
+});
+window.addEventListener('resize', update);
+update();
+</script>
 </body>
 </html>
