@@ -5,26 +5,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Eindeepseek</title>
   <style>
-    body {margin:0;font-family:Arial,Helvetica,sans-serif;background:#0b0c10;color:#e9ecf1;}
-    header{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:#121318;color:#fff}
-    .brand a{color:#fff;text-decoration:none;font-weight:800;font-size:20px}
-    .lang{display:inline-flex;gap:6px;align-items:center}
-    .lang button{appearance:none;border:none;cursor:pointer;padding:6px 10px;border-radius:6px;color:#7b8190;background:#1d1e25}
-    .lang button.active{color:#fff;background:#2b7de9}
-    .wrap{max-width:1100px;margin:0 auto;padding:22px 18px 56px}
+    :root{--bg:#0b0c10;--card:#121318;--muted:#7b8190;--text:#e9ecf1;--primary:#6ea8fe;--ring:rgba(110,168,254,.35)}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:radial-gradient(80vw 80vh at 20% -20%,#141726,#0b0c10);color:var(--text)}
+    header{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:14px 18px;backdrop-filter:saturate(140%) blur(6px);background:linear-gradient(to bottom,rgba(10,10,15,.8),rgba(10,10,15,.2) 60%,transparent);border-bottom:1px solid rgba(255,255,255,.06)}
+    .brand a{color:var(--text);text-decoration:none;font-weight:800;letter-spacing:.3px}
+    .lang{display:inline-flex;gap:6px;align-items:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:6px}
+    .lang button{appearance:none;border:none;cursor:pointer;padding:6px 10px;border-radius:999px;color:var(--muted);background:transparent;font-weight:600}
+    .lang button.active{color:var(--text);background:rgba(255,255,255,.06);box-shadow:0 0 0 6px var(--ring) inset}
+
+    .wrap{max-width:1200px;margin:0 auto;padding:22px 18px 56px}
     h1{font-size:28px;margin:8px 0 10px}
-    p.lead{color:#7b8190;margin-top:0}
-    .contactbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:10px 0 20px}
-    .contactbar a,.contactbar span{background:#1d1e25;border:1px solid #333;padding:8px 12px;border-radius:8px;color:#e9ecf1;text-decoration:none;font-size:14px}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px}
-    .card{background:#121318;border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,.45);overflow:hidden;display:flex;flex-direction:column}
-    .thumb{background:#fff;display:flex;align-items:center;justify-content:center}
-    .thumb img{max-width:100%;height:auto;display:block}
-    .body{padding:14px;display:flex;flex-direction:column;gap:8px;flex:1}
-    .title{font-weight:800}
-    .desc{color:#aaa;font-size:14px;line-height:1.5}
-    .btn{margin-top:auto;align-self:flex-start;background:#2b7de9;color:#fff;padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:600}
-    footer{border-top:1px solid #333;text-align:center;padding:16px;color:#7b8190;margin-top:28px}
+    p.lead{color:var(--muted);margin-top:0}
+
+    .contactbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:10px 0 18px}
+    .contactbar a,.contactbar span{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);padding:8px 10px;border-radius:10px;color:var(--text);text-decoration:none;font-size:14px}
+    .contactbar a:hover{background:rgba(255,255,255,.1)}
+
+    .grid{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:18px}
+    @media(min-width:640px){.grid{grid-template-columns:repeat(2,1fr)}}
+    @media(min-width:960px){.grid{grid-template-columns:repeat(3,1fr)}}
+    .card{position:relative;overflow:hidden;border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08);box-shadow:0 8px 30px rgba(0,0,0,.35);transform:translateY(10px);opacity:0;animation:rise .7s ease forwards}
+    .card:nth-child(1){animation-delay:.05s}.card:nth-child(2){animation-delay:.1s}.card:nth-child(3){animation-delay:.15s}.card:nth-child(4){animation-delay:.2s}.card:nth-child(5){animation-delay:.25s}.card:nth-child(6){animation-delay:.3s}
+    @keyframes rise{to{transform:none;opacity:1}}
+    .thumb{aspect-ratio:4/3;width:100%;display:block;object-fit:cover;filter:saturate(105%)}
+    .body{padding:14px 14px 16px}
+    .title{font-weight:800;margin:2px 0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .desc{color:var(--muted);margin:0;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .badge{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.55);color:#fff;padding:4px 8px;border-radius:999px;font-size:12px}
+    /* make entire card clickable reliably */
+    .cardlink{display:block;text-decoration:none;color:inherit}
+    .btn{display:inline-block;margin-top:8px;background:#2b7de9;color:#fff;padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:600}
+
+    /* group card image smaller */
+    .qr-thumb{max-width:180px;max-height:180px;margin:16px auto;display:block;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:#fff}
+    footer{border-top:1px solid rgba(255,255,255,.08);text-align:center;padding:16px;color:var(--muted);margin-top:28px}
   </style>
 </head>
 <body>
@@ -38,50 +53,133 @@
   </header>
 
   <div class="wrap">
-    <!-- 联系方式 -->
-    <div class="contactbar">
-      <a href="mailto:wengandy128@gmail.com">📧 邮件: wengandy128@gmail.com</a>
-      <a href="https://wa.me/8615888791812" target="_blank">💬 WhatsApp: +86 15888791812</a>
-      <a href="tel:+8615888791812">📞 电话: +86 15888791812</a>
-      <span>🟩 微信: 15888791812</span>
-    </div>
+    <div class="contactbar" id="contactBar"></div>
 
     <h1 id="heading">产品展示</h1>
     <p class="lead" id="sub">选择语言后会在全站生效；仅显示有内容的产品。</p>
 
-    <div class="grid" id="grid">
-      <!-- 产品卡片会通过JS自动加载 -->
-    </div>
-
-    <!-- 群组二维码卡片 -->
-    <article class="card">
-      <div class="thumb"><img src="group.jpeg" alt="WhatsApp Group QR"></div>
-      <div class="body">
-        <div class="title">加入 WhatsApp 群组</div>
-        <div class="desc">扫码二维码，或点击下方按钮直接加入我们的贸易 & 物流交流群。</div>
-        <a class="btn" href="https://chat.whatsapp.com/IzsPZY0GJfYAm1yOueXYkb?mode=ac_t" target="_blank">点击加入群组</a>
-      </div>
-    </article>
-
+    <div class="grid" id="grid"></div>
   </div>
 
   <footer>© <span id="y"></span> Eindeepseek</footer>
 
   <script>
-    document.getElementById('y').textContent=new Date().getFullYear();
+    // i18n
+    const I18N={
+      zh:{title:'产品展示',sub:'选择语言后会在全站生效；仅显示有内容的产品。',groupTitle:'加入 WhatsApp 群组',groupDesc:'扫码二维码，进入我们的贸易 & 物流交流群。',join:'加入群',email:'邮件',whats:'WhatsApp',phone:'电话',wechat:'微信'},
+      en:{title:'Products',sub:'Language selection applies site-wide. Only products with content are shown.',groupTitle:'Join WhatsApp Group',groupDesc:'Scan the QR code to join our trade & logistics group.',join:'Join Group',email:'Email',whats:'WhatsApp',phone:'Phone',wechat:'WeChat'},
+      de:{title:'Produkte',sub:'Die Sprachauswahl gilt für die ganze Seite. Es werden nur Produkte mit Inhalt angezeigt.',groupTitle:'WhatsApp‑Gruppe beitreten',groupDesc:'QR-Code scannen, um unserer Handels‑ & Logistik‑Gruppe beizutreten.',join:'Beitreten',email:'E‑Mail',whats:'WhatsApp',phone:'Telefon',wechat:'WeChat'}
+    };
     const qs=new URLSearchParams(location.search);
     const currentLang=(qs.get('lang')||localStorage.getItem('lang')||'zh').toLowerCase();
     localStorage.setItem('lang',currentLang);
+    // Lang buttons
     const langEl=document.getElementById('langSwitcher');
     [...langEl.querySelectorAll('button')].forEach(b=>{
       if(b.dataset.lang===currentLang) b.classList.add('active');
       b.onclick=()=>{const lang=b.dataset.lang;localStorage.setItem('lang',lang);const url=new URL(location.href);url.searchParams.set('lang',lang);location.href=url.toString();};
     });
-    async function exists(u){try{const r=await fetch(u,{method:'HEAD',cache:'no-store'});return r.ok;}catch{return false;}}
-    async function firstImage(base){const exts=['jpg','jpeg','png','webp'];for(const ext of exts){const u=`${base}/1.${ext}`;if(await exists(u))return u;}return '';}
-    async function readPreview(slug){const order=[currentLang,'en','zh','de'];for(const lg of order){const u=`products/${slug}-${lg}.txt`;try{const r=await fetch(u,{cache:'no-store'});if(r.ok){const tx=(await r.text()).trim();const [first,...rest]=tx.split(/\\r?\\n/);return {title:first?.trim()||null,desc:rest.join('\\n').trim()||null,lang:lg};}}catch{}}return null;}
-    async function buildGrid(){const grid=document.getElementById('grid');for(let i=1;i<=6;i++){const slug=`product-${i}`;const imgBase=`assets/imgs/${slug}`;const img=await firstImage(imgBase);const preview=await readPreview(slug);if(!img&&!preview)continue;const title=preview?.title||`Product ${i}`;const desc=preview?.desc||'';const card=document.createElement('div');card.className='card';const a=document.createElement('a');const href=new URL(`products/${slug}.html`,location.origin+location.pathname);href.searchParams.set('lang',currentLang);a.href=href.toString();card.innerHTML=`${img?`<img class="thumb" src="${img}" alt="${title}">`:`<div class="thumb" style="aspect-ratio:4/3;background:#222"></div>`}<div class="body"><div class="title">${title}</div><p class="desc">${desc}</p></div>`;card.appendChild(a);grid.appendChild(card);}}
+    // Headings
+    (()=>{const t=I18N[currentLang]||I18N.zh;heading.textContent=t.title;sub.textContent=t.sub;})();
+
+    // Contact fixed values
+    const CONTACT={
+      email:'wengandy128@gmail.com',
+      whatsapp:'+86 15888791812',
+      phone:'+86 15888791812',
+      wechat:'15888791812',
+      waInvite:'' // fill later
+    };
+    function renderContact(){
+      const t=I18N[currentLang]||I18N.zh;
+      const el=document.getElementById('contactBar');
+      el.innerHTML=`
+        <a href="mailto:${CONTACT.email}">📧 ${t.email}: ${CONTACT.email}</a>
+        <a href="https://wa.me/${CONTACT.whatsapp.replace(/[^0-9]/g,'')}" target="_blank">💬 ${t.whats}</a>
+        <a href="tel:${CONTACT.phone.replace(/\\s/g,'')}">📞 ${t.phone}: ${CONTACT.phone}</a>
+        <span>🟩 ${t.wechat}: ${CONTACT.wechat}</span>
+      `;
+    }
+    renderContact();
+
+    // utils
+    async function exists(url){
+      try{const r=await fetch(url,{method:'HEAD',cache:'no-store'}); if(r.ok) return true;}catch(e){}
+      try{const r=await fetch(url,{cache:'no-store'}); return r.ok;}catch(e){return false;}
+    }
+    async function firstImage(base){
+      const exts=['jpg','jpeg','png','webp'];
+      for(const ext of exts){const u=`${base}/1.${ext}`; if(await exists(u)) return u;}
+      return '';
+    }
+    async function readPreview(slug){
+      const order=[currentLang,'en','zh','de'];
+      for(const lg of order){
+        const url=`products/${slug}-${lg}.txt`;
+        try{const r=await fetch(url,{cache:'no-store'}); if(r.ok){const tx=(await r.text()).trim(); const [first,...rest]=tx.split(/\\r?\\n/); return {title:first?.trim()||null, desc:rest.join('\\n').trim()||null};}}catch{}
+      }
+      return null;
+    }
+
+    // build product cards
+    async function buildGrid(){
+      const grid=document.getElementById('grid');
+      const t=I18N[currentLang]||I18N.zh;
+
+      for(let i=1;i<=6;i++){
+        const slug=`product-${i}`;
+        const imgBase=`assets/imgs/${slug}`;
+        const img=await firstImage(imgBase);
+        const preview=await readPreview(slug);
+        if(!img && !preview) continue;
+
+        const title=preview?.title || `Product ${i}`;
+        const desc=preview?.desc || '';
+
+        // Use an anchor wrapper to ensure the entire card is clickable
+        const a=document.createElement('a');
+        a.className='cardlink';
+        a.href=`products/${slug}.html?lang=${encodeURIComponent(currentLang)}`;
+
+        const card=document.createElement('article');
+        card.className='card';
+        card.innerHTML=`
+          ${img?`<img class="thumb" src="${img}" alt="${title}">`:`<div class="thumb" style="aspect-ratio:4/3;background:linear-gradient(120deg,#1b1d27,#0f1116)"></div>`}
+          <div class="body">
+            <div class="title">${title}</div>
+            <p class="desc">${desc}</p>
+          </div>`;
+
+        a.appendChild(card);
+        grid.appendChild(a);
+      }
+
+      // Append group card if group.jpeg/png/jpg/webp exists
+      const qrcands=['group.jpeg','group.jpg','group.png','group.webp'];
+      let qr='';
+      for(const f of qrcands){ if(await exists(f)){ qr=f; break; } }
+      if(qr){
+        const a=document.createElement('a');
+        a.className='cardlink';
+        a.href= CONTACT.waInvite ? CONTACT.waInvite : qr; // if invite exists go url, else open image
+        a.target = CONTACT.waInvite ? '_blank' : '_self';
+
+        const card=document.createElement('article');
+        card.className='card';
+        card.innerHTML=`
+          <div class="thumb"><img src="${qr}" alt="WhatsApp Group QR" class="qr-thumb"></div>
+          <div class="body">
+            <div class="title">${t.groupTitle}</div>
+            <p class="desc">${t.groupDesc}</p>
+            ${CONTACT.waInvite?`<span class="btn">${t.join}</span>`:''}
+          </div>`;
+        a.appendChild(card);
+        grid.appendChild(a);
+      }
+    }
     buildGrid();
+
+    document.getElementById('y').textContent=new Date().getFullYear();
   </script>
 </body>
 </html>
