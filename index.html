@@ -13,9 +13,15 @@
     .lang{display:inline-flex;gap:6px;align-items:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:6px}
     .lang button{appearance:none;border:none;cursor:pointer;padding:6px 10px;border-radius:999px;color:var(--muted);background:transparent;font-weight:600}
     .lang button.active{color:var(--text);background:rgba(255,255,255,.06);box-shadow:0 0 0 6px var(--ring) inset}
-    .wrap{max-width:1200px;margin:0 auto;padding:22px 18px 56px}
+
+    .wrap{max-width:1200px;margin:0 auto;padding:22px 18px 80px}
     h1{font-size:28px;margin:8px 0 10px}
     p.lead{color:var(--muted);margin-top:0}
+
+    .contactbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:10px 0 10px}
+    .contactbar a,.contactbar span{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);padding:8px 10px;border-radius:10px;color:var(--text);text-decoration:none;font-size:14px}
+    .contactbar a:hover{background:rgba(255,255,255,.1)}
+
     .grid{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:18px}
     @media(min-width:640px){.grid{grid-template-columns:repeat(2,1fr)}}
     @media(min-width:960px){.grid{grid-template-columns:repeat(3,1fr)}}
@@ -28,7 +34,36 @@
     .desc{color:var(--muted);margin:0;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
     .badge{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.55);color:#fff;padding:4px 8px;border-radius:999px;font-size:12px}
     .card a{position:absolute;inset:0;z-index:0}
-    /* contact + gallery parts omitted for brevity here; use the previous enhanced one in your repo if needed */
+
+    .gwrap{margin-top:28px}
+    .gtitle{font-size:22px;margin:0 0 10px}
+    .gg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    @media(min-width:700px){.gg{grid-template-columns:repeat(4,1fr)}}
+    .gitem{overflow:hidden;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);transform:translateY(8px);opacity:0;animation:rise .6s ease forwards}
+    .gitem img{display:block;width:100%;height:100%;object-fit:cover}
+
+    footer{border-top:1px solid rgba(255,255,255,.08);text-align:center;padding:16px;color:var(--muted);margin-top:28px}
+
+    /* WhatsApp 加群小图（底部右侧） */
+    .wa-fab{
+      position:fixed; right:16px; bottom:16px; z-index:50;
+      width:64px; height:64px; border-radius:16px; overflow:hidden;
+      border:1px solid rgba(255,255,255,.12); box-shadow:0 10px 28px rgba(0,0,0,.45);
+      background:rgba(255,255,255,.06); backdrop-filter:blur(6px);
+      display:flex; align-items:center; justify-content:center; cursor:pointer;
+    }
+    .wa-fab img{width:100%; height:100%; object-fit:cover}
+    .wa-fab span{font-weight:800; color:#e9ecf1}
+    .wa-tip{
+      position:fixed; right:90px; bottom:28px; background:rgba(0,0,0,.7); color:#fff; padding:8px 10px; border-radius:10px; font-size:12px; display:none;
+    }
+    .wa-fab:hover + .wa-tip{display:block}
+    /* 简单弹窗（当没有邀请链接时展示二维码） */
+    .modal{position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; align-items:center; justify-content:center; z-index:60}
+    .sheet{background:#fff; color:#111; border-radius:16px; padding:14px; width:min(92vw,420px); box-shadow:0 18px 50px rgba(0,0,0,.45)}
+    .sheet h3{margin:6px 0 10px; font-size:18px}
+    .sheet img{width:100%; height:auto; display:block; border-radius:10px; border:1px solid #eee}
+    .close{margin-top:10px; display:block; text-align:center; font-weight:700; color:#2b7de9; cursor:pointer}
   </style>
 </head>
 <body>
@@ -42,65 +77,129 @@
   </header>
 
   <div class="wrap">
+    <div class="contactbar" id="contactBar"></div>
+
     <h1 id="heading">产品展示</h1>
     <p class="lead" id="sub">选择语言后会在全站生效；仅显示有内容的产品。</p>
+
     <div class="grid" id="grid"></div>
+
+    <div class="gwrap" id="groupWrap" style="display:none">
+      <h2 class="gtitle" id="groupTitle">WhatsApp 群照片</h2>
+      <div class="gg" id="ggrid"></div>
+    </div>
+  </div>
+
+  <footer>© <span id="y"></span> Eindeepseek</footer>
+
+  <!-- 加群悬浮小图 & 气泡 -->
+  <a class="wa-fab" id="waFab" target="_blank" rel="noopener" aria-label="Join WhatsApp group"><span>WA</span></a>
+  <div class="wa-tip" id="waTip">加入 WhatsApp 群组</div>
+
+  <!-- 无群链接时的二维码弹窗 -->
+  <div class="modal" id="qrModal">
+    <div class="sheet">
+      <h3 id="qrTitle">扫描二维码加入 WhatsApp 群</h3>
+      <img id="qrImg" alt="WhatsApp Group QR">
+      <span class="close" id="qrClose">关闭</span>
+    </div>
   </div>
 
   <script>
-    const I18N={zh:{title:'产品展示',sub:'选择语言后会在全站生效；仅显示有内容的产品。'},en:{title:'Products',sub:'Language selection applies site‑wide. Only products with content are shown.'},de:{title:'Produkte',sub:'Die Sprachauswahl gilt für die ganze Seite. Es werden nur Produkte mit Inhalt angezeigt.'}};
+    // 多语言
+    const I18N={
+      zh:{title:'产品展示',sub:'选择语言后会在全站生效；仅显示有内容的产品。',contact:{labelEmail:'邮件',labelWhats:'WhatsApp',labelPhone:'电话',labelWechat:'微信',joinGroup:'WhatsApp 群照片',qr:'扫描二维码加入 WhatsApp 群'},tip:'加入 WhatsApp 群组',close:'关闭'},
+      en:{title:'Products',sub:'Language selection applies site-wide. Only products with content are shown.',contact:{labelEmail:'Email',labelWhats:'WhatsApp',labelPhone:'Phone',labelWechat:'WeChat',joinGroup:'WhatsApp Group Photos',qr:'Scan to join our WhatsApp group'},tip:'Join WhatsApp group',close:'Close'},
+      de:{title:'Produkte',sub:'Die Sprachauswahl gilt für die ganze Seite. Es werden nur Produkte mit Inhalt angezeigt.',contact:{labelEmail:'E-Mail',labelWhats:'WhatsApp',labelPhone:'Telefon',labelWechat:'WeChat',joinGroup:'WhatsApp-Gruppenfotos',qr:'QR scannen, um beizutreten'},tip:'WhatsApp‑Gruppe beitreten',close:'Schließen'}
+    };
+    const LANG_BADGE={zh:'ZH',en:'EN',de:'DE'};
     const qs=new URLSearchParams(location.search);
     const currentLang=(qs.get('lang')||localStorage.getItem('lang')||'zh').toLowerCase();
     localStorage.setItem('lang',currentLang);
-    const langEl=document.getElementById('langSwitcher');
-    [...langEl.querySelectorAll('button')].forEach(b=>{if(b.dataset.lang===currentLang)b.classList.add('active');b.onclick=()=>{const lang=b.dataset.lang;localStorage.setItem('lang',lang);const url=new URL(location.href);url.searchParams.set('lang',lang);location.href=url.toString();}});
-    (()=>{const t=I18N[currentLang]||I18N.zh;heading.textContent=t.title;sub.textContent=t.sub;})();
 
-    // Robust exists(): HEAD first, fallback to GET
-    async function exists(url){
-      try{ const r=await fetch(url,{method:'HEAD',cache:'no-store'}); if(r.ok) return true; }catch(e){}
-      try{ const r=await fetch(url,{method:'GET',cache:'no-store'}); return r.ok; }catch(e){ return false; }
+    // 语言按钮
+    const langEl=document.getElementById('langSwitcher');
+    [...langEl.querySelectorAll('button')].forEach(b=>{
+      if(b.dataset.lang===currentLang) b.classList.add('active');
+      b.onclick=()=>{const lang=b.dataset.lang;localStorage.setItem('lang',lang);const url=new URL(location.href);url.searchParams.set('lang',lang);location.href=url.toString();};
+    });
+    // 文案
+    (()=>{const t=I18N[currentLang]||I18N.zh;heading.textContent=t.title;sub.textContent=t.sub;document.getElementById('qrTitle').textContent=t.contact.qr;document.getElementById('qrClose').textContent=t.close;document.getElementById('waTip').textContent=t.tip;})();
+
+    // 联系方式（按需替换）
+    const CONTACT_CFG={
+      email:'info@eindeepseek.com',
+      whatsapp:'+8613800138000',
+      phone:'+86 138 0013 8000',
+      wechat:'Eindeepseek-Official',
+      waInvite:'' // 如果有群邀请链接，填这里；有值时小图会直接跳转该链接
+    };
+    function renderContact(){
+      const t=(I18N[currentLang]||I18N.zh).contact;
+      const bar=document.getElementById('contactBar');
+      bar.innerHTML = `
+        <a href="mailto:${CONTACT_CFG.email}">📧 ${t.labelEmail}: ${CONTACT_CFG.email}</a>
+        <a href="https://wa.me/${CONTACT_CFG.whatsapp.replace(/[^0-9]/g,'')}" target="_blank">💬 ${t.labelWhats}</a>
+        ${CONTACT_CFG.waInvite ? `<a href="${CONTACT_CFG.waInvite}" target="_blank">👥 Group</a>` : ''}
+        <a href="tel:${CONTACT_CFG.phone.replace(/\\s/g,'')}">📞 ${t.labelPhone}: ${CONTACT_CFG.phone}</a>
+        <span>🟩 ${t.labelWechat}: ${CONTACT_CFG.wechat}</span>
+      `;
     }
-    async function firstImage(base){
-      const exts=['jpg','jpeg','png','webp'];
-      for(const ext of exts){
-        const u=`${base}/1.${ext}`;
-        const ok=await exists(u);
-        console.log('check image',u,ok);
-        if(ok) return u;
-      }
-      return '';
-    }
-    async function readPreview(slug){
-      const order=[currentLang,'en','zh','de'];
-      for(const lg of order){
-        const u=`products/${slug}-${lg}.txt`;
-        try{
-          const r=await fetch(u,{cache:'no-store'});
-          console.log('check txt',u,r.ok);
-          if(r.ok){
-            const tx=(await r.text()).trim(); const [first,...rest]=tx.split(/\\r?\\n/);
-            return {title:first?.trim()||null,desc:rest.join('\\n').trim()||null,lang:lg};
-          }
-        }catch(e){console.warn('txt fail',u,e);}
-      }
-      return null;
-    }
+    renderContact();
+
+    // 工具
+    async function exists(url){ try{ const r=await fetch(url,{method:'HEAD',cache:'no-store'}); if(r.ok) return true; }catch{} try{ const r=await fetch(url,{cache:'no-store'}); return r.ok; }catch{ return false; } }
+    async function firstImage(base){ const exts=['jpg','jpeg','png','webp']; for(const ext of exts){ const u=`${base}/1.${ext}`; if(await exists(u)) return u; } return ''; }
+    async function readPreview(slug){ const order=[currentLang,'en','zh','de']; for(const lg of order){ const url=`products/${slug}-${lg}.txt`; try{ const r=await fetch(url,{cache:'no-store'}); if(r.ok){ const t=(await r.text()).trim(); const [first,...rest]=t.split(/\\r?\\n/); return {title:first?.trim()||null, desc:rest.join('\\n').trim()||null, lang:lg}; } }catch{} } return null; }
+
+    // 产品卡片
     async function buildGrid(){
       const grid=document.getElementById('grid');
       for(let i=1;i<=6;i++){
         const slug=`product-${i}`; const imgBase=`assets/imgs/${slug}`;
         const img=await firstImage(imgBase); const preview=await readPreview(slug);
-        console.log('product',i,'img?',!!img,'txt?',!!preview);
         if(!img && !preview) continue;
-        const title=preview?.title||`Product ${i}`; const desc=preview?.desc||'';
-        const a=document.createElement('a'); const href=new URL(`products/${slug}.html`,location.origin+location.pathname); href.searchParams.set('lang',currentLang); a.href=href.toString();
+        const title=preview?.title || `Product ${i}`; const desc=preview?.desc || '';
         const card=document.createElement('div'); card.className='card';
-        card.innerHTML=`${img?`<img class="thumb" src="${img}" alt="${title}">`:`<div class="thumb" style="aspect-ratio:4/3;background:linear-gradient(120deg,#1b1d27,#0f1116)"></div>`}<div class="body"><div class="title">${title}</div><p class="desc">${desc}</p></div>`;
+        const a=document.createElement('a'); const href=new URL(`products/${slug}.html`, location.origin + location.pathname); href.searchParams.set('lang', currentLang); a.href=href.toString();
+        card.innerHTML=`${img?`<img class="thumb" src="${img}" alt="${title}">`:`<div class="thumb" style="aspect-ratio:4/3;background:linear-gradient(120deg,#1b1d27,#0f1116)"></div>`}<div class="body"><div class="title">${title}</div><p class="desc">${desc || ''}</p></div><span class="badge">${LANG_BADGE[currentLang]}</span>`;
         card.appendChild(a); grid.appendChild(card);
       }
     }
     buildGrid();
+
+    // 群相册（可选）：group-1.* ~ group-12.*
+    async function buildGroupGallery(){
+      const exts=['jpg','jpeg','png','webp']; const imgs=[];
+      for(let i=1;i<=12;i++){ let found=''; for(const ext of exts){ const url=`group-${i}.${ext}`; if(await exists(url)){ found=url; break; } } if(found) imgs.push(found); else break; }
+      if(imgs.length===0) return;
+      const t=(I18N[currentLang]||I18N.zh).contact.joinGroup; document.getElementById('groupTitle').textContent=t;
+      const wrap=document.getElementById('groupWrap'); const g=document.getElementById('ggrid');
+      imgs.forEach((src,idx)=>{ const item=document.createElement('div'); item.className='gitem'; item.style.animationDelay=(0.05*idx)+'s'; item.innerHTML=`<img src="${src}" alt="group ${idx+1}">`; g.appendChild(item); });
+      wrap.style.display='block';
+    }
+    buildGroupGallery();
+
+    // 悬浮小图：优先显示 group.(jpg|jpeg|png|webp) 作为缩略图；
+    // 若 CONTACT_CFG.waInvite 有值，则点击直接跳转；否则弹出二维码大图（group.*）
+    (async function setupFab(){
+      const fab=document.getElementById('waFab');
+      const exts=['jpg','jpeg','png','webp']; let thumb='';
+      for(const ext of exts){ const u=`group.${ext}`; if(await exists(u)){ thumb=u; break; } }
+      if(thumb){ fab.innerHTML=`<img src="${thumb}" alt="Join WhatsApp group">`; }
+      const invite=CONTACT_CFG.waInvite;
+      if(invite){ fab.href = invite; }
+      else{
+        fab.href = 'javascript:void(0)';
+        const modal=document.getElementById('qrModal'); const img=document.getElementById('qrImg');
+        if(thumb){ img.src = thumb; } // 用同一张作为弹窗大图
+        fab.addEventListener('click',()=>{ modal.style.display='flex'; });
+        document.getElementById('qrClose').onclick=()=>{ modal.style.display='none'; };
+        modal.addEventListener('click',(e)=>{ if(e.target===modal) modal.style.display='none'; });
+      }
+    })();
+
+    document.getElementById('y').textContent=new Date().getFullYear();
   </script>
 </body>
 </html>
