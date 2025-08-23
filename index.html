@@ -2,104 +2,134 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title data-i18n="site.title">Eindeepseek · 产品精选</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Eindeepseek</title>
   <style>
-    body {font-family: Arial, sans-serif; margin:0; background:#f7f8fa; color:#222;}
-    header {position:sticky; top:0; background:#fff; border-bottom:1px solid #ddd; padding:12px 20px; display:flex; justify-content:space-between; align-items:center;}
-    .brand {font-weight:800; font-size:20px; display:flex; align-items:center; gap:8px;}
-    .brand img {height:26px;}
-    .lang-switch button {margin-left:6px; padding:4px 8px; border:1px solid #ccc; background:#fff; cursor:pointer; border-radius:6px;}
-    .lang-switch button[aria-pressed="true"] {background:#2b7de9; color:#fff; border-color:#2b7de9;}
-    .container {max-width:1100px; margin:0 auto; padding:20px;}
-    .grid {display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:18px;}
-    .card {background:#fff; border:1px solid #ddd; border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); overflow:hidden; display:flex; flex-direction:column; min-height:340px;}
-    .thumb {display:grid; place-items:center; background:#fff;}
-    .thumb img {max-width:220px; max-height:220px; object-fit:contain; margin:16px;}
-    .body {padding:0 16px 16px; display:flex; flex-direction:column; gap:8px; flex:1;}
-    .title {font-weight:700;}
-    .desc {font-size:14px; color:#555; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
-    .btn {margin-top:auto; align-self:flex-start; background:#2b7de9; color:#fff; padding:8px 12px; border-radius:8px; text-decoration:none; font-weight:600;}
-    footer {border-top:1px solid #ddd; text-align:center; padding:16px; font-size:13px; color:#555;}
+    :root{--bg:#0b0c10;--card:#121318;--muted:#7b8190;--text:#e9ecf1;--primary:#6ea8fe;--ring:rgba(110,168,254,.35)}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; background:radial-gradient(80vw 80vh at 20% -20%,#141726,#0b0c10); color:var(--text)}
+    header{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:14px 18px;backdrop-filter:saturate(140%) blur(6px);background:linear-gradient(to bottom,rgba(10,10,15,.8),rgba(10,10,15,.2) 60%,transparent);border-bottom:1px solid rgba(255,255,255,.06)}
+    .brand a{color:var(--text);text-decoration:none;font-weight:800;letter-spacing:.3px}
+    .lang{display:inline-flex;gap:6px;align-items:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:6px}
+    .lang button{appearance:none;border:none;cursor:pointer;padding:6px 10px;border-radius:999px;color:var(--muted);background:transparent;font-weight:600}
+    .lang button.active{color:var(--text);background:rgba(255,255,255,.06);box-shadow:0 0 0 6px var(--ring) inset}
+    .wrap{max-width:1200px;margin:0 auto;padding:22px 18px 56px}
+    h1{font-size:28px;margin:8px 0 10px}
+    p.lead{color:var(--muted);margin-top:0}
+    .grid{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:18px}
+    @media(min-width:640px){.grid{grid-template-columns:repeat(2,1fr)}}
+    @media(min-width:960px){.grid{grid-template-columns:repeat(3,1fr)}}
+    .card{position:relative;overflow:hidden;border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08);box-shadow:0 8px 30px rgba(0,0,0,.35);transform:translateY(10px);opacity:0;animation:rise .7s ease forwards}
+    .card:nth-child(1){animation-delay:.05s}.card:nth-child(2){animation-delay:.1s}.card:nth-child(3){animation-delay:.15s}.card:nth-child(4){animation-delay:.2s}.card:nth-child(5){animation-delay:.25s}.card:nth-child(6){animation-delay:.3s}
+    @keyframes rise{to{transform:none;opacity:1}}
+    .thumb{aspect-ratio:4/3;width:100%;display:block;object-fit:cover;filter:saturate(105%)}
+    .body{padding:14px 14px 16px}
+    .title{font-weight:800;margin:2px 0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .desc{color:var(--muted);margin:0;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .badge{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.55);color:#fff;padding:4px 8px;border-radius:999px;font-size:12px}
+    .card a{position:absolute;inset:0;z-index:0}
+    footer{border-top:1px solid rgba(255,255,255,.08);text-align:center;padding:16px;color:var(--muted)}
   </style>
 </head>
 <body>
   <header>
-    <div class="brand"><img src="assets/img/logo.png" alt="logo" onerror="this.style.display='none'"><span data-i18n="brand">Eindeepseek</span></div>
-    <div class="lang-switch">
-      <button data-lang="zh" aria-pressed="true">ZH</button>
-      <button data-lang="en" aria-pressed="false">EN</button>
-      <button data-lang="de" aria-pressed="false">DE</button>
+    <div class="brand"><a href="./">Eindeepseek</a></div>
+    <div class="lang" id="langSwitcher">
+      <button data-lang="zh">ZH</button>
+      <button data-lang="en">EN</button>
+      <button data-lang="de">DE</button>
     </div>
   </header>
 
-  <main class="container">
-    <h1 data-i18n="hero.title">产品精选</h1>
-    <p data-i18n="hero.sub">面向消费者的产品展示，支持三语言切换。</p>
-
-    <section class="grid">
-      <!-- 6 product cards -->
-      <!-- Product 1 -->
-      <article class="card">
-        <div class="thumb"><img src="assets/img/1.png" alt="Product 1" onerror="this.closest('article').style.display='none'"></div>
-        <div class="body">
-          <div class="title" data-i18n="p1.title">产品 1</div>
-          <div class="desc" data-i18n="p1.desc">这是产品 1 的简短描述。</div>
-          <a class="btn" href="products/product-1.html" data-i18n="view">查看详情</a>
-        </div>
-      </article>
-      <!-- Product 2 -->
-      <article class="card">
-        <div class="thumb"><img src="assets/img/2.png" alt="Product 2" onerror="this.closest('article').style.display='none'"></div>
-        <div class="body">
-          <div class="title" data-i18n="p2.title">产品 2</div>
-          <div class="desc" data-i18n="p2.desc">这是产品 2 的简短描述。</div>
-          <a class="btn" href="products/product-2.html" data-i18n="view">查看详情</a>
-        </div>
-      </article>
-      <!-- Product 3 -->
-      <article class="card">
-        <div class="thumb"><img src="assets/img/3.png" alt="Product 3" onerror="this.closest('article').style.display='none'"></div>
-        <div class="body">
-          <div class="title" data-i18n="p3.title">产品 3</div>
-          <div class="desc" data-i18n="p3.desc">这是产品 3 的简短描述。</div>
-          <a class="btn" href="products/product-3.html" data-i18n="view">查看详情</a>
-        </div>
-      </article>
-      <!-- Product 4 -->
-      <article class="card">
-        <div class="thumb"><img src="assets/img/4.png" alt="Product 4" onerror="this.closest('article').style.display='none'"></div>
-        <div class="body">
-          <div class="title" data-i18n="p4.title">产品 4</div>
-          <div class="desc" data-i18n="p4.desc">这是产品 4 的简短描述。</div>
-          <a class="btn" href="products/product-4.html" data-i18n="view">查看详情</a>
-        </div>
-      </article>
-      <!-- Product 5 -->
-      <article class="card">
-        <div class="thumb"><img src="assets/img/5.png" alt="Product 5" onerror="this.closest('article').style.display='none'"></div>
-        <div class="body">
-          <div class="title" data-i18n="p5.title">产品 5</div>
-          <div class="desc" data-i18n="p5.desc">这是产品 5 的简短描述。</div>
-          <a class="btn" href="products/product-5.html" data-i18n="view">查看详情</a>
-        </div>
-      </article>
-      <!-- Product 6 -->
-      <article class="card">
-        <div class="thumb"><img src="assets/img/6.png" alt="Product 6" onerror="this.closest('article').style.display='none'"></div>
-        <div class="body">
-          <div class="title" data-i18n="p6.title">产品 6</div>
-          <div class="desc" data-i18n="p6.desc">这是产品 6 的简短描述。</div>
-          <a class="btn" href="products/product-6.html" data-i18n="view">查看详情</a>
-        </div>
-      </article>
-    </section>
-  </main>
+  <div class="wrap">
+    <h1 id="heading">产品展示</h1>
+    <p class="lead" id="sub">选择语言后会在全站生效；仅显示有内容的产品。</p>
+    <div class="grid" id="grid"></div>
+  </div>
 
   <footer>© <span id="y"></span> Eindeepseek</footer>
 
-<script>
-document.getElementById('y').textContent=new Date().getFullYear();
-</script>
+  <script>
+    const LANGS={zh:'ZH',en:'EN',de:'DE'};
+    const I18N={
+      zh:{title:'产品展示',sub:'选择语言后会在全站生效；仅显示有内容的产品。'},
+      en:{title:'Products',sub:'Language selection applies site-wide. Only products with content are shown.'},
+      de:{title:'Produkte',sub:'Die Sprachauswahl gilt für die ganze Seite. Es werden nur Produkte mit Inhalt angezeigt.'}
+    };
+    const qs=new URLSearchParams(location.search);
+    const currentLang=(qs.get('lang')||localStorage.getItem('lang')||'zh').toLowerCase();
+    localStorage.setItem('lang',currentLang);
+
+    const langEl=document.getElementById('langSwitcher');
+    [...langEl.querySelectorAll('button')].forEach(b=>{
+      if(b.dataset.lang===currentLang) b.classList.add('active');
+      b.onclick=()=>{
+        const lang=b.dataset.lang;
+        localStorage.setItem('lang',lang);
+        const url=new URL(location.href);
+        url.searchParams.set('lang',lang);
+        location.href=url.toString();
+      };
+    });
+
+    (()=>{const t=I18N[currentLang]||I18N.zh;heading.textContent=t.title;sub.textContent=t.sub;})();
+
+    async function headOK(url){ try{ const r=await fetch(url,{method:'HEAD',cache:'no-store'}); return r.ok; } catch { return false; } }
+    async function firstImage(baseDir){
+      const exts=['jpg','jpeg','png','webp'];
+      for(const ext of exts){ const u=`${baseDir}/1.${ext}`; if(await headOK(u)) return u; }
+      return '';
+    }
+    async function readPreview(slug){
+      const order=[currentLang,'en','zh','de'];
+      for(const lg of order){
+        const url=`products/${slug}-${lg}.txt`;
+        try{
+          const r=await fetch(url,{cache:'no-store'});
+          if(r.ok){
+            const t=(await r.text()).trim();
+            const [first,...rest]=t.split(/\r?\n/);
+            return {title:first?.trim()||null, desc:rest.join('\n').trim()||null, lang:lg};
+          }
+        }catch{}
+      }
+      return null;
+    }
+
+    async function buildGrid(){
+      const grid=document.getElementById('grid');
+      for(let i=1;i<=6;i++){
+        const slug=`product-${i}`;
+        const imgBase=`assets/imgs/${slug}`;
+        const img=await firstImage(imgBase);
+        const preview=await readPreview(slug);
+        if(!img && !preview) continue;
+
+        const title=preview?.title || `Product ${i}`;
+        const desc=preview?.desc || '';
+        const card=document.createElement('div');
+        card.className='card';
+        const a=document.createElement('a');
+        const href=new URL(`products/${slug}.html`, location.origin + location.pathname);
+        href.searchParams.set('lang', currentLang);
+        a.href=href.toString();
+
+        card.innerHTML = `
+          ${img ? `<img class="thumb" src="${img}" alt="${title}">`
+                : `<div class="thumb" style="aspect-ratio:4/3;background:linear-gradient(120deg,#1b1d27,#0f1116)"></div>`}
+          <div class="body">
+            <div class="title">${title}</div>
+            <p class="desc">${desc || ''}</p>
+          </div>
+          <span class="badge">${LANGS[currentLang]}</span>
+        `;
+        card.appendChild(a);
+        grid.appendChild(card);
+      }
+    }
+
+    buildGrid();
+    document.getElementById('y').textContent=new Date().getFullYear();
+  </script>
 </body>
 </html>
