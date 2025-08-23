@@ -3,44 +3,42 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title data-i18n="site.title">Eindeepseek 供应链 · 产品展示</title>
-  <meta name="description" content="Eindeepseek 供应链/独立站卖家：精选产品展示与合作对接。">
+  <title data-i18n="site.title">Eindeepseek · 产品精选</title>
+  <meta name="description" content="Eindeepseek 独立站卖家：B2C 产品精选，支持中/英/德三语切换。">
   <style>
-    :root{
-      --bg:#f7f8fa; --card:#ffffff; --text:#222; --muted:#666;
-      --border:#e8eaef; --brand:#2b7de9;
-    }
+    :root{ --bg:#f6f7fb; --card:#fff; --text:#222; --muted:#666; --border:#e8eaf0; --brand:#2b7de9; --brand2:#4cd3ff; }
     *{box-sizing:border-box}
     html{scroll-behavior:smooth}
     body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,PingFang SC,Microsoft Yahei,sans-serif}
     a{color:var(--brand);text-decoration:none}
-    header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.8);backdrop-filter:saturate(160%) blur(8px);border-bottom:1px solid var(--border)}
-    .container{max-width:1024px;margin:0 auto;padding:0 16px}
+    header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.85);backdrop-filter:saturate(160%) blur(8px);border-bottom:1px solid var(--border)}
+    .container{max-width:1120px;margin:0 auto;padding:0 16px}
     .nav{display:flex;align-items:center;justify-content:center;min-height:72px;position:relative}
-    .brand{font-weight:800;font-size:24px}
-    .sub{margin:6px 0 18px;color:var(--muted)}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:22px}
+    .brand img{height:28px}
     .lang-switch{position:absolute;right:10px;top:50%;transform:translateY(-50%);display:flex;gap:8px}
-    .lang-switch button{
-      background:transparent;border:1px solid var(--border);padding:6px 10px;border-radius:8px;cursor:pointer;
-      font-weight:700;color:#333
-    }
+    .lang-switch button{background:transparent;border:1px solid var(--border);padding:6px 10px;border-radius:8px;cursor:pointer;font-weight:700;color:#333}
     .lang-switch button[aria-pressed="true"]{background:var(--brand);color:#fff;border-color:var(--brand)}
-    main{padding:28px 0}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:0 2px 8px rgba(20,30,60,.06);padding:20px;margin:16px auto;max-width:760px}
-    .muted{color:var(--muted)}
-    .product{display:grid;justify-items:center;text-align:center;gap:14px}
-    .product img{max-width:300px;height:auto;border-radius:12px;border:1px solid var(--border)}
-    .grid{display:grid;grid-template-columns:1fr;gap:16px}
-    .qr{display:grid;justify-items:center;text-align:center;gap:10px}
-    .qr img{max-width:220px;height:auto;border-radius:12px;border:1px solid var(--border);background:#fff}
+    .hero{padding:32px 0}
+    .hero .wrap{background:linear-gradient(135deg,#ffffff, #f0f5ff); border:1px solid var(--border); border-radius:16px; padding:24px 18px; text-align:center}
+    .hero h1{margin:0 0 8px}
+    .sub{margin:0;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin:22px 0 10px}
+    .card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:0 2px 8px rgba(20,30,60,.06);overflow:hidden;min-height:380px}
+    .thumb{display:grid;place-items:center;background:#fff}
+    .thumb img{max-width:240px;max-height:240px;object-fit:contain;border-radius:12px;margin:16px}
+    .body{padding:0 16px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+    .title{font-weight:700}
+    .desc{color:var(--muted);font-size:14px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .btn{margin-top:auto;align-self:flex-start;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;border:none;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}
+    .cta{margin:8px 0 0 0;font-size:13px;color:var(--muted)}
     footer{border-top:1px solid var(--border);padding:20px 0;margin-top:16px;color:var(--muted);font-size:13px;text-align:center}
-    @media (min-width:860px){.grid{grid-template-columns:1fr 1fr}}
   </style>
 </head>
 <body>
   <header>
     <div class="container nav">
-      <div class="brand" data-i18n="brand">Eindeepseek</div>
+      <div class="brand"><img src="assets/img/logo.png" alt="logo" onerror="this.style.display='none'"><span data-i18n="brand">Eindeepseek</span></div>
       <div class="lang-switch" aria-label="Language">
         <button data-lang="zh" aria-pressed="true">ZH</button>
         <button data-lang="en" aria-pressed="false">EN</button>
@@ -50,34 +48,51 @@
   </header>
 
   <main class="container">
-    <div class="card" style="text-align:center">
-      <h1 style="margin:4px 0" data-i18n="hero.title">产品展示 · 独立卖家</h1>
-      <p class="sub" data-i18n="hero.sub">精选产品展示与合作对接，不涉及货运/货代业务。</p>
-    </div>
+    <section class="hero">
+      <div class="wrap">
+        <h1 data-i18n="hero.title">产品精选 · 面向消费者</h1>
+        <p class="sub" data-i18n="hero.sub">清晰图片 · 关键卖点 · 详情页了解更多。支持中/英/德切换。</p>
+      </div>
+    </section>
 
-    <section class="grid" id="products">
-      <article class="card product">
-        <img src="assets/img/1.png" alt="Product 1">
-        <h2 data-i18n="p1.title">智能便携设备</h2>
-        <p class="muted" data-i18n="p1.desc">现代设计，易于使用，轻巧便携，适合多场景。</p>
+    <section id="products" class="grid">
+      <!-- Product 1 -->
+      <article class="card">
+        <div class="thumb">
+          <img src="assets/img/1.png" alt="Product 1">
+        </div>
+        <div class="body">
+          <div class="title" data-i18n="p1.title">智能便携设备</div>
+          <div class="desc" data-i18n="p1.desc">现代设计，轻巧便携，核心功能一键直达，适合多场景使用。</div>
+          <a class="btn" href="product-1.html" data-i18n="view">查看详情</a>
+          <div class="cta" data-i18n="cta">继续向下添加更多产品卡片即可扩展列表。</div>
+        </div>
       </article>
 
-      <!-- 示例：复制此块添加更多产品，修改图片路径/文案即可 -->
-      <article class="card product">
-        <img src="assets/img/2.png" alt="Product 2" onerror="this.style.display='none'">
-        <h2 data-i18n="p2.title">新品占位（可删除）</h2>
-        <p class="muted" data-i18n="p2.desc">把图片命名为 2.png 上传到 assets/img/ 即可显示。</p>
+      <!-- Product 2 placeholder (shows only if image 2 exists) -->
+      <article class="card">
+        <div class="thumb">
+          <img src="assets/img/2.png" alt="Product 2" onerror="this.closest('article').style.display='none'">
+        </div>
+        <div class="body">
+          <div class="title" data-i18n="p2.title">新品占位</div>
+          <div class="desc" data-i18n="p2.desc">将图片命名为 2.png 上传到 assets/img/，并创建 product-2.html 作为详情页。</div>
+          <a class="btn" href="product-2.html" data-i18n="view">查看详情</a>
+          <div class="cta" data-i18n="cta">你可以复制该区块，快速添加更多产品。</div>
+        </div>
       </article>
     </section>
 
-    <section class="card qr" id="contact">
-      <h2 data-i18n="wa.title">加入我们的 WhatsApp 群</h2>
-      <img src="assets/img/group.jpeg" alt="WhatsApp QR">
-      <p class="muted" data-i18n="wa.tip">扫描二维码加入交流群，或直接通过邮箱/WhatsApp 联系我们。</p>
-      <p class="muted">
-        <span data-i18n="contact.email">邮箱</span>：<a href="mailto:wengandy128@gmail.com">wengandy128@gmail.com</a> &nbsp;·&nbsp;
-        <span data-i18n="contact.wa">WhatsApp</span>：<a target="_blank" href="https://wa.me/8615888791812">+86 158 8879 1812</a>
-      </p>
+    <section class="hero" id="contact">
+      <div class="wrap" style="text-align:center">
+        <h2 data-i18n="wa.title">加入我们的 WhatsApp 群</h2>
+        <img src="assets/img/group.jpeg" alt="WhatsApp QR" style="max-width:200px;border:1px solid var(--border);border-radius:12px;background:#fff" onerror="this.style.display='none'">
+        <p class="sub" data-i18n="wa.tip">扫描二维码加入交流群，或通过邮箱/WhatsApp 联系我们。</p>
+        <p class="sub">
+          <span data-i18n="contact.email">邮箱</span>：<a href="mailto:wengandy128@gmail.com">wengandy128@gmail.com</a> &nbsp;·&nbsp;
+          <span data-i18n="contact.wa">WhatsApp</span>：<a target="_blank" href="https://wa.me/8615888791812">+86 158 8879 1812</a>
+        </p>
+      </div>
     </section>
   </main>
 
@@ -86,35 +101,37 @@
   </footer>
 
 <script>
-// ===== Year
 document.getElementById('y').textContent = new Date().getFullYear();
 
-// ===== I18N
 const I18N = {
   zh: {
-    "site.title":"Eindeepseek 供应链 · 产品展示",
+    "site.title":"Eindeepseek · 产品精选",
     "brand":"Eindeepseek",
-    "hero.title":"产品展示 · 独立卖家",
-    "hero.sub":"精选产品展示与合作对接，不涉及货运/货代业务。",
+    "hero.title":"产品精选 · 面向消费者",
+    "hero.sub":"清晰图片 · 关键卖点 · 详情页了解更多。支持中/英/德切换。",
     "p1.title":"智能便携设备",
-    "p1.desc":"现代设计，易于使用，轻巧便携，适合多场景。",
-    "p2.title":"新品占位（可删除）",
-    "p2.desc":"把图片命名为 2.png 上传到 assets/img/ 即可显示。",
+    "p1.desc":"现代设计，轻巧便携，核心功能一键直达，适合多场景使用。",
+    "p2.title":"新品占位",
+    "p2.desc":"将图片命名为 2.png 上传到 assets/img/，并创建 product-2.html 作为详情页。",
+    "view":"查看详情",
+    "cta":"继续向下添加更多产品卡片即可扩展列表。",
     "wa.title":"加入我们的 WhatsApp 群",
-    "wa.tip":"扫描二维码加入交流群，或直接通过邮箱/WhatsApp 联系我们。",
+    "wa.tip":"扫描二维码加入交流群，或通过邮箱/WhatsApp 联系我们。",
     "contact.email":"邮箱",
     "contact.wa":"WhatsApp",
     "rights":"保留所有权利"
   },
   en: {
-    "site.title":"Eindeepseek Supply Chain · Product Showcase",
+    "site.title":"Eindeepseek · Featured Products",
     "brand":"Eindeepseek",
-    "hero.title":"Product Showcase · Independent Seller",
-    "hero.sub":"Curated products and partnerships. No freight-forwarding services.",
+    "hero.title":"Featured Products · B2C",
+    "hero.sub":"Clear visuals, key highlights, and details on dedicated pages. Multilingual support.",
     "p1.title":"Smart Portable Device",
-    "p1.desc":"Modern design, easy to use and lightweight for various scenarios.",
-    "p2.title":"Placeholder (removable)",
-    "p2.desc":"Upload 2.png to assets/img/ to show this product.",
+    "p1.desc":"Modern design, lightweight, and one‑tap access to core features for everyday use.",
+    "p2.title":"New Arrival Placeholder",
+    "p2.desc":"Upload 2.png to assets/img/ and create product-2.html as its detail page.",
+    "view":"View More",
+    "cta":"Duplicate cards below to add more products.",
     "wa.title":"Join Our WhatsApp Group",
     "wa.tip":"Scan the QR to join, or contact us via email/WhatsApp.",
     "contact.email":"Email",
@@ -122,16 +139,18 @@ const I18N = {
     "rights":"All Rights Reserved"
   },
   de: {
-    "site.title":"Eindeepseek Lieferkette · Produktausstellung",
+    "site.title":"Eindeepseek · Ausgewählte Produkte",
     "brand":"Eindeepseek",
-    "hero.title":"Produktschau · Unabhängiger Verkäufer",
-    "hero.sub":"Kuratiere Produkte und Partnerschaften. Keine Speditionsdienste.",
+    "hero.title":"Ausgewählte Produkte · B2C",
+    "hero.sub":"Klare Bilder, wichtigste Vorteile und Details auf eigenen Seiten. Mehrsprachig.",
     "p1.title":"Intelligentes tragbares Gerät",
-    "p1.desc":"Modernes Design, einfach zu bedienen und leicht für viele Szenarien.",
-    "p2.title":"Platzhalter (entfernbar)",
-    "p2.desc":"Laden Sie 2.png nach assets/img/ hoch, um dieses Produkt zu zeigen.",
+    "p1.desc":"Modernes Design, leicht und mit One‑Tap Zugriff auf Kernfunktionen für den Alltag.",
+    "p2.title":"Platzhalter für Neuheit",
+    "p2.desc":"Laden Sie 2.png nach assets/img/ hoch und erstellen Sie product-2.html als Detailseite.",
+    "view":"Mehr Details",
+    "cta":"Duplizieren Sie Karten, um weitere Produkte hinzuzufügen.",
     "wa.title":"Unserer WhatsApp‑Gruppe beitreten",
-    "wa.tip":"Scannen Sie den QR-Code oder kontaktieren Sie uns per E‑Mail/WhatsApp.",
+    "wa.tip":"QR-Code scannen oder per E‑Mail/WhatsApp kontaktieren.",
     "contact.email":"E‑Mail",
     "contact.wa":"WhatsApp",
     "rights":"Alle Rechte vorbehalten"
@@ -139,12 +158,12 @@ const I18N = {
 };
 
 function applyLang(lang){
-  const dict = I18N[lang] || I18N.zh;
+  const d = I18N[lang] || I18N.zh;
+  document.title = d['site.title'] || document.title;
   document.documentElement.lang = (lang==='zh'?'zh-CN':lang);
-  document.title = dict['site.title'] || document.title;
   document.querySelectorAll('[data-i18n]').forEach(el=>{
     const key = el.getAttribute('data-i18n');
-    if(dict[key]!==undefined){ el.textContent = dict[key]; }
+    if(d[key]!==undefined) el.textContent = d[key];
   });
   document.querySelectorAll('.lang-switch [data-lang]').forEach(b=>{
     b.setAttribute('aria-pressed', b.getAttribute('data-lang')===lang ? 'true' : 'false');
