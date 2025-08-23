@@ -1,101 +1,163 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eindeepseek Supply Chain</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-i18n="site.title">Eindeepseek 供应链 · 产品展示</title>
+  <meta name="description" content="Eindeepseek 供应链/独立站卖家：精选产品展示与合作对接。">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f9f9f9;
-      color: #333;
-      text-align: center;
+    :root{
+      --bg:#f7f8fa; --card:#ffffff; --text:#222; --muted:#666;
+      --border:#e8eaef; --brand:#2b7de9;
     }
-    header {
-      background: #ffffff;
-      padding: 20px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,PingFang SC,Microsoft Yahei,sans-serif}
+    a{color:var(--brand);text-decoration:none}
+    header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.8);backdrop-filter:saturate(160%) blur(8px);border-bottom:1px solid var(--border)}
+    .container{max-width:1024px;margin:0 auto;padding:0 16px}
+    .nav{display:flex;align-items:center;justify-content:center;min-height:72px;position:relative}
+    .brand{font-weight:800;font-size:24px}
+    .sub{margin:6px 0 18px;color:var(--muted)}
+    .lang-switch{position:absolute;right:10px;top:50%;transform:translateY(-50%);display:flex;gap:8px}
+    .lang-switch button{
+      background:transparent;border:1px solid var(--border);padding:6px 10px;border-radius:8px;cursor:pointer;
+      font-weight:700;color:#333
     }
-    header h1 {
-      margin: 0;
-      font-size: 28px;
-      color: #222;
-    }
-    .container {
-      width: 90%;
-      max-width: 1000px;
-      margin: 30px auto;
-    }
-    .product {
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      margin-bottom: 30px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    .product img {
-      max-width: 300px;
-      height: auto;
-      border-radius: 10px;
-    }
-    .product h2 {
-      margin-top: 15px;
-      font-size: 22px;
-      color: #444;
-    }
-    .whatsapp {
-      margin: 40px auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      display: inline-block;
-    }
-    .whatsapp img {
-      max-width: 250px;
-    }
-    footer {
-      background: #f1f1f1;
-      padding: 15px;
-      font-size: 14px;
-      margin-top: 30px;
-    }
+    .lang-switch button[aria-pressed="true"]{background:var(--brand);color:#fff;border-color:var(--brand)}
+    main{padding:28px 0}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:0 2px 8px rgba(20,30,60,.06);padding:20px;margin:16px auto;max-width:760px}
+    .muted{color:var(--muted)}
+    .product{display:grid;justify-items:center;text-align:center;gap:14px}
+    .product img{max-width:300px;height:auto;border-radius:12px;border:1px solid var(--border)}
+    .grid{display:grid;grid-template-columns:1fr;gap:16px}
+    .qr{display:grid;justify-items:center;text-align:center;gap:10px}
+    .qr img{max-width:220px;height:auto;border-radius:12px;border:1px solid var(--border);background:#fff}
+    footer{border-top:1px solid var(--border);padding:20px 0;margin-top:16px;color:var(--muted);font-size:13px;text-align:center}
+    @media (min-width:860px){.grid{grid-template-columns:1fr 1fr}}
   </style>
 </head>
 <body>
   <header>
-    <h1>Eindeepseek Supply Chain</h1>
-    <p>Independent Online Store · Quality Products Worldwide</p>
+    <div class="container nav">
+      <div class="brand" data-i18n="brand">Eindeepseek</div>
+      <div class="lang-switch" aria-label="Language">
+        <button data-lang="zh" aria-pressed="true">ZH</button>
+        <button data-lang="en" aria-pressed="false">EN</button>
+        <button data-lang="de" aria-pressed="false">DE</button>
+      </div>
+    </div>
   </header>
 
-  <div class="container">
-    <!-- 产品展示1 -->
-    <div class="product">
-      <img src="assets/img/1.png" alt="Product Sample">
-      <h2>Smart Portable Device</h2>
-      <p>Modern design, easy to use, and built for convenience.</p>
+  <main class="container">
+    <div class="card" style="text-align:center">
+      <h1 style="margin:4px 0" data-i18n="hero.title">产品展示 · 独立卖家</h1>
+      <p class="sub" data-i18n="hero.sub">精选产品展示与合作对接，不涉及货运/货代业务。</p>
     </div>
 
-    <!-- 产品展示2 -->
-    <div class="product">
-      <img src="assets/img/dbd61346-da25-486f-8f00-12fa18a92d2f.png" alt="Product Sample">
-      <h2>New Arrival</h2>
-      <p>Latest product in our collection, combining innovation and style.</p>
-    </div>
+    <section class="grid" id="products">
+      <article class="card product">
+        <img src="assets/img/1.png" alt="Product 1">
+        <h2 data-i18n="p1.title">智能便携设备</h2>
+        <p class="muted" data-i18n="p1.desc">现代设计，易于使用，轻巧便携，适合多场景。</p>
+      </article>
 
-    <!-- WhatsApp 群二维码 -->
-    <div class="whatsapp">
-      <h2>Join Our WhatsApp Group</h2>
-      <img src="assets/img/group.jpeg" alt="WhatsApp QR Code">
-      <p>Scan the QR code to join our Trade & Community group.</p>
-    </div>
-  </div>
+      <!-- 示例：复制此块添加更多产品，修改图片路径/文案即可 -->
+      <article class="card product">
+        <img src="assets/img/2.png" alt="Product 2" onerror="this.style.display='none'">
+        <h2 data-i18n="p2.title">新品占位（可删除）</h2>
+        <p class="muted" data-i18n="p2.desc">把图片命名为 2.png 上传到 assets/img/ 即可显示。</p>
+      </article>
+    </section>
+
+    <section class="card qr" id="contact">
+      <h2 data-i18n="wa.title">加入我们的 WhatsApp 群</h2>
+      <img src="assets/img/group.jpeg" alt="WhatsApp QR">
+      <p class="muted" data-i18n="wa.tip">扫描二维码加入交流群，或直接通过邮箱/WhatsApp 联系我们。</p>
+      <p class="muted">
+        <span data-i18n="contact.email">邮箱</span>：<a href="mailto:wengandy128@gmail.com">wengandy128@gmail.com</a> &nbsp;·&nbsp;
+        <span data-i18n="contact.wa">WhatsApp</span>：<a target="_blank" href="https://wa.me/8615888791812">+86 158 8879 1812</a>
+      </p>
+    </section>
+  </main>
 
   <footer>
-    <p>© 2025 Eindeepseek Supply Chain. All Rights Reserved.</p>
+    <div>© <span id="y"></span> <span data-i18n="brand">Eindeepseek</span>. <span data-i18n="rights">保留所有权利</span>.</div>
   </footer>
+
+<script>
+// ===== Year
+document.getElementById('y').textContent = new Date().getFullYear();
+
+// ===== I18N
+const I18N = {
+  zh: {
+    "site.title":"Eindeepseek 供应链 · 产品展示",
+    "brand":"Eindeepseek",
+    "hero.title":"产品展示 · 独立卖家",
+    "hero.sub":"精选产品展示与合作对接，不涉及货运/货代业务。",
+    "p1.title":"智能便携设备",
+    "p1.desc":"现代设计，易于使用，轻巧便携，适合多场景。",
+    "p2.title":"新品占位（可删除）",
+    "p2.desc":"把图片命名为 2.png 上传到 assets/img/ 即可显示。",
+    "wa.title":"加入我们的 WhatsApp 群",
+    "wa.tip":"扫描二维码加入交流群，或直接通过邮箱/WhatsApp 联系我们。",
+    "contact.email":"邮箱",
+    "contact.wa":"WhatsApp",
+    "rights":"保留所有权利"
+  },
+  en: {
+    "site.title":"Eindeepseek Supply Chain · Product Showcase",
+    "brand":"Eindeepseek",
+    "hero.title":"Product Showcase · Independent Seller",
+    "hero.sub":"Curated products and partnerships. No freight-forwarding services.",
+    "p1.title":"Smart Portable Device",
+    "p1.desc":"Modern design, easy to use and lightweight for various scenarios.",
+    "p2.title":"Placeholder (removable)",
+    "p2.desc":"Upload 2.png to assets/img/ to show this product.",
+    "wa.title":"Join Our WhatsApp Group",
+    "wa.tip":"Scan the QR to join, or contact us via email/WhatsApp.",
+    "contact.email":"Email",
+    "contact.wa":"WhatsApp",
+    "rights":"All Rights Reserved"
+  },
+  de: {
+    "site.title":"Eindeepseek Lieferkette · Produktausstellung",
+    "brand":"Eindeepseek",
+    "hero.title":"Produktschau · Unabhängiger Verkäufer",
+    "hero.sub":"Kuratiere Produkte und Partnerschaften. Keine Speditionsdienste.",
+    "p1.title":"Intelligentes tragbares Gerät",
+    "p1.desc":"Modernes Design, einfach zu bedienen und leicht für viele Szenarien.",
+    "p2.title":"Platzhalter (entfernbar)",
+    "p2.desc":"Laden Sie 2.png nach assets/img/ hoch, um dieses Produkt zu zeigen.",
+    "wa.title":"Unserer WhatsApp‑Gruppe beitreten",
+    "wa.tip":"Scannen Sie den QR-Code oder kontaktieren Sie uns per E‑Mail/WhatsApp.",
+    "contact.email":"E‑Mail",
+    "contact.wa":"WhatsApp",
+    "rights":"Alle Rechte vorbehalten"
+  }
+};
+
+function applyLang(lang){
+  const dict = I18N[lang] || I18N.zh;
+  document.documentElement.lang = (lang==='zh'?'zh-CN':lang);
+  document.title = dict['site.title'] || document.title;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.getAttribute('data-i18n');
+    if(dict[key]!==undefined){ el.textContent = dict[key]; }
+  });
+  document.querySelectorAll('.lang-switch [data-lang]').forEach(b=>{
+    b.setAttribute('aria-pressed', b.getAttribute('data-lang')===lang ? 'true' : 'false');
+  });
+  localStorage.setItem('lang', lang);
+}
+
+document.querySelector('.lang-switch').addEventListener('click', (e)=>{
+  const btn = e.target.closest('[data-lang]'); if(!btn) return;
+  applyLang(btn.getAttribute('data-lang'));
+});
+
+applyLang(localStorage.getItem('lang')||'zh');
+</script>
 </body>
 </html>
