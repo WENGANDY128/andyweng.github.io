@@ -57,7 +57,7 @@
 </head>
 <body>
   <header>
-    <div class="brand"><a id="homeLink" href="index.html">Eindeepseek</a></div>
+    <div class="brand"><a id="homeLink" href="/index.html">Eindeepseek</a></div>
     <div class="lang" id="langSwitcher">
       <button data-lang="zh">ZH</button>
       <button data-lang="en">EN</button>
@@ -112,7 +112,7 @@
     async function resolveExtViaManifest(){const mf=await jsonFast('manifest.json').catch(()=>null); if(mf?.items){const it=mf.items.find(x=>x.id==PRODUCT_ID); if(it?.imgExt) return it.imgExt;} return '';}
 
     async function loadImages(){
-      const base=`assets/imgs/product-${PRODUCT_ID}`;
+      const base=`/assets/imgs/product-${PRODUCT_ID}`;
       let ext = await resolveExtViaManifest();
       if(!ext){ ext = (await firstOk([`${base}/1.jpg`,`${base}/1.jpeg`,`${base}/1.png`,`${base}/1.webp`])).split('.').pop() || ''; }
       if(!ext) return [];
@@ -133,7 +133,7 @@
     async function loadParams(productId, lang){
       const order=[lang,'en','zh','de'];
       for(const lg of order){
-        const url=`assets/txt/product-${productId}/assets/txt/product-${productId}/product-${productId}-params-${lg}.txt`;
+        const url=`assets/txt/product-${productId}//assets/txt/product-${productId}/product-${productId}-params-${lg}.txt`;
         try{
           const r=await fetchWithTimeout(url,1000);
           if(r.ok){
@@ -160,7 +160,7 @@
     async function loadDetails(productId, lang){
       const order=[lang,'en','zh','de'];
       for(const lg of order){
-        const url=`assets/txt/product-${productId}/assets/txt/product-${productId}/product-${productId}-details-${lg}.txt`;
+        const url=`assets/txt/product-${productId}//assets/txt/product-${productId}/product-${productId}-details-${lg}.txt`;
         try{
           const r=await fetchWithTimeout(url,1200);
           if(r.ok){
