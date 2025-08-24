@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -14,24 +15,14 @@
     gtag('config', 'G-SP9BZHN30E');
   </script>
 
-  <meta name="description" content="Eindeepseek B2C 产品展示，支持中文/英文/德文，多语言切换；自动从图片目录与文本加载内容。" />
-  <meta property="og:title" content="Eindeepseek · 产品精选" />
-  <meta property="og:description" content="多语言产品展示网站：自动读取图片与文案，仅显示有内容的产品。" />
-  <meta property="og:type" content="website" />
-  <meta property="og:image" content="https://www.eindeepseek.com/group.jpeg" />
-  <meta property="og:url" content="https://www.eindeepseek.com/" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Eindeepseek · 产品精选" />
-  <meta name="twitter:description" content="多语言产品展示网站：自动读取图片与文案，仅显示有内容的产品。" />
+  <meta name="description" content="Eindeepseek B2C 产品展示，支持中文/英文/德文，多语言切换；极速首屏。" />
   <link rel="dns-prefetch" href="//www.eindeepseek.com">
   <link rel="preconnect" href="https://www.eindeepseek.com" crossorigin>
 
-  <link rel="preload" as="image" href="group.jpeg" />
-
   <style>
     :root{
-      --bg:#f7f8fa; --text:#222; --muted:#555; --primary:#2b7de9;
-      --card:#fff; --border:#ddd; --ring:rgba(43,125,233,.18);
+      --bg:#f7f8fa; --text:#1c1d1f; --muted:#5b606a; --primary:#2b7de9;
+      --card:#fff; --border:#e5e7eb; --ring:rgba(43,125,233,.15);
       --skeleton:#eef1f5; --skeleton-shimmer:#f7f8fb;
     }
     *{box-sizing:border-box}
@@ -45,10 +36,6 @@
     .wrap{max-width:1200px;margin:0 auto;padding:18px 16px 56px}
     h1{font-size:28px;margin:10px 0 8px}
     p.lead{color:var(--muted);margin:0 0 10px}
-
-    .contactbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:6px 0 16px}
-    .contactbar a,.contactbar span{background:#fff;border:1px solid var(--border);padding:8px 10px;border-radius:10px;color:var(--text);text-decoration:none;font-size:14px}
-    .contactbar a:hover{background:#f1f5ff;border-color:#cfe0ff}
 
     .grid{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:24px}
     @media(min-width:640px){.grid{grid-template-columns:repeat(2,1fr)}}
@@ -67,8 +54,6 @@
     .skeleton::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg, transparent, var(--skeleton-shimmer), transparent);animation:shimmer 1.2s infinite}
     @keyframes shimmer{100%{transform:translateX(100%)}}
 
-    .qr-thumb{max-width:180px;max-height:180px;margin:16px auto;display:block;border-radius:10px;border:1px solid var(--border);background:#fff}
-
     footer{border-top:1px solid var(--border);text-align:center;padding:14px;color:var(--muted);margin-top:26px}
   </style>
 </head>
@@ -83,8 +68,6 @@
   </header>
 
   <div class="wrap">
-    <div class="contactbar" id="contactBar"></div>
-
     <h1 id="heading">产品展示</h1>
     <p class="lead" id="sub">选择语言后会在全站生效；仅显示有内容的产品。</p>
 
@@ -99,60 +82,50 @@
 
   <script>
     const I18N={
-      zh:{title:'产品展示',sub:'选择语言后会在全站生效；仅显示有内容的产品。',groupTitle:'加入 WhatsApp 群组',groupDesc:'扫码二维码，进入我们的贸易 & 物流交流群。',email:'邮件',whats:'WhatsApp',phone:'电话',wechat:'微信'},
-      en:{title:'Products',sub:'Language selection applies site-wide. Only products with content are shown.',groupTitle:'Join WhatsApp Group',groupDesc:'Scan the QR code to join our trade & logistics group.',email:'Email',whats:'WhatsApp',phone:'Phone',wechat:'WeChat'},
-      de:{title:'Produkte',sub:'Die Sprachauswahl gilt für die ganze Seite. Es werden nur Produkte mit Inhalt angezeigt.',groupTitle:'WhatsApp‑Gruppe beitreten',groupDesc:'QR-Code scannen, um unserer Handels‑ & Logistik‑Gruppe beizutreten.',email:'E‑Mail',whats:'WhatsApp',phone:'Telefon',wechat:'WeChat'}
+      zh:{title:'产品展示',sub:'选择语言后会在全站生效；仅显示有内容的产品。'},
+      en:{title:'Products',sub:'Language selection applies site-wide. Only products with content are shown.'},
+      de:{title:'Produkte',sub:'Die Sprachauswahl gilt für die ganze Seite. Es werden nur Produkte mit Inhalt angezeigt.'}
     };
+
     const qs=new URLSearchParams(location.search);
     const currentLang=(qs.get('lang')||localStorage.getItem('lang')||'zh').toLowerCase();
     localStorage.setItem('lang',currentLang);
     const t=I18N[currentLang]||I18N.zh;
     document.getElementById('heading').textContent=t.title;
     document.getElementById('sub').textContent=t.sub;
+    document.getElementById('y').textContent=new Date().getFullYear();
 
     [...document.querySelectorAll('#langSwitcher button')].forEach(b=>{
       if(b.dataset.lang===currentLang) b.classList.add('active');
       b.onclick=()=>{const lang=b.dataset.lang;localStorage.setItem('lang',lang);const url=new URL(location.href);url.searchParams.set('lang',lang);location.href=url.toString();};
     });
 
-    const CONTACT={email:'wengandy128@gmail.com',whatsapp:'+86 15888791812',phone:'+86 15888791812',wechat:'15888791812',waInvite:''};
-    document.getElementById('contactBar').innerHTML=`
-      <a href="mailto:${CONTACT.email}">📧 ${t.email}: ${CONTACT.email}</a>
-      <a href="https://wa.me/${CONTACT.whatsapp.replace(/[^0-9]/g,'')}" target="_blank">💬 ${t.whats}</a>
-      <a href="tel:${CONTACT.phone.replace(/\s/g,'')}">📞 ${t.phone}: ${CONTACT.phone}</a>
-      <span>🟩 ${t.wechat}: ${CONTACT.wechat}</span>
-    `;
-
     function fetchWithTimeout(url,ms=1200){const ctl=new AbortController();const id=setTimeout(()=>ctl.abort(),ms);return fetch(url,{cache:'no-store',signal:ctl.signal}).finally(()=>clearTimeout(id));}
-    async function tryJson(url){try{const r=await fetchWithTimeout(url,1500);if(r.ok)return await r.json();}catch{}return null;}
-    async function existsFast(url){try{const r=await fetchWithTimeout(url,1200);return r.ok;}catch{return false;}}
-    async function firstExisting(urls){const wrapped=urls.map(u=>fetchWithTimeout(u,1200).then(r=>r.ok?u:Promise.reject(u)));try{return await Promise.any(wrapped);}catch{return '';}}
-    async function getPreviewFromTxt(slug){const order=[currentLang,'en','zh','de'];for(const lg of order){const u=`products/${slug}-${lg}.txt`;try{const r=await fetchWithTimeout(u,1200);if(r.ok){const tx=(await r.text()).trim();const [first,...rest]=tx.split(/\r?\n/);return{title:first?.trim()||null,desc:rest.join('\n').trim()||null};}}catch{}}return null;}
+    async function jsonFast(url){try{const r=await fetchWithTimeout(url,1500);if(r.ok)return await r.json();}catch{}return null;}
 
-    function trackProductClick(id,title){try{gtag('event','click_product',{product_id:id,product_name:title});}catch(e){}}
-    function trackGroupClick(){try{gtag('event','click_group');}catch(e){}}
-
-    async function build(){
-      const grid=document.getElementById('grid');grid.innerHTML='';
-      (async()=>{const qr=await firstExisting(['group.jpeg','group.jpg','group.png','group.webp']);if(qr){const a=document.createElement('a');a.className='cardlink';a.href=CONTACT.waInvite?CONTACT.waInvite:qr;a.target=CONTACT.waInvite?'_blank':'_self';a.onclick=trackGroupClick;a.innerHTML=`<article class="card"><div class="thumb" style="display:flex;align-items:center;justify-content:center"><img src="${qr}" alt="WhatsApp Group QR" class="qr-thumb" loading="eager" width="180" height="180"></div><div class="body"><div class="title">${t.groupTitle}</div><p class="desc">${t.groupDesc}</p></div></article>`;grid.appendChild(a);}})();
-
-      const mf=await tryJson('products/manifest.json');
-      const ids=mf?.items?.map(x=>x.id)||[1,2,3,4,5,6];
-      const tasks=ids.map(async id=>{const slug=`product-${id}`;let title=null,desc=null,img='';
-        if(mf){const item=mf.items.find(x=>x.id===id);if(item){const ext=item.imgExt||'jpg';img=`assets/imgs/${slug}/1.${ext}`;if(item.title)title=item.title[currentLang]||item.title.en||item.title.zh||null;}}
-        if(!img || !(await existsFast(img))){img=await firstExisting([`assets/imgs/${slug}/1.jpg`,`assets/imgs/${slug}/1.jpeg`,`assets/imgs/${slug}/1.png`,`assets/imgs/${slug}/1.webp`]);}
-        if(!title){const p=await getPreviewFromTxt(slug);if(p){title=p.title||title;desc=p.desc||desc;}}
-        if(!img && !title && !desc) return;
-        if(!title) title=`Product ${id}`; if(!desc) desc='';
-        const href=`products/${slug}.html?lang=${encodeURIComponent(currentLang)}`;
-        const a=document.createElement('a');a.className='cardlink';a.href=href;a.onclick=()=>trackProductClick(id,title);
-        a.innerHTML=`<article class="card">${img?`<img class="thumb" src="${img}" alt="${title}" loading="lazy">`:`<div class="thumb skeleton"></div>`}<div class="body"><div class="title">${title}</div><p class="desc">${desc}</p></div><span class="badge">${currentLang.toUpperCase()}</span></article>`;
+    (async function build(){
+      const mf=await jsonFast('products/manifest.json'); // <-- manifest moved under /products
+      const lang=currentLang;
+      const grid=document.getElementById('grid'); grid.innerHTML='';
+      if(!mf?.items) return;
+      mf.items.forEach((it)=>{
+        const slug=`products/${it.id}.html`; // detail page
+        const title=(it.title?.[lang]||it.title?.zh||('Product '+it.id));
+        const hero=`assets/imgs/product-__ID__/1.__EXT__`.replace('__ID__',it.id).replace('__EXT__',it.imgExt||'jpg');
+        const a=document.createElement('a');
+        a.className='cardlink';
+        const url=new URL(slug, location.href);
+        url.searchParams.set('lang',lang);
+        a.href=url.toString();
+        a.onclick=()=>{ try{ sessionStorage.setItem('heroSrc-'+it.id, hero); gtag('event','click_product',{product_id:it.id,product_name:title}); }catch(e){} };
+        a.innerHTML=`
+          <article class="card">
+            <img class="thumb" src="${hero}" alt="${title}" loading="eager" decoding="async" fetchpriority="high">
+            <div class="body"><div class="title">${title}</div><p class="desc">${it.subtitle?.[lang]||''}</p></div>
+          </article>`;
         grid.appendChild(a);
       });
-      await Promise.all(tasks);
-    }
-    build();
-    document.getElementById('y').textContent=new Date().getFullYear();
+    })();
   </script>
 </body>
 </html>
