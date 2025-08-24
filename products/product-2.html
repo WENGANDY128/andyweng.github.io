@@ -14,8 +14,12 @@
     gtag('config', 'G-SP9BZHN30E');
   </script>
 
+  <!-- Perf hints -->
+  <link rel="dns-prefetch" href="//www.eindeepseek.com">
+  <link rel="preconnect" href="https://www.eindeepseek.com" crossorigin>
+
   <style>
-    :root{--bg:#f7f8fa;--text:#222;--muted:#555;--primary:#2b7de9;--border:#ddd;--card:#fff}
+    :root{--bg:#f7f8fa;--text:#222;--muted:#555;--primary:#2b7de9;--border:#ddd;--card:#fff;--skeleton:#eef1f5;--shimmer:#f7f8fb}
     *{box-sizing:border-box}
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
     header{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#fff;border-bottom:1px solid var(--border)}
@@ -28,6 +32,7 @@
     @media(min-width:900px){.layout{grid-template-columns:1.1fr .9fr;align-items:start}}
     .title{font-size:28px;font-weight:800;margin:8px 0}
     .desc{color:var(--muted);line-height:1.6;white-space:pre-wrap;word-wrap:break-word}
+
     .carousel{position:relative;overflow:hidden;border-radius:14px;border:1px solid var(--border);background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.06)}
     .track{display:flex;transition:transform .45s ease;will-change:transform}
     .slide{min-width:100%;user-select:none}
@@ -37,6 +42,10 @@
     .dots{display:flex;justify-content:center;gap:6px;margin-top:10px}
     .dot{width:8px;height:8px;border-radius:50%;background:#cfd3da;border:none}
     .dot.active{background:#2b7de9}
+
+    .skeleton{position:relative;overflow:hidden;background:var(--skeleton)}
+    .skeleton::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,var(--shimmer),transparent);animation:shimmer 1.2s infinite}
+    @keyframes shimmer{100%{transform:translateX(100%)}}
   </style>
 </head>
 <body>
@@ -53,7 +62,9 @@
     <div class="layout">
       <section>
         <div class="carousel" id="carousel" aria-label="gallery">
-          <div class="track" id="track"></div>
+          <div class="track" id="track">
+            <div class="slide"><div class="skeleton" style="aspect-ratio:4/3;width:100%"></div></div>
+          </div>
           <button class="navBtn prev" id="prev" aria-label="Prev">◀</button>
           <button class="navBtn next" id="next" aria-label="Next">▶</button>
         </div>
@@ -72,18 +83,48 @@
     const currentLang=(qs.get('lang')||localStorage.getItem('lang')||'zh').toLowerCase();
     localStorage.setItem('lang',currentLang);
     const home=new URL('../index.html',location.href); home.searchParams.set('lang',currentLang); document.getElementById('homeLink').href=home.toString();
-    const langEl=document.getElementById('langSwitcher');
-    [...langEl.querySelectorAll('button')].forEach(b=>{if(b.dataset.lang===currentLang)b.classList.add('active');b.onclick=()=>{const url=new URL(location.href);url.searchParams.set('lang',b.dataset.lang);localStorage.setItem('lang',b.dataset.lang);location.href=url.toString();}});
+    [...document.querySelectorAll('#langSwitcher button')].forEach(b=>{if(b.dataset.lang===currentLang)b.classList.add('active');b.onclick=()=>{const url=new URL(location.href);url.searchParams.set('lang',b.dataset.lang);localStorage.setItem('lang',b.dataset.lang);location.href=url.toString();}});
 
-    async function exists(u){try{const r=await fetch(u,{method:'HEAD',cache:'no-store'}); if(r.ok) return true;}catch{} try{const r=await fetch(u,{cache:'no-store'}); return r.ok;}catch{return false;}}
-    async function loadTxt(){const slug=`product-${PRODUCT_ID}`; const order=[currentLang,'en','zh','de']; for(const lg of order){const url=`${slug}-${lg}.txt`; try{const r=await fetch(url,{cache:'no-store'}); if(r.ok){const t=(await r.text()).trim(); const [first,...rest]=t.split(/\\r?\\n/); return {title:first?.trim()||`Product ${PRODUCT_ID}`, desc:rest.join('\\n').trim()||''};}}catch{} } return {title:`Product ${PRODUCT_ID}`,desc:''};}
-    async function loadImages(){const base=`../assets/imgs/product-${PRODUCT_ID}`; const exts=['jpg','jpeg','png','webp']; const imgs=[]; for(let i=1;i<=20;i++){ let found=''; for(const ext of exts){const u=`${base}/${i}.${ext}`; if(await exists(u)){found=u;break}} if(found) imgs.push(found); else break;} return imgs;}
+    function fetchWithTimeout(url,ms=1200){const ctl=new AbortController();const id=setTimeout(()=>ctl.abort(),ms);return fetch(url,{cache:'no-store',signal:ctl.signal}).finally(()=>clearTimeout(id));}
+    async function jsonFast(url){try{const r=await fetchWithTimeout(url,1500); if(r.ok) return await r.json();}catch{} return null;}
+    async function firstOk(urls){const wrapped=urls.map(u=>fetchWithTimeout(u,1200).then(r=>r.ok?u:Promise.reject(u))); try{return await Promise.any(wrapped);}catch{return ''}}
+    async function exists(u){try{const r=await fetchWithTimeout(u,900); return r.ok;}catch{return false;}}
+
+    async function loadTxt(){const slug=`product-${PRODUCT_ID}`; const order=[currentLang,'en','zh','de']; for(const lg of order){const url=`${slug}-${lg}.txt`; try{const r=await fetchWithTimeout(url,1200); if(r.ok){const t=(await r.text()).trim(); const [first,...rest]=t.split(/\r?\n/); return {title:first?.trim()||`Product ${PRODUCT_ID}`, desc:rest.join('\n').trim()||''};}}catch{} } return {title:`Product ${PRODUCT_ID}`,desc:''};}
+
+    async function resolveExtViaManifest(){const mf=await jsonFast('manifest.json').catch(()=>null); if(mf?.items){const it=mf.items.find(x=>x.id==PRODUCT_ID); if(it?.imgExt) return it.imgExt;} return '';}
+
+    async function loadImages(){
+      const base=`../assets/imgs/product-${PRODUCT_ID}`;
+      let ext = await resolveExtViaManifest();
+      if(!ext){ ext = (await firstOk([`${base}/1.jpg`,`${base}/1.jpeg`,`${base}/1.png`,`${base}/1.webp`])).split('.').pop() || ''; }
+      if(!ext) return [];
+
+      // 预加载第一张
+      const link=document.createElement('link'); link.rel='preload'; link.as='image'; link.href=`${base}/1.${ext}`; document.head.appendChild(link);
+
+      // 按已知扩展名加载后续，遇到缺失即停止
+      const imgs=[];
+      for(let i=1;i<=20;i++){
+        const u=`${base}/${i}.${ext}`;
+        if(await exists(u)) imgs.push(u); else break;
+      }
+      return imgs;
+    }
 
     (async function init(){
       const data=await loadTxt(); title.textContent=data.title; desc.textContent=data.desc;
       const imgs=await loadImages(); const track=document.getElementById('track'); const dots=document.getElementById('dots');
+      track.innerHTML='';
       if(imgs.length===0){ document.getElementById('carousel').style.display='none'; return; }
-      imgs.forEach((src,idx)=>{const s=document.createElement('div'); s.className='slide'; s.innerHTML=`<img src="${src}" alt="${data.title} ${idx+1}">`; track.appendChild(s); const d=document.createElement('button'); d.className='dot'+(idx===0?' active':''); d.setAttribute('aria-label',`Go to ${idx+1}`); d.onclick=()=>go(idx); dots.appendChild(d);});
+
+      imgs.forEach((src,idx)=>{
+        const s=document.createElement('div'); s.className='slide';
+        s.innerHTML=`<img src="${src}" alt="${data.title} ${idx+1}" loading="${idx===0?'eager':'lazy'}" decoding="async" fetchpriority="${idx===0?'high':'auto'}">`;
+        track.appendChild(s);
+        const d=document.createElement('button'); d.className='dot'+(idx===0?' active':''); d.setAttribute('aria-label',`Go to ${idx+1}`); d.onclick=()=>go(idx); dots.appendChild(d);
+      });
+
       let index=0; const prev=document.getElementById('prev'), next=document.getElementById('next');
       function update(){ track.style.transform=`translateX(${-index*100}%)`; [...dots.children].forEach((d,i)=>d.classList.toggle('active',i===index)); }
       function go(i){ index=Math.max(0,Math.min(imgs.length-1,i)); update(); }
