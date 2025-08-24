@@ -133,11 +133,12 @@
     async function loadParams(productId, lang){
       const order=[lang,'en','zh','de'];
       for(const lg of order){
-        const url=`product-${productId}-params-${lg}.txt`;
+        const url=`asset/txt/product-${productId}/asset/txt/product-${productId}/product-${productId}-params-${lg}.txt`;
         try{
           const r=await fetchWithTimeout(url,1000);
           if(r.ok){
-            const lines=(await r.text()).trim().split(/\r?\n/).filter(Boolean);
+            let lines=(await r.text()).trim().split(/\r?\n/).filter(Boolean);
+            if(lg!==lang){ lines = await translateListLines(lines, lang); } /*TRANS_PARAMS*/
             const list=document.getElementById('specsList');
             list.innerHTML='';
             lines.forEach(line=>{
@@ -159,11 +160,12 @@
     async function loadDetails(productId, lang){
       const order=[lang,'en','zh','de'];
       for(const lg of order){
-        const url=`product-${productId}-details-${lg}.txt`;
+        const url=`asset/txt/product-${productId}/asset/txt/product-${productId}/product-${productId}-details-${lg}.txt`;
         try{
           const r=await fetchWithTimeout(url,1200);
           if(r.ok){
-            const txt=(await r.text()).trim();
+            let txt=(await r.text()).trim();
+            if(lg!==lang){ txt = await translateText(txt, lang); } /*TRANS_DETAILS*/
             if(txt){
               const h2=(lang==='zh'?'详细描述':(lang==='de'?'Beschreibung':'Details'));
               document.getElementById('detailsTitle').textContent=h2;
@@ -175,6 +177,34 @@
         }catch(e){}
       }
       document.getElementById('detailsBox').style.display='none';
+    }
+
+    
+    const TRANSLATE_CFG={enabled:true,endpoint:'https://libretranslate.com/translate',apiKey:''};
+    function cacheKey(prefix,text,target){return prefix+':'+target+':'+(text||'').slice(0,2000);}
+    async function translateText(text,target){
+      if(!TRANSLATE_CFG.enabled||!text||!target) return text;
+      try{
+        const key=cacheKey('tr',text,target);
+        const cached=localStorage.getItem(key);
+        if(cached) return cached;
+        const r=await fetch(TRANSLATE_CFG.endpoint,{
+          method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({q:text,source:'auto',target:target,format:'text',api_key:TRANSLATE_CFG.apiKey||undefined})
+        });
+        if(!r.ok) return text;
+        const data=await r.json();
+        const out=data.translatedText||text;
+        localStorage.setItem(key,out);
+        return out;
+      }catch(e){return text;}
+    }
+    async function translateListLines(lines,target){
+      if(!TRANSLATE_CFG.enabled||!Array.isArray(lines)||!lines.length) return lines;
+      const tr=await translateText(lines.join('
+'),target);
+      return tr.split(/?
+/);
     }
 
     (async function init(){
