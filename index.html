@@ -23,10 +23,9 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Eindeepseek · 产品精选" />
   <meta name="twitter:description" content="多语言产品展示网站：自动读取图片与文案，仅显示有内容的产品。" />
-
   <link rel="dns-prefetch" href="//www.eindeepseek.com">
   <link rel="preconnect" href="https://www.eindeepseek.com" crossorigin>
-  <link rel="preload" as="fetch" href="/manifest.json" crossorigin="anonymous">
+
   <link rel="preload" as="image" href="group.jpeg" />
 
   <style>
@@ -90,7 +89,6 @@
     <p class="lead" id="sub">选择语言后会在全站生效；仅显示有内容的产品。</p>
 
     <div class="grid" id="grid">
-      <!-- initial skeletons -->
       <div class="card"><div class="thumb skeleton"></div><div class="body"><div class="title skeleton" style="height:18px;width:60%"></div><p class="desc skeleton" style="height:38px"></p></div></div>
       <div class="card"><div class="thumb skeleton"></div><div class="body"><div class="title skeleton" style="height:18px;width:60%"></div><p class="desc skeleton" style="height:38px"></p></div></div>
       <div class="card"><div class="thumb skeleton"></div><div class="body"><div class="title skeleton" style="height:18px;width:60%"></div><p class="desc skeleton" style="height:38px"></p></div></div>
@@ -100,7 +98,6 @@
   <footer>© <span id="y"></span> Eindeepseek</footer>
 
   <script>
-    // ---- i18n ----
     const I18N={
       zh:{title:'产品展示',sub:'选择语言后会在全站生效；仅显示有内容的产品。',groupTitle:'加入 WhatsApp 群组',groupDesc:'扫码二维码，进入我们的贸易 & 物流交流群。',email:'邮件',whats:'WhatsApp',phone:'电话',wechat:'微信'},
       en:{title:'Products',sub:'Language selection applies site-wide. Only products with content are shown.',groupTitle:'Join WhatsApp Group',groupDesc:'Scan the QR code to join our trade & logistics group.',email:'Email',whats:'WhatsApp',phone:'Phone',wechat:'WeChat'},
@@ -118,7 +115,6 @@
       b.onclick=()=>{const lang=b.dataset.lang;localStorage.setItem('lang',lang);const url=new URL(location.href);url.searchParams.set('lang',lang);location.href=url.toString();};
     });
 
-    // ---- Contacts ----
     const CONTACT={email:'wengandy128@gmail.com',whatsapp:'+86 15888791812',phone:'+86 15888791812',wechat:'15888791812',waInvite:''};
     document.getElementById('contactBar').innerHTML=`
       <a href="mailto:${CONTACT.email}">📧 ${t.email}: ${CONTACT.email}</a>
@@ -127,84 +123,55 @@
       <span>🟩 ${t.wechat}: ${CONTACT.wechat}</span>
     `;
 
-    // ---- Utils ----
-    function fetchWithTimeout(url,ms=5000){
-      const ctl=new AbortController();
-      const id=setTimeout(()=>ctl.abort(),ms);
-      return fetch(url,{signal:ctl.signal}).finally(()=>clearTimeout(id));
-    }
-    async function loadManifest(){
-      // try multiple paths; let browser cache decide
-      for(const u of ['manifest.json','/manifest.json','./manifest.json']){
-        try{
-          const r = await fetchWithTimeout(u, 5000);
-          if(r.ok) return await r.json();
-        }catch(e){}
-      }
-      return null;
-    }
+    function fetchWithTimeout(url,ms=1200){const ctl=new AbortController();const id=setTimeout(()=>ctl.abort(),ms);return fetch(url,{cache:'no-store',signal:ctl.signal}).finally(()=>clearTimeout(id));}
+    async function tryJson(url){try{const r=await fetchWithTimeout(url,1500);if(r.ok)return await r.json();}catch{}return null;}
+    async function existsFast(url){try{const r=await fetchWithTimeout(url,1000);return r.ok;}catch{return false;}}
 
-    // ---- Build grid ----
     async function build(){
-      const grid=document.getElementById('grid'); grid.innerHTML='';
+      const grid=document.getElementById('grid');grid.innerHTML='';
 
-      // WhatsApp group card (lazy load)
+      // WhatsApp 群卡片（有任意二维码图片即显示）
       try{
         const qrCandidates=['group.jpeg','group.jpg','group.png','group.webp'];
         let qrFound='';
-        for(const u of qrCandidates){
-          try{
-            const r=await fetchWithTimeout(u,1500);
-            if(r.ok){ qrFound=u; break; }
-          }catch(e){}
-        }
+        for(const u of qrCandidates){ if(await existsFast(u)){ qrFound=u; break; } }
         if(qrFound){
-          const a=document.createElement('a');
-          a.className='cardlink'; a.href=qrFound;
-          a.onclick=()=>{try{gtag('event','click_group');}catch(e){} };
-          a.innerHTML=\`
-            <article class="card">
-              <div class="thumb" style="display:flex;align-items:center;justify-content:center">
-                <img src="\${qrFound}" alt="WhatsApp Group QR" class="qr-thumb" loading="lazy" decoding="async" width="180" height="180">
-              </div>
-              <div class="body">
-                <div class="title">\${t.groupTitle}</div>
-                <p class="desc">\${t.groupDesc}</p>
-              </div>
-            </article>\`;
+          const a=document.createElement('a');a.className='cardlink';a.href=qrFound;a.onclick=()=>{ try{gtag('event','click_group');}catch(e){} };
+          a.innerHTML=`<article class="card"><div class="thumb" style="display:flex;align-items:center;justify-content:center"><img src="${qrFound}" alt="WhatsApp Group QR" class="qr-thumb" loading="eager" width="180" height="180"></div><div class="body"><div class="title">${t.groupTitle}</div><p class="desc">${t.groupDesc}</p></div></article>`;
           grid.appendChild(a);
         }
-      }catch(e){}
+      }catch{}
 
-      // manifest
-      const mf = await loadManifest();
+      // 读取 manifest.json（根目录）
+      const mf = await (async()=>{
+        for(const u of ['manifest.json','/manifest.json','./manifest.json']){
+          const d = await tryJson(u); if(d) return d;
+        }
+        return null;
+      })();
+
       const ids = mf?.items?.map(x=>x.id) || [1,2,3,4,5,6];
 
       for(const id of ids){
-        const slug = \`product-\${id}\`;
-        const imgUrl = \`assets/imgs/\${slug}/1.png\`;
+        const slug = `product-${id}`;
+        const img = `assets/imgs/${slug}/1.png`;
+
+        // 规则：没有 1.png 就跳过（不渲染卡片）
+        if(!(await existsFast(img))) continue;
+
         const item = mf?.items?.find(x=>x.id===id);
-        const title = item?.title?.[currentLang] || item?.title?.en || item?.title?.zh || \`Product \${id}\`;
-        const desc  = item?.desc?.[currentLang] || '';
+        const title = item?.title?.[currentLang] || item?.title?.en || item?.title?.zh || `Product ${id}`;
 
-        const href  = \`products/\${slug}.html?lang=\${encodeURIComponent(currentLang)}\`;
+        const href = `products/${slug}.html?lang=${encodeURIComponent(currentLang)}`;
         const a = document.createElement('a'); a.className='cardlink'; a.href=href;
-
-        // Create hidden card; reveal when image is ready
-        a.innerHTML = \`
-          <article class="card" style="display:none">
-            <img class="thumb" src="\${imgUrl}" alt="\${title}" loading="lazy" decoding="async" width="800" height="600">
+        a.innerHTML = `<article class="card">
+            <img class="thumb" src="${img}" alt="${title}" loading="lazy">
             <div class="body">
-              <div class="title">\${title}</div>
-              <p class="desc">\${desc}</p>
+              <div class="title">${title}</div>
+              <p class="desc"></p>
             </div>
-            <span class="badge">\${currentLang.toUpperCase()}</span>
-          </article>\`;
-
-        const imgEl = a.querySelector('img');
-        imgEl.onload  = () => { a.firstElementChild.style.display=''; };
-        imgEl.onerror = () => { a.remove(); };
-
+            <span class="badge">${currentLang.toUpperCase()}</span>
+          </article>`;
         grid.appendChild(a);
       }
     }
