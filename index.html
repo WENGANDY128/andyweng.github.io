@@ -5,41 +5,43 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Eindeepseek</title>
   <style>
-    :root{--bg:#0b0c10;--card:#121318;--muted:#7b8190;--text:#e9ecf1;--primary:#6ea8fe;--ring:rgba(110,168,254,.35)}
+    :root{
+      --bg:#f7f8fa; --text:#222; --muted:#555; --primary:#2b7de9;
+      --card:#fff; --border:#ddd; --ring:rgba(43,125,233,.18);
+    }
     *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:radial-gradient(80vw 80vh at 20% -20%,#141726,#0b0c10);color:var(--text)}
-    header{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:14px 18px;backdrop-filter:saturate(140%) blur(6px);background:linear-gradient(to bottom,rgba(10,10,15,.8),rgba(10,10,15,.2) 60%,transparent);border-bottom:1px solid rgba(255,255,255,.06)}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--text)}
+    header{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#fff;border-bottom:1px solid var(--border)}
     .brand a{color:var(--text);text-decoration:none;font-weight:800;letter-spacing:.3px}
-    .lang{display:inline-flex;gap:6px;align-items:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:6px}
+    .lang{display:inline-flex;gap:6px;align-items:center;background:#fff;border:1px solid var(--border);border-radius:999px;padding:6px}
     .lang button{appearance:none;border:none;cursor:pointer;padding:6px 10px;border-radius:999px;color:var(--muted);background:transparent;font-weight:600}
-    .lang button.active{color:var(--text);background:rgba(255,255,255,.06);box-shadow:0 0 0 6px var(--ring) inset}
+    .lang button.active{color:#fff;background:var(--primary);box-shadow:0 0 0 6px var(--ring) inset}
 
-    .wrap{max-width:1200px;margin:0 auto;padding:22px 18px 56px}
-    h1{font-size:28px;margin:8px 0 10px}
-    p.lead{color:var(--muted);margin-top:0}
+    .wrap{max-width:1200px;margin:0 auto;padding:18px 16px 56px}
+    h1{font-size:28px;margin:10px 0 8px}
+    p.lead{color:var(--muted);margin:0 0 10px}
 
-    .contactbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:10px 0 18px}
-    .contactbar a,.contactbar span{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);padding:8px 10px;border-radius:10px;color:var(--text);text-decoration:none;font-size:14px}
-    .contactbar a:hover{background:rgba(255,255,255,.1)}
+    .contactbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:6px 0 16px}
+    .contactbar a,.contactbar span{background:#fff;border:1px solid var(--border);padding:8px 10px;border-radius:10px;color:var(--text);text-decoration:none;font-size:14px}
+    .contactbar a:hover{background:#f1f5ff;border-color:#cfe0ff}
 
     .grid{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:18px}
     @media(min-width:640px){.grid{grid-template-columns:repeat(2,1fr)}}
     @media(min-width:960px){.grid{grid-template-columns:repeat(3,1fr)}}
-    .card{position:relative;overflow:hidden;border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08);box-shadow:0 8px 30px rgba(0,0,0,.35);transform:translateY(10px);opacity:0;animation:rise .7s ease forwards}
+    .card{position:relative;overflow:hidden;border-radius:14px;background:var(--card);border:1px solid var(--border);box-shadow:0 2px 10px rgba(0,0,0,.06);transform:translateY(8px);opacity:0;animation:rise .55s ease forwards}
     .card:nth-child(1){animation-delay:.05s}.card:nth-child(2){animation-delay:.1s}.card:nth-child(3){animation-delay:.15s}.card:nth-child(4){animation-delay:.2s}.card:nth-child(5){animation-delay:.25s}.card:nth-child(6){animation-delay:.3s}
     @keyframes rise{to{transform:none;opacity:1}}
-    .thumb{aspect-ratio:4/3;width:100%;display:block;object-fit:cover;filter:saturate(105%)}
-    .body{padding:14px 14px 16px}
-    .title{font-weight:800;margin:2px 0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .desc{color:var(--muted);margin:0;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-    .badge{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.55);color:#fff;padding:4px 8px;border-radius:999px;font-size:12px}
-    /* make entire card clickable reliably */
+    .thumb{aspect-ratio:4/3;width:100%;display:block;object-fit:cover;background:#f1f3f5}
+    .body{padding:12px 14px 16px}
+    .title{font-weight:800;margin:2px 0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#111}
+    .desc{color:var(--muted);margin:0;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .badge{position:absolute;top:10px;left:10px;background:#111;color:#fff;padding:2px 8px;border-radius:999px;font-size:12px;opacity:.85}
     .cardlink{display:block;text-decoration:none;color:inherit}
-    .btn{display:inline-block;margin-top:8px;background:#2b7de9;color:#fff;padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:600}
+    .btn{display:inline-block;margin-top:8px;background:var(--primary);color:#fff;padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:600}
 
-    /* group card image smaller */
-    .qr-thumb{max-width:180px;max-height:180px;margin:16px auto;display:block;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:#fff}
-    footer{border-top:1px solid rgba(255,255,255,.08);text-align:center;padding:16px;color:var(--muted);margin-top:28px}
+    .qr-thumb{max-width:180px;max-height:180px;margin:16px auto;display:block;border-radius:10px;border:1px solid var(--border);background:#fff}
+
+    footer{border-top:1px solid var(--border);text-align:center;padding:14px;color:var(--muted);margin-top:26px}
   </style>
 </head>
 <body>
@@ -82,7 +84,7 @@
     // Headings
     (()=>{const t=I18N[currentLang]||I18N.zh;heading.textContent=t.title;sub.textContent=t.sub;})();
 
-    // Contact fixed values
+    // Contact
     const CONTACT={
       email:'wengandy128@gmail.com',
       whatsapp:'+86 15888791812',
@@ -121,7 +123,7 @@
       return null;
     }
 
-    // build product cards
+    // build product cards and group card
     async function buildGrid(){
       const grid=document.getElementById('grid');
       const t=I18N[currentLang]||I18N.zh;
@@ -136,7 +138,6 @@
         const title=preview?.title || `Product ${i}`;
         const desc=preview?.desc || '';
 
-        // Use an anchor wrapper to ensure the entire card is clickable
         const a=document.createElement('a');
         a.className='cardlink';
         a.href=`products/${slug}.html?lang=${encodeURIComponent(currentLang)}`;
@@ -144,30 +145,33 @@
         const card=document.createElement('article');
         card.className='card';
         card.innerHTML=`
-          ${img?`<img class="thumb" src="${img}" alt="${title}">`:`<div class="thumb" style="aspect-ratio:4/3;background:linear-gradient(120deg,#1b1d27,#0f1116)"></div>`}
+          ${img?`<img class="thumb" src="${img}" alt="${title}">`:`<div class="thumb"></div>`}
           <div class="body">
             <div class="title">${title}</div>
             <p class="desc">${desc}</p>
-          </div>`;
+          </div>
+          <span class="badge">${currentLang.toUpperCase()}</span>`;
 
         a.appendChild(card);
         grid.appendChild(a);
       }
 
-      // Append group card if group.jpeg/png/jpg/webp exists
+      // group card
       const qrcands=['group.jpeg','group.jpg','group.png','group.webp'];
       let qr='';
       for(const f of qrcands){ if(await exists(f)){ qr=f; break; } }
       if(qr){
         const a=document.createElement('a');
         a.className='cardlink';
-        a.href= CONTACT.waInvite ? CONTACT.waInvite : qr; // if invite exists go url, else open image
+        a.href= CONTACT.waInvite ? CONTACT.waInvite : qr;
         a.target = CONTACT.waInvite ? '_blank' : '_self';
 
         const card=document.createElement('article');
         card.className='card';
         card.innerHTML=`
-          <div class="thumb"><img src="${qr}" alt="WhatsApp Group QR" class="qr-thumb"></div>
+          <div class="thumb" style="display:flex;align-items:center;justify-content:center;">
+            <img src="${qr}" alt="WhatsApp Group QR" class="qr-thumb">
+          </div>
           <div class="body">
             <div class="title">${t.groupTitle}</div>
             <p class="desc">${t.groupDesc}</p>
