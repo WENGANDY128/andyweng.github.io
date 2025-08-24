@@ -52,6 +52,7 @@
   .specs ul{margin:0;padding-left:18px;color:var(--muted);line-height:1.6}
   .specs li{margin:2px 0}
   .details p{margin:0;color:var(--muted);line-height:1.7;white-space:pre-wrap}
+  .empty{padding:12px;color:#666}
 </style>
 </head>
 <body>
@@ -67,11 +68,12 @@
 <div class="wrap">
   <div class="layout">
     <section>
-      <!-- 8款卡片选择 -->
+      <!-- 8款卡片选择（若某款无图将自动隐藏该卡片） -->
       <div class="model-cards" id="modelCards"></div>
+      <div id="noModels" class="empty" style="display:none">暂无可展示的型号。</div>
 
       <!-- 图片轮播 -->
-      <div class="carousel" id="carousel">
+      <div class="carousel" id="carousel" style="display:none">
         <div class="track" id="track"></div>
         <button class="navBtn prev" id="prev" aria-label="Prev">◀</button>
         <button class="navBtn next" id="next" aria-label="Next">▶</button>
@@ -118,42 +120,73 @@ const MODELS = [
 ];
 const t = (obj)=> obj?.[currentLang] || obj?.en;
 
-/* ====== 生成 8 个大框框卡片 ====== */
-function buildCards(){
+// 目录基准（改为嵌套：/assets/imgs/product-1/product-1a/...）
+function imgBase(sub){ return `../assets/imgs/product-1/product-1${sub}`; }
+function txtBase(sub){ return `../assets/txt/product-1/product-1${sub}`; }
+
+/* ====== 工具：探测首张图片是否存在（决定卡片是否展示） ====== */
+async function findThumb(sub){
+  const base = imgBase(sub);
+  const exts = ['jpg','png','webp','jpeg'];
+  for(const e of exts){
+    try{
+      const r = await fetch(`${base}/1.${e}`, {method:'HEAD'});
+      if(r.ok) return {url:`${base}/1.${e}`, ext:e};
+    }catch{}
+  }
+  return null; // 无图
+}
+
+/* ====== 生成卡片（自动隐藏无图型号） ====== */
+async function buildCards(){
   const box = document.getElementById('modelCards');
+  const none = document.getElementById('noModels');
   box.innerHTML = '';
-  MODELS.forEach(m=>{
+  let anyShown = false;
+  for(const m of MODELS){
+    const thumb = await findThumb(m.sub);
+    if(!thumb) continue; // 跳过无图型号
+    anyShown = true;
     const card = document.createElement('div');
     card.className = 'model-card' + (m.sub===SUB_ID ? ' active':'');
     card.dataset.sub = m.sub;
-
-    const thumbCandidates = [
-      `../assets/imgs/product-1${m.sub}/1.jpg`,
-      `../assets/imgs/product-1${m.sub}/1.png`,
-      `../assets/imgs/product-1${m.sub}/1.webp`,
-      `../assets/imgs/product-1${m.sub}/1.jpeg`
-    ];
-    const thumb = thumbCandidates[0]; // 直接用 jpg；如需更智能可再加探测
-
-    card.innerHTML = \`
-      <img src="\${thumb}" alt="\${t(m.name)||m.sub}" loading="lazy" decoding="async">
+    card.innerHTML = `
+      <img src="${thumb.url}" alt="${t(m.name)||m.sub}" loading="lazy" decoding="async">
       <div class="meta">
-        <p class="name">\${t(m.name)||m.sub.toUpperCase()}</p>
-        <p class="brief">\${t(m.brief)||''}</p>
+        <p class="name">${t(m.name)||m.sub.toUpperCase()}</p>
+        <p class="brief">${t(m.brief)||''}</p>
       </div>
-    \`;
+    `;
     card.onclick = ()=>{
       if(SUB_ID===m.sub) return;
       SUB_ID = m.sub;
       const url = new URL(location.href);
       url.searchParams.set('sub', SUB_ID);
       url.searchParams.set('lang', currentLang);
-      history.replaceState(null,'',url); // 无刷新更新地址
+      history.replaceState(null,'',url);
       buildCards();
       renderProduct();
     };
     box.appendChild(card);
-  });
+  }
+  none.style.display = anyShown ? 'none' : 'block';
+
+  // 如果当前 SUB_ID 对应无图且未展示，自动切换到第一个可展示的型号
+  if(anyShown){
+    const currentShown = [...box.querySelectorAll('.model-card')].some(c=>c.dataset.sub===SUB_ID);
+    if(!currentShown){
+      const first = box.querySelector('.model-card');
+      if(first){ SUB_ID = first.dataset.sub; renderProduct(); }
+    }
+  }else{
+    // 没有任何型号可展示，清空细节区域
+    document.getElementById('title').textContent = '暂无可展示型号';
+    document.getElementById('desc').textContent  = '';
+    document.getElementById('specsBox').style.display='none';
+    document.getElementById('detailsBox').style.display='none';
+    document.getElementById('carousel').style.display='none';
+    document.getElementById('dots').innerHTML='';
+  }
 }
 
 /* ====== 文案/参数/详情/图片加载 ====== */
@@ -161,30 +194,30 @@ async function loadTxt(sub){
   const order=[currentLang,'en','zh','de'];
   for(const lg of order){
     try{
-      const r=await fetch(\`product-1\${sub}-\${lg}.txt\`,{cache:'no-store'});
+      const r=await fetch(`product-1${sub}-${lg}.txt`,{cache:'no-store'});
       if(r.ok){
         const t=await r.text();
         const lines=t.trim().split(/\r?\n/);
-        const title = (lines[0]||'').trim() || \`Model \${sub.toUpperCase()}\`;
+        const title = (lines[0]||'').trim() || `Model ${sub.toUpperCase()}`;
         const desc  = lines.slice(1).join('\n').trim();
         return {title, desc};
       }
     }catch{}
   }
-  return {title:\`Model \${sub.toUpperCase()}\`, desc:''};
+  return {title:`Model ${sub.toUpperCase()}`, desc:''};
 }
 
 async function loadParams(sub, lang){
   const order=[lang,'en','zh','de'];
   for(const lg of order){
     try{
-      const r=await fetch(\`../assets/txt/product-1\${sub}/params-\${lg}.txt\`,{cache:'no-store'});
+      const r=await fetch(`${txtBase(sub)}/params-${lg}.txt`,{cache:'no-store'});
       if(r.ok){
         const lines=(await r.text()).trim().split(/\r?\n/).filter(Boolean);
         const ul=document.getElementById('specsList'); ul.innerHTML='';
         lines.forEach(line=>{
           const m=line.split(/\s*[:：]\s*/); const k=m[0]||''; const v=m.slice(1).join(':')||'';
-          const li=document.createElement('li'); li.textContent= v?\`\${k}: \${v}\`:k; ul.appendChild(li);
+          const li=document.createElement('li'); li.textContent= v?`${k}: ${v}`:k; ul.appendChild(li);
         });
         const i18n={zh:'参数',en:'Specs',de:'Spezifikationen'};
         document.getElementById('specsTitle').textContent=i18n[lg]||'Specs';
@@ -200,7 +233,7 @@ async function loadDetails(sub, lang){
   const order=[lang,'en','zh','de'];
   for(const lg of order){
     try{
-      const r=await fetch(\`../assets/txt/product-1\${sub}/details-\${lg}.txt\`,{cache:'no-store'});
+      const r=await fetch(`${txtBase(sub)}/details-${lg}.txt`,{cache:'no-store'});
       if(r.ok){
         const txt=(await r.text()).trim();
         if(txt){
@@ -217,32 +250,33 @@ async function loadDetails(sub, lang){
 }
 
 async function loadImages(sub){
-  const base=\`../assets/imgs/product-1\${sub}\`;
+  const base = imgBase(sub);
   const exts=['jpg','jpeg','png','webp'];
-  let ext=''; // 识别首张可用格式
+  let ext='';
   for(const e of exts){
-    try{ const r=await fetch(\`\${base}/1.\${e}\`,{method:'HEAD'}); if(r.ok){ ext=e; break; } }catch{}
+    try{ const r=await fetch(`${base}/1.${e}`,{method:'HEAD'}); if(r.ok){ ext=e; break; } }catch{}
   }
   if(!ext) return [];
   const arr=[];
   for(let i=1;i<=20;i++){
-    try{ const u=\`\${base}/\${i}.\${ext}\`; const r=await fetch(u,{method:'HEAD'}); if(r.ok) arr.push(u); else break; }catch{}
+    try{ const u=`${base}/${i}.${ext}`; const r=await fetch(u,{method:'HEAD'}); if(r.ok) arr.push(u); else break; }catch{}
   }
   return arr;
 }
 
 /* ====== 渲染当前型号 ====== */
 async function renderProduct(){
-  // 标题 & 简介
+  // 如果当前 sub 无图，直接退出（buildCards 会处理自动切换）
+  const thumbs = await findThumb(SUB_ID);
+  if(!thumbs){ document.getElementById('carousel').style.display='none'; return; }
+
   const data = await loadTxt(SUB_ID);
   document.getElementById('title').textContent = data.title;
   document.getElementById('desc').textContent  = data.desc;
 
-  // 参数 & 详情
   await loadParams(SUB_ID, currentLang);
   await loadDetails(SUB_ID, currentLang);
 
-  // 图片轮播
   const imgs = await loadImages(SUB_ID);
   const track=document.getElementById('track');
   const dots=document.getElementById('dots');
@@ -254,13 +288,13 @@ async function renderProduct(){
 
   imgs.forEach((src,idx)=>{
     const s=document.createElement('div'); s.className='slide';
-    s.innerHTML=\`<img src="\${src}" alt="\${data.title} \${idx+1}" loading="\${idx===0?'eager':'lazy'}" decoding="async">\`;
+    s.innerHTML=`<img src="${src}" alt="${data.title} ${idx+1}" loading="${idx===0?'eager':'lazy'}" decoding="async">`;
     track.appendChild(s);
     const d=document.createElement('button'); d.className='dot'+(idx===0?' active':''); d.onclick=()=>go(idx); dots.appendChild(d);
   });
 
   let index=0;
-  function update(){ track.style.transform=\`translateX(\${-index*100}%)\`; [...dots.children].forEach((d,i)=>d.classList.toggle('active',i===index)); }
+  function update(){ track.style.transform=`translateX(${-index*100}%)`; [...dots.children].forEach((d,i)=>d.classList.toggle('active',i===index)); }
   function go(i){ index=Math.max(0,Math.min(imgs.length-1,i)); update(); }
   document.getElementById('prev').onclick=()=>go(index-1);
   document.getElementById('next').onclick=()=>go(index+1);
@@ -269,7 +303,7 @@ async function renderProduct(){
 
 /* ====== 启动 ====== */
 (async function init(){
-  buildCards();
+  await buildCards();  // 先探测并渲染可用卡片
   await renderProduct();
 })();
 </script>
