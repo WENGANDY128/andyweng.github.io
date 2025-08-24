@@ -7,6 +7,11 @@
         "zh": "产品 1",
         "en": "Product 1",
         "de": "Produkt 1"
+      },
+      "desc": {
+        "zh": "简洁可靠的基础款示例。",
+        "en": "A clean, reliable baseline example.",
+        "de": "Ein sauberes, zuverlässiges Basismodell."
       }
     },
     {
@@ -16,6 +21,11 @@
         "zh": "产品 2",
         "en": "Product 2",
         "de": "Produkt 2"
+      },
+      "desc": {
+        "zh": "展示图像与多语言标题。",
+        "en": "Shows image and multilingual titles.",
+        "de": "Zeigt Bild und mehrsprachige Titel."
       }
     },
     {
@@ -25,6 +35,11 @@
         "zh": "产品 3",
         "en": "Product 3",
         "de": "Produkt 3"
+      },
+      "desc": {
+        "zh": "首页仅读取 1.png。",
+        "en": "Homepage reads only 1.png.",
+        "de": "Startseite lädt nur 1.png."
       }
     },
     {
@@ -34,6 +49,11 @@
         "zh": "产品 4",
         "en": "Product 4",
         "de": "Produkt 4"
+      },
+      "desc": {
+        "zh": "详情页可循环 1–12.png。",
+        "en": "Detail pages may loop 1–12.png.",
+        "de": "Detailseiten können 1–12.png durchlaufen."
       }
     },
     {
@@ -43,6 +63,11 @@
         "zh": "产品 5",
         "en": "Product 5",
         "de": "Produkt 5"
+      },
+      "desc": {
+        "zh": "无描述也可正常显示。",
+        "en": "Works fine with no description.",
+        "de": "Funktioniert auch ohne Beschreibung."
       }
     },
     {
@@ -52,6 +77,11 @@
         "zh": "产品 6",
         "en": "Product 6",
         "de": "Produkt 6"
+      },
+      "desc": {
+        "zh": "如缺 1.png 将自动隐藏。",
+        "en": "Hidden automatically if 1.png is missing.",
+        "de": "Wird automatisch ausgeblendet, wenn 1.png fehlt."
       }
     }
   ]
