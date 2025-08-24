@@ -96,56 +96,8 @@
 
     async function loadImages(){
       const base=`../assets/imgs/product-${PRODUCT_ID}`;
-      // 1) Resolve extension (manifest first, then probe 1.*)
-      let ext='';
-      const mf=await jsonFast('../manifest.json').catch(()=>null);
-      if(mf?.items){ const it=mf.items.find(x=>x.id==PRODUCT_ID); if(it?.imgExt) ext=it.imgExt; }
-      if(!ext){
-        const guess=['jpg','jpeg','png','webp'];
-        const hit = await Promise.any(guess.map(g=>fetch(`${base}/1.${g}`,{method:'HEAD'}).then(r=>r.ok?g:Promise.reject()))).catch(()=>'');
-        ext = hit||'';
-      }
-      if(!ext) return [];
-
-      // helper: HEAD exists
-      async function headOk(u){ try{ const r=await fetch(u,{method:'HEAD',cache:'force-cache'}); return r.ok?r.headers:null; }catch{return null;} }
-
-      // 2) Try cache (count + last-modified of 1st image)
-      const first=`${base}/1.${ext}`;
-      const h = await headOk(first);
-      if(!h) return [];
-      const lm = (h.get('last-modified')||'') + (h.get('etag')||'');
-      const cacheKey=`p${PRODUCT_ID}:${ext}`;
-      try{
-        const mem=JSON.parse(localStorage.getItem(cacheKey)||'null');
-        if(mem && mem.lm===lm && mem.count>0){
-          return Array.from({length:mem.count}, (_,k)=>`${base}/${k+1}.${ext}`);
-        }
-      }catch{}
-
-      // 3) Incremental parallel probing in chunks to discover count quickly
-      const maxN=24;           // hard ceiling
-      const chunk=6;           // probe 6 at a time
-      let high=6;              // start window
-      let urls=[];
-
-      // we already know #1 exists
-      for(;;){
-        const start = urls.length? urls.length+1 : 1;
-        const end = Math.min(high, maxN);
-        const batch = Array.from({length:end-start+1}, (_,i)=>`${base}/${start+i}.${ext}`);
-        const res = await Promise.all(batch.map((u,idx)=> idx===0 && start===1 ? Promise.resolve(true) : headOk(u).then(x=>!!x)));
-        batch.forEach((u, i)=>{ if(res[i]) urls.push(u); });
-        // stop if last chunk has any miss and end equals high (no need to expand further)
-        if(res.some(v=>!v) && end===high) break;
-        if(end>=maxN) break;
-        high += chunk;
-      }
-
-      // 4) Persist cache guarded by last-modified
-      try{ localStorage.setItem(cacheKey, JSON.stringify({lm, count: urls.length||1})); }catch{}
-      return urls.length? urls : [first];
-    }
+      let ext = await resolveExtViaManifest();
+      if(!ext){ ext = (await firstOk([`${base}/1.jpg`,`${base}/1.jpeg`,`${base}/1.png`,`${base}/1.webp`])).split('.').pop() || ''; }
       if(!ext) return [];
 
       // 预加载第一张
