@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Eindeepseek</title>
+  <!-- 预加载群图，加速首屏 -->
+  <link rel="preload" as="image" href="group.jpeg">
   <style>
     :root{
       --bg:#f7f8fa; --text:#222; --muted:#555; --primary:#2b7de9;
@@ -29,7 +31,6 @@
     @media(min-width:640px){.grid{grid-template-columns:repeat(2,1fr)}}
     @media(min-width:960px){.grid{grid-template-columns:repeat(3,1fr)}}
     .card{position:relative;overflow:hidden;border-radius:14px;background:var(--card);border:1px solid var(--border);box-shadow:0 2px 10px rgba(0,0,0,.06);transform:translateY(8px);opacity:0;animation:rise .55s ease forwards}
-    .card:nth-child(1){animation-delay:.05s}.card:nth-child(2){animation-delay:.1s}.card:nth-child(3){animation-delay:.15s}.card:nth-child(4){animation-delay:.2s}.card:nth-child(5){animation-delay:.25s}.card:nth-child(6){animation-delay:.3s}
     @keyframes rise{to{transform:none;opacity:1}}
     .thumb{aspect-ratio:4/3;width:100%;display:block;object-fit:cover;background:#f1f3f5}
     .body{padding:12px 14px 16px}
@@ -37,10 +38,7 @@
     .desc{color:var(--muted);margin:0;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
     .badge{position:absolute;top:10px;left:10px;background:#111;color:#fff;padding:2px 8px;border-radius:999px;font-size:12px;opacity:.85}
     .cardlink{display:block;text-decoration:none;color:inherit}
-    .btn{display:inline-block;margin-top:8px;background:var(--primary);color:#fff;padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:600}
-
     .qr-thumb{max-width:180px;max-height:180px;margin:16px auto;display:block;border-radius:10px;border:1px solid var(--border);background:#fff}
-
     footer{border-top:1px solid var(--border);text-align:center;padding:14px;color:var(--muted);margin-top:26px}
   </style>
 </head>
@@ -68,120 +66,101 @@
   <script>
     // i18n
     const I18N={
-      zh:{title:'产品展示',sub:'选择语言后会在全站生效；仅显示有内容的产品。',groupTitle:'加入 WhatsApp 群组',groupDesc:'扫码二维码，进入我们的贸易 & 物流交流群。',join:'加入群',email:'邮件',whats:'WhatsApp',phone:'电话',wechat:'微信'},
-      en:{title:'Products',sub:'Language selection applies site-wide. Only products with content are shown.',groupTitle:'Join WhatsApp Group',groupDesc:'Scan the QR code to join our trade & logistics group.',join:'Join Group',email:'Email',whats:'WhatsApp',phone:'Phone',wechat:'WeChat'},
-      de:{title:'Produkte',sub:'Die Sprachauswahl gilt für die ganze Seite. Es werden nur Produkte mit Inhalt angezeigt.',groupTitle:'WhatsApp‑Gruppe beitreten',groupDesc:'QR-Code scannen, um unserer Handels‑ & Logistik‑Gruppe beizutreten.',join:'Beitreten',email:'E‑Mail',whats:'WhatsApp',phone:'Telefon',wechat:'WeChat'}
+      zh:{title:'产品展示',sub:'选择语言后会在全站生效；仅显示有内容的产品。',groupTitle:'加入 WhatsApp 群组',groupDesc:'扫码二维码，进入我们的贸易 & 物流交流群。',email:'邮件',whats:'WhatsApp',phone:'电话',wechat:'微信'},
+      en:{title:'Products',sub:'Language selection applies site-wide. Only products with content are shown.',groupTitle:'Join WhatsApp Group',groupDesc:'Scan the QR code to join our trade & logistics group.',email:'Email',whats:'WhatsApp',phone:'Phone',wechat:'WeChat'},
+      de:{title:'Produkte',sub:'Die Sprachauswahl gilt für die ganze Seite. Es werden nur Produkte mit Inhalt angezeigt.',groupTitle:'WhatsApp‑Gruppe beitreten',groupDesc:'QR-Code scannen, um unserer Handels‑ & Logistik‑Gruppe beizutreten.',email:'E‑Mail',whats:'WhatsApp',phone:'Telefon',wechat:'WeChat'}
     };
     const qs=new URLSearchParams(location.search);
     const currentLang=(qs.get('lang')||localStorage.getItem('lang')||'zh').toLowerCase();
     localStorage.setItem('lang',currentLang);
+    const t=I18N[currentLang]||I18N.zh;
+    document.getElementById('heading').textContent=t.title;
+    document.getElementById('sub').textContent=t.sub;
     // Lang buttons
-    const langEl=document.getElementById('langSwitcher');
-    [...langEl.querySelectorAll('button')].forEach(b=>{
+    [...document.querySelectorAll('#langSwitcher button')].forEach(b=>{
       if(b.dataset.lang===currentLang) b.classList.add('active');
       b.onclick=()=>{const lang=b.dataset.lang;localStorage.setItem('lang',lang);const url=new URL(location.href);url.searchParams.set('lang',lang);location.href=url.toString();};
     });
-    // Headings
-    (()=>{const t=I18N[currentLang]||I18N.zh;heading.textContent=t.title;sub.textContent=t.sub;})();
 
     // Contact
-    const CONTACT={
-      email:'wengandy128@gmail.com',
-      whatsapp:'+86 15888791812',
-      phone:'+86 15888791812',
-      wechat:'15888791812',
-      waInvite:'' // fill later
-    };
-    function renderContact(){
-      const t=I18N[currentLang]||I18N.zh;
-      const el=document.getElementById('contactBar');
-      el.innerHTML=`
-        <a href="mailto:${CONTACT.email}">📧 ${t.email}: ${CONTACT.email}</a>
-        <a href="https://wa.me/${CONTACT.whatsapp.replace(/[^0-9]/g,'')}" target="_blank">💬 ${t.whats}</a>
-        <a href="tel:${CONTACT.phone.replace(/\\s/g,'')}">📞 ${t.phone}: ${CONTACT.phone}</a>
-        <span>🟩 ${t.wechat}: ${CONTACT.wechat}</span>
-      `;
-    }
-    renderContact();
+    const CONTACT={email:'wengandy128@gmail.com',whatsapp:'+86 15888791812',phone:'+86 15888791812',wechat:'15888791812',waInvite:''};
+    document.getElementById('contactBar').innerHTML=`
+      <a href="mailto:${CONTACT.email}">📧 ${t.email}: ${CONTACT.email}</a>
+      <a href="https://wa.me/${CONTACT.whatsapp.replace(/[^0-9]/g,'')}" target="_blank">💬 ${t.whats}</a>
+      <a href="tel:${CONTACT.phone.replace(/\\s/g,'')}">📞 ${t.phone}: ${CONTACT.phone}</a>
+      <span>🟩 ${t.wechat}: ${CONTACT.wechat}</span>
+    `;
 
-    // utils
-    async function exists(url){
-      try{const r=await fetch(url,{method:'HEAD',cache:'no-store'}); if(r.ok) return true;}catch(e){}
-      try{const r=await fetch(url,{cache:'no-store'}); return r.ok;}catch(e){return false;}
+    // ======== 性能关键点：快速存在性检测 + 并行 ========
+    // 1) 不再使用 HEAD，改为 GET，并设置 1.2s 超时
+    function fetchWithTimeout(url,ms=1200){
+      const ctl=new AbortController();
+      const id=setTimeout(()=>ctl.abort(),ms);
+      return fetch(url,{cache:'no-store',signal:ctl.signal}).finally(()=>clearTimeout(id));
     }
-    async function firstImage(base){
-      const exts=['jpg','jpeg','png','webp'];
-      for(const ext of exts){const u=`${base}/1.${ext}`; if(await exists(u)) return u;}
-      return '';
-    }
-    async function readPreview(slug){
-      const order=[currentLang,'en','zh','de'];
-      for(const lg of order){
-        const url=`products/${slug}-${lg}.txt`;
-        try{const r=await fetch(url,{cache:'no-store'}); if(r.ok){const tx=(await r.text()).trim(); const [first,...rest]=tx.split(/\\r?\\n/); return {title:first?.trim()||null, desc:rest.join('\\n').trim()||null};}}catch{}
-      }
-      return null;
+    async function existsFast(url){ try{ const r=await fetchWithTimeout(url); return r.ok; } catch { return false; } }
+
+    // 2) 并行检查多后缀，谁先可用就用谁（Promise.any 方案）
+    async function firstExisting(urls){
+      const wrapped = urls.map(u => fetchWithTimeout(u).then(r => r.ok ? u : Promise.reject(u)));
+      try{ return await Promise.any(wrapped); } catch { return ''; }
     }
 
-    // build product cards and group card
-    async function buildGrid(){
+    // 3) 首先优先把群卡片插入（感知更快）
+    async function addGroupCard(){
+      const candidates=['group.jpeg','group.jpg','group.png','group.webp'];
+      const qr = await firstExisting(candidates);
+      if(!qr) return;
       const grid=document.getElementById('grid');
-      const t=I18N[currentLang]||I18N.zh;
-
-      for(let i=1;i<=6;i++){
-        const slug=`product-${i}`;
-        const imgBase=`assets/imgs/${slug}`;
-        const img=await firstImage(imgBase);
-        const preview=await readPreview(slug);
-        if(!img && !preview) continue;
-
-        const title=preview?.title || `Product ${i}`;
-        const desc=preview?.desc || '';
-
-        const a=document.createElement('a');
-        a.className='cardlink';
-        a.href=`products/${slug}.html?lang=${encodeURIComponent(currentLang)}`;
-
-        const card=document.createElement('article');
-        card.className='card';
-        card.innerHTML=`
-          ${img?`<img class="thumb" src="${img}" alt="${title}">`:`<div class="thumb"></div>`}
-          <div class="body">
-            <div class="title">${title}</div>
-            <p class="desc">${desc}</p>
-          </div>
-          <span class="badge">${currentLang.toUpperCase()}</span>`;
-
-        a.appendChild(card);
-        grid.appendChild(a);
-      }
-
-      // group card
-      const qrcands=['group.jpeg','group.jpg','group.png','group.webp'];
-      let qr='';
-      for(const f of qrcands){ if(await exists(f)){ qr=f; break; } }
-      if(qr){
-        const a=document.createElement('a');
-        a.className='cardlink';
-        a.href= CONTACT.waInvite ? CONTACT.waInvite : qr;
-        a.target = CONTACT.waInvite ? '_blank' : '_self';
-
-        const card=document.createElement('article');
-        card.className='card';
-        card.innerHTML=`
-          <div class="thumb" style="display:flex;align-items:center;justify-content:center;">
-            <img src="${qr}" alt="WhatsApp Group QR" class="qr-thumb">
-          </div>
-          <div class="body">
-            <div class="title">${t.groupTitle}</div>
-            <p class="desc">${t.groupDesc}</p>
-            ${CONTACT.waInvite?`<span class="btn">${t.join}</span>`:''}
-          </div>`;
-        a.appendChild(card);
-        grid.appendChild(a);
-      }
+      const a=document.createElement('a'); a.className='cardlink'; a.href=CONTACT.waInvite?CONTACT.waInvite:qr; a.target=CONTACT.waInvite?'_blank':'_self';
+      a.innerHTML=`<article class="card" style="animation-delay:.05s">
+        <div class="thumb" style="display:flex;align-items:center;justify-content:center">
+          <img src="${qr}" alt="WhatsApp Group QR" class="qr-thumb" loading="eager" width="180" height="180">
+        </div>
+        <div class="body">
+          <div class="title">${t.groupTitle}</div>
+          <p class="desc">${t.groupDesc}</p>
+        </div>
+      </article>`;
+      grid.appendChild(a);
     }
-    buildGrid();
+
+    // 4) 产品卡片并行生成（避免串行等待）
+    async function addProductCards(){
+      const grid=document.getElementById('grid');
+      const tasks = Array.from({length:6}, (_,i)=>i+1).map(async i=>{
+        const slug=`product-${i}`;
+        const base=`assets/imgs/${slug}`;
+        const img = await firstExisting([`${base}/1.jpg`,`${base}/1.jpeg`,`${base}/1.png`,`${base}/1.webp`]);
+        // 预取文案（并行）
+        const txtOrder=[currentLang,'en','zh','de'];
+        const txtUrls=txtOrder.map(lg=>`products/${slug}-${lg}.txt`);
+        const descPromise = (async () => {
+          for (const u of txtUrls) {
+            try { const r=await fetchWithTimeout(u); if(r.ok){ const tx=(await r.text()).trim(); const [first,...rest]=tx.split(/\\r?\\n/); return {title:first?.trim()||`Product ${i}`,desc:rest.join('\\n').trim()||''}; } } catch {}
+          }
+          return null;
+        })();
+        const preview = await descPromise;
+        if(!img && !preview) return;
+
+        const title=preview?.title||`Product ${i}`;
+        const desc=preview?.desc||'';
+        const href=`products/${slug}.html?lang=${encodeURIComponent(currentLang)}`;
+
+        const a=document.createElement('a'); a.className='cardlink'; a.href=href;
+        a.innerHTML=`<article class="card">
+          ${img?`<img class="thumb" src="${img}" alt="${title}" loading="lazy">`:`<div class="thumb"></div>`}
+          <div class="body"><div class="title">${title}</div><p class="desc">${desc}</p></div>
+          <span class="badge">${currentLang.toUpperCase()}</span>
+        </article>`;
+        grid.appendChild(a);
+      });
+      await Promise.all(tasks);
+    }
+
+    // 先群卡片，再产品卡片（两者都在内部做并行）
+    addGroupCard().then(addProductCards);
 
     document.getElementById('y').textContent=new Date().getFullYear();
   </script>
