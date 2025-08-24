@@ -46,13 +46,6 @@
     .skeleton{position:relative;overflow:hidden;background:var(--skeleton)}
     .skeleton::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,var(--shimmer),transparent);animation:shimmer 1.2s infinite}
     @keyframes shimmer{100%{transform:translateX(100%)}}
-  
-    /* === Specs & Details cards === */
-    .box{margin-top:18px;padding:12px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
-    .box h2{margin:0 0 8px;font-size:18px;font-weight:800;color:#111}
-    .specs ul{margin:0;padding-left:18px;color:var(--muted);line-height:1.6}
-    .specs li{margin:2px 0}
-    .details p{margin:0;color:var(--muted);line-height:1.7;white-space:pre-wrap}
   </style>
 </head>
 <body>
@@ -80,16 +73,6 @@
       <section>
         <h1 class="title" id="title">Product 1</h1>
         <div class="desc" id="desc"></div>
-      
-        <div id="specsBox" class="box specs" style="display:none">
-          <h2 id="specsTitle">参数</h2>
-          <ul id="specsList"></ul>
-        </div>
-        <div id="detailsBox" class="box details" style="display:none">
-          <h2 id="detailsTitle">详细描述</h2>
-          <div id="detailsText"></div>
-        </div>
-
       </section>
     </div>
   </div>
@@ -107,62 +90,62 @@
     async function firstOk(urls){const wrapped=urls.map(u=>fetchWithTimeout(u,1200).then(r=>r.ok?u:Promise.reject(u))); try{return await Promise.any(wrapped);}catch{return ''}}
     async function exists(u){try{const r=await fetchWithTimeout(u,900); return r.ok;}catch{return false;}}
 
-    async function loadParams(productId, lang){
-      const order=[lang,'en','zh','de'];
-      for(const lg of order){
-        const url=`../assets/txt/product-${productId}/product-${productId}-params-${lg}.txt`;
-        try{
-          const r=await fetchWithTimeout(url,1200);
-          if(r.ok){
-            const lines=(await r.text()).trim().split(/\r?\n/).filter(Boolean);
-            const list=document.getElementById('specsList'); list.innerHTML='';
-            lines.forEach(line=>{
-              const m=line.split(/\s*[:：]\s*/);
-              const k=m[0]||''; const v=m.slice(1).join(':')||'';
-              const li=document.createElement('li');
-              li.textContent = v?`${k}: ${v}`:k;
-              list.appendChild(li);
-            });
-            const titleI18n={zh:'参数',en:'Specs',de:'Spezifikationen'};
-            document.getElementById('specsTitle').textContent=titleI18n[lang]||'Specs';
-            document.getElementById('specsBox').style.display=lines.length?'block':'none';
-            return;
-          }
-        }catch(e){}
-      }
-      document.getElementById('specsBox').style.display='none';
-    }
-
-    async function loadDetails(productId, lang){
-      const order=[lang,'en','zh','de'];
-      for(const lg of order){
-        const url=`../assets/txt/product-${productId}/product-${productId}-details-${lg}.txt`;
-        try{
-          const r=await fetchWithTimeout(url,1200);
-          if(r.ok){
-            const txt=(await r.text()).trim();
-            if(txt){
-              const titleI18n={zh:'详细描述',en:'Details',de:'Beschreibung'};
-              document.getElementById('detailsTitle').textContent=titleI18n[lang]||'Details';
-              document.getElementById('detailsText').textContent=txt;
-              document.getElementById('detailsBox').style.display='block';
-              return;
-            }
-          }
-        }catch(e){}
-      }
-      document.getElementById('detailsBox').style.display='none';
-    }
-
-
     async function loadTxt(){const slug=`product-${PRODUCT_ID}`; const order=[currentLang,'en','zh','de']; for(const lg of order){const url=`${slug}-${lg}.txt`; try{const r=await fetchWithTimeout(url,1200); if(r.ok){const t=(await r.text()).trim(); const [first,...rest]=t.split(/\r?\n/); return {title:first?.trim()||`Product ${PRODUCT_ID}`, desc:rest.join('\n').trim()||''};}}catch{} } return {title:`Product ${PRODUCT_ID}`,desc:''};}
 
-    async function resolveExtViaManifest(){const mf=await jsonFast('../manifest.json').catch(()=>null); if(mf?.items){const it=mf.items.find(x=>x.id==PRODUCT_ID); if(it?.imgExt) return it.imgExt;} return '';}
+    async function resolveExtViaManifest(){const mf=await jsonFast('manifest.json').catch(()=>null); if(mf?.items){const it=mf.items.find(x=>x.id==PRODUCT_ID); if(it?.imgExt) return it.imgExt;} return '';}
 
     async function loadImages(){
       const base=`../assets/imgs/product-${PRODUCT_ID}`;
-      let ext = await resolveExtViaManifest();
-      if(!ext){ ext = (await firstOk([`${base}/1.jpg`,`${base}/1.jpeg`,`${base}/1.png`,`${base}/1.webp`])).split('.').pop() || ''; }
+      // 1) Resolve extension (manifest first, then probe 1.*)
+      let ext='';
+      const mf=await jsonFast('../manifest.json').catch(()=>null);
+      if(mf?.items){ const it=mf.items.find(x=>x.id==PRODUCT_ID); if(it?.imgExt) ext=it.imgExt; }
+      if(!ext){
+        const guess=['jpg','jpeg','png','webp'];
+        const hit = await Promise.any(guess.map(g=>fetch(`${base}/1.${g}`,{method:'HEAD'}).then(r=>r.ok?g:Promise.reject()))).catch(()=>'');
+        ext = hit||'';
+      }
+      if(!ext) return [];
+
+      // helper: HEAD exists
+      async function headOk(u){ try{ const r=await fetch(u,{method:'HEAD',cache:'force-cache'}); return r.ok?r.headers:null; }catch{return null;} }
+
+      // 2) Try cache (count + last-modified of 1st image)
+      const first=`${base}/1.${ext}`;
+      const h = await headOk(first);
+      if(!h) return [];
+      const lm = (h.get('last-modified')||'') + (h.get('etag')||'');
+      const cacheKey=`p${PRODUCT_ID}:${ext}`;
+      try{
+        const mem=JSON.parse(localStorage.getItem(cacheKey)||'null');
+        if(mem && mem.lm===lm && mem.count>0){
+          return Array.from({length:mem.count}, (_,k)=>`${base}/${k+1}.${ext}`);
+        }
+      }catch{}
+
+      // 3) Incremental parallel probing in chunks to discover count quickly
+      const maxN=24;           // hard ceiling
+      const chunk=6;           // probe 6 at a time
+      let high=6;              // start window
+      let urls=[];
+
+      // we already know #1 exists
+      for(;;){
+        const start = urls.length? urls.length+1 : 1;
+        const end = Math.min(high, maxN);
+        const batch = Array.from({length:end-start+1}, (_,i)=>`${base}/${start+i}.${ext}`);
+        const res = await Promise.all(batch.map((u,idx)=> idx===0 && start===1 ? Promise.resolve(true) : headOk(u).then(x=>!!x)));
+        batch.forEach((u, i)=>{ if(res[i]) urls.push(u); });
+        // stop if last chunk has any miss and end equals high (no need to expand further)
+        if(res.some(v=>!v) && end===high) break;
+        if(end>=maxN) break;
+        high += chunk;
+      }
+
+      // 4) Persist cache guarded by last-modified
+      try{ localStorage.setItem(cacheKey, JSON.stringify({lm, count: urls.length||1})); }catch{}
+      return urls.length? urls : [first];
+    }
       if(!ext) return [];
 
       // 预加载第一张
@@ -178,9 +161,7 @@
     }
 
     (async function init(){
-      const data=await loadTxt(); title.textContent=data.title; desc.textContent=data.desc; if(!data.desc){ const mf = await jsonFast('../manifest.json'); const it = mf?.items?.find(x=>x.id==PRODUCT_ID); if(it?.title?.[currentLang]) title.textContent = it.title[currentLang]; }
-      await loadParams(PRODUCT_ID, currentLang);
-      await loadDetails(PRODUCT_ID, currentLang);
+      const data=await loadTxt(); title.textContent=data.title; desc.textContent=data.desc;
       const imgs=await loadImages(); const track=document.getElementById('track'); const dots=document.getElementById('dots');
       track.innerHTML='';
       if(imgs.length===0){ document.getElementById('carousel').style.display='none'; return; }
