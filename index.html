@@ -5,20 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Eindeepseek · 产品精选</title>
 
-  <!-- SEO -->
+  <!-- GA4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SP9BZHN30E"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-SP9BZHN30E');
+  </script>
+
   <meta name="description" content="Eindeepseek B2C 产品展示，支持中文/英文/德文，多语言切换；自动从图片目录与文本加载内容。" />
   <meta property="og:title" content="Eindeepseek · 产品精选" />
   <meta property="og:description" content="多语言产品展示网站：自动读取图片与文案，仅显示有内容的产品。" />
   <meta property="og:type" content="website" />
-  <meta property="og:image" content="https://eindeepseek.com/group.jpeg" />
-  <meta property="og:url" content="https://eindeepseek.com/" />
+  <meta property="og:image" content="https://www.eindeepseek.com/group.jpeg" />
+  <meta property="og:url" content="https://www.eindeepseek.com/" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Eindeepseek · 产品精选" />
   <meta name="twitter:description" content="多语言产品展示网站：自动读取图片与文案，仅显示有内容的产品。" />
-  <link rel="dns-prefetch" href="//eindeepseek.com">
-  <link rel="preconnect" href="https://eindeepseek.com" crossorigin>
+  <link rel="dns-prefetch" href="//www.eindeepseek.com">
+  <link rel="preconnect" href="https://www.eindeepseek.com" crossorigin>
 
-  <!-- 优先预加载群二维码，提升首屏 -->
   <link rel="preload" as="image" href="group.jpeg" />
 
   <style>
@@ -56,12 +63,10 @@
     .badge{position:absolute;top:10px;left:10px;background:#111;color:#fff;padding:2px 8px;border-radius:999px;font-size:12px;opacity:.85}
     .cardlink{display:block;text-decoration:none;color:inherit}
 
-    /* 骨架屏 */
     .skeleton{position:relative;overflow:hidden;background:var(--skeleton)}
     .skeleton::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg, transparent, var(--skeleton-shimmer), transparent);animation:shimmer 1.2s infinite}
     @keyframes shimmer{100%{transform:translateX(100%)}}
 
-    /* 群卡片缩略图 */
     .qr-thumb{max-width:180px;max-height:180px;margin:16px auto;display:block;border-radius:10px;border:1px solid var(--border);background:#fff}
 
     footer{border-top:1px solid var(--border);text-align:center;padding:14px;color:var(--muted);margin-top:26px}
@@ -84,7 +89,6 @@
     <p class="lead" id="sub">选择语言后会在全站生效；仅显示有内容的产品。</p>
 
     <div class="grid" id="grid">
-      <!-- 预放骨架，避免首屏跳动 -->
       <div class="card"><div class="thumb skeleton"></div><div class="body"><div class="title skeleton" style="height:18px;width:60%"></div><p class="desc skeleton" style="height:38px"></p></div></div>
       <div class="card"><div class="thumb skeleton"></div><div class="body"><div class="title skeleton" style="height:18px;width:60%"></div><p class="desc skeleton" style="height:38px"></p></div></div>
       <div class="card"><div class="thumb skeleton"></div><div class="body"><div class="title skeleton" style="height:18px;width:60%"></div><p class="desc skeleton" style="height:38px"></p></div></div>
@@ -94,7 +98,6 @@
   <footer>© <span id="y"></span> Eindeepseek</footer>
 
   <script>
-    // i18n
     const I18N={
       zh:{title:'产品展示',sub:'选择语言后会在全站生效；仅显示有内容的产品。',groupTitle:'加入 WhatsApp 群组',groupDesc:'扫码二维码，进入我们的贸易 & 物流交流群。',email:'邮件',whats:'WhatsApp',phone:'电话',wechat:'微信'},
       en:{title:'Products',sub:'Language selection applies site-wide. Only products with content are shown.',groupTitle:'Join WhatsApp Group',groupDesc:'Scan the QR code to join our trade & logistics group.',email:'Email',whats:'WhatsApp',phone:'Phone',wechat:'WeChat'},
@@ -107,95 +110,48 @@
     document.getElementById('heading').textContent=t.title;
     document.getElementById('sub').textContent=t.sub;
 
-    // 语言按钮
     [...document.querySelectorAll('#langSwitcher button')].forEach(b=>{
       if(b.dataset.lang===currentLang) b.classList.add('active');
       b.onclick=()=>{const lang=b.dataset.lang;localStorage.setItem('lang',lang);const url=new URL(location.href);url.searchParams.set('lang',lang);location.href=url.toString();};
     });
 
-    // 联系方式
     const CONTACT={email:'wengandy128@gmail.com',whatsapp:'+86 15888791812',phone:'+86 15888791812',wechat:'15888791812',waInvite:''};
     document.getElementById('contactBar').innerHTML=`
       <a href="mailto:${CONTACT.email}">📧 ${t.email}: ${CONTACT.email}</a>
       <a href="https://wa.me/${CONTACT.whatsapp.replace(/[^0-9]/g,'')}" target="_blank">💬 ${t.whats}</a>
-      <a href="tel:${CONTACT.phone.replace(/\\s/g,'')}">📞 ${t.phone}: ${CONTACT.phone}</a>
+      <a href="tel:${CONTACT.phone.replace(/\s/g,'')}">📞 ${t.phone}: ${CONTACT.phone}</a>
       <span>🟩 ${t.wechat}: ${CONTACT.wechat}</span>
     `;
 
-    // ========== 加载数据：优先 manifest，回退探测 ==========
-    function fetchWithTimeout(url,ms=1200){ const ctl=new AbortController(); const id=setTimeout(()=>ctl.abort(),ms); return fetch(url,{cache:'no-store',signal:ctl.signal}).finally(()=>clearTimeout(id)); }
-    async function tryJson(url){ try{ const r=await fetchWithTimeout(url,1500); if(r.ok) return await r.json(); } catch {} return null; }
-    async function existsFast(url){ try{ const r=await fetchWithTimeout(url,1200); return r.ok; } catch { return false; } }
-    async function firstExisting(urls){ const wrapped=urls.map(u=>fetchWithTimeout(u,1200).then(r=>r.ok?u:Promise.reject(u))); try{ return await Promise.any(wrapped);} catch { return ''; } }
+    function fetchWithTimeout(url,ms=1200){const ctl=new AbortController();const id=setTimeout(()=>ctl.abort(),ms);return fetch(url,{cache:'no-store',signal:ctl.signal}).finally(()=>clearTimeout(id));}
+    async function tryJson(url){try{const r=await fetchWithTimeout(url,1500);if(r.ok)return await r.json();}catch{}return null;}
+    async function existsFast(url){try{const r=await fetchWithTimeout(url,1200);return r.ok;}catch{return false;}}
+    async function firstExisting(urls){const wrapped=urls.map(u=>fetchWithTimeout(u,1200).then(r=>r.ok?u:Promise.reject(u)));try{return await Promise.any(wrapped);}catch{return '';}}
+    async function getPreviewFromTxt(slug){const order=[currentLang,'en','zh','de'];for(const lg of order){const u=`products/${slug}-${lg}.txt`;try{const r=await fetchWithTimeout(u,1200);if(r.ok){const tx=(await r.text()).trim();const [first,...rest]=tx.split(/\r?\n/);return{title:first?.trim()||null,desc:rest.join('\n').trim()||null};}}catch{}}return null;}
 
-    async function getPreviewFromTxt(slug){
-      const order=[currentLang,'en','zh','de'];
-      for(const lg of order){
-        const u=`products/${slug}-${lg}.txt`;
-        try{ const r=await fetchWithTimeout(u,1200); if(r.ok){ const tx=(await r.text()).trim(); const [first,...rest]=tx.split(/\\r?\\n/); return {title:first?.trim()||null, desc:rest.join('\\n').trim()||null}; } }catch{}
-      }
-      return null;
-    }
+    function trackProductClick(id,title){try{gtag('event','click_product',{product_id:id,product_name:title});}catch(e){}}
+    function trackGroupClick(){try{gtag('event','click_group');}catch(e){}}
 
     async function build(){
-      const grid=document.getElementById('grid');
-      grid.innerHTML=''; // 清空骨架
+      const grid=document.getElementById('grid');grid.innerHTML='';
+      (async()=>{const qr=await firstExisting(['group.jpeg','group.jpg','group.png','group.webp']);if(qr){const a=document.createElement('a');a.className='cardlink';a.href=CONTACT.waInvite?CONTACT.waInvite:qr;a.target=CONTACT.waInvite?'_blank':'_self';a.onclick=trackGroupClick;a.innerHTML=`<article class="card"><div class="thumb" style="display:flex;align-items:center;justify-content:center"><img src="${qr}" alt="WhatsApp Group QR" class="qr-thumb" loading="eager" width="180" height="180"></div><div class="body"><div class="title">${t.groupTitle}</div><p class="desc">${t.groupDesc}</p></div></article>`;grid.appendChild(a);}})();
 
-      // 1) 群卡片（优先）
-      (async ()=>{
-        const qr=await firstExisting(['group.jpeg','group.jpg','group.png','group.webp']);
-        if(qr){
-          const a=document.createElement('a'); a.className='cardlink'; a.href=CONTACT.waInvite?CONTACT.waInvite:qr; a.target=CONTACT.waInvite?'_blank':'_self';
-          a.innerHTML=`<article class="card">
-            <div class="thumb" style="display:flex;align-items:center;justify-content:center"><img src="${qr}" alt="WhatsApp Group QR" class="qr-thumb" loading="eager" width="180" height="180"></div>
-            <div class="body"><div class="title">${t.groupTitle}</div><p class="desc">${t.groupDesc}</p></div>
-          </article>`;
-          grid.appendChild(a);
-        }
-      })();
-
-      // 2) 产品（优先 manifest）
       const mf=await tryJson('products/manifest.json');
-      const ids = mf?.items?.map(x=>x.id) || [1,2,3,4,5,6];
-      const tasks = ids.map(async id=>{
-        const slug=`product-${id}`;
-        let title=null, desc=null, img='';
-
-        if(mf){
-          const item=mf.items.find(x=>x.id===id);
-          if(item){
-            const ext=item.imgExt||'jpg';
-            img=`assets/imgs/${slug}/1.${ext}`;
-            if(item.title) title=item.title[currentLang]||item.title.en||item.title.zh||null;
-          }
-        }
-        // 若没有 manifest 或图片可能 404，则回退探测
-        if(!img || !(await existsFast(img))){
-          img = await firstExisting([`assets/imgs/${slug}/1.jpg`,`assets/imgs/${slug}/1.jpeg`,`assets/imgs/${slug}/1.png`,`assets/imgs/${slug}/1.webp`]);
-        }
-        // 文案优先 manifest.title；若为空，回退 txt
-        if(!title){
-          const p=await getPreviewFromTxt(slug);
-          if(p){ title=p.title||title; desc=p.desc||desc; }
-        }
-
-        if(!img && !title && !desc) return; // 没内容跳过
-        if(!title) title = `Product ${id}`;
-        if(!desc) desc = '';
-
-        const a=document.createElement('a'); a.className='cardlink'; a.href=`products/${slug}.html?lang=${encodeURIComponent(currentLang)}`;
-        a.innerHTML=`<article class="card">
-          ${img?`<img class="thumb" src="${img}" alt="${title}" loading="lazy">`:`<div class="thumb skeleton"></div>`}
-          <div class="body"><div class="title">${title}</div><p class="desc">${desc}</p></div>
-          <span class="badge">${currentLang.toUpperCase()}</span>
-        </article>`;
+      const ids=mf?.items?.map(x=>x.id)||[1,2,3,4,5,6];
+      const tasks=ids.map(async id=>{const slug=`product-${id}`;let title=null,desc=null,img='';
+        if(mf){const item=mf.items.find(x=>x.id===id);if(item){const ext=item.imgExt||'jpg';img=`assets/imgs/${slug}/1.${ext}`;if(item.title)title=item.title[currentLang]||item.title.en||item.title.zh||null;}}
+        if(!img || !(await existsFast(img))){img=await firstExisting([`assets/imgs/${slug}/1.jpg`,`assets/imgs/${slug}/1.jpeg`,`assets/imgs/${slug}/1.png`,`assets/imgs/${slug}/1.webp`]);}
+        if(!title){const p=await getPreviewFromTxt(slug);if(p){title=p.title||title;desc=p.desc||desc;}}
+        if(!img && !title && !desc) return;
+        if(!title) title=`Product ${id}`; if(!desc) desc='';
+        const href=`products/${slug}.html?lang=${encodeURIComponent(currentLang)}`;
+        const a=document.createElement('a');a.className='cardlink';a.href=href;a.onclick=()=>trackProductClick(id,title);
+        a.innerHTML=`<article class="card">${img?`<img class="thumb" src="${img}" alt="${title}" loading="lazy">`:`<div class="thumb skeleton"></div>`}<div class="body"><div class="title">${title}</div><p class="desc">${desc}</p></div><span class="badge">${currentLang.toUpperCase()}</span></article>`;
         grid.appendChild(a);
       });
-
       await Promise.all(tasks);
     }
     build();
-
     document.getElementById('y').textContent=new Date().getFullYear();
   </script>
 </body>
