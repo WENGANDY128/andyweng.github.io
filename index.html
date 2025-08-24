@@ -125,31 +125,34 @@
 
     function fetchWithTimeout(url,ms=1200){const ctl=new AbortController();const id=setTimeout(()=>ctl.abort(),ms);return fetch(url,{cache:'no-store',signal:ctl.signal}).finally(()=>clearTimeout(id));}
     async function tryJson(url){try{const r=await fetchWithTimeout(url,1500);if(r.ok)return await r.json();}catch{}return null;}
-    async function existsFast(url){try{const r=await fetchWithTimeout(url,1200);return r.ok;}catch{return false;}}
-    async function firstExisting(urls){const wrapped=urls.map(u=>fetchWithTimeout(u,1200).then(r=>r.ok?u:Promise.reject(u)));try{return await Promise.any(wrapped);}catch{return '';}}
-    async function getPreviewFromTxt(slug){const order=[currentLang,'en','zh','de'];for(const lg of order){const u=`products/${slug}-${lg}.txt`;try{const r=await fetchWithTimeout(u,1200);if(r.ok){const tx=(await r.text()).trim();const [first,...rest]=tx.split(/\r?\n/);return{title:first?.trim()||null,desc:rest.join('\n').trim()||null};}}catch{}}return null;}
+    async function existsFast(url){try{const r=await fetchWithTimeout(url,1000);return r.ok;}catch{return false;}}
+    async function firstExisting(urls){const wrapped=urls.map(u=>fetchWithTimeout(u,1000).then(r=>r.ok?u:Promise.reject(u)));try{return await Promise.any(wrapped);}catch{return '';}}
+    async function getPreviewFromTxt(slug){const order=[currentLang,'en','zh','de'];for(const lg of order){const u=\`products/\${slug}-\${lg}.txt\`;try{const r=await fetchWithTimeout(u,1000);if(r.ok){const tx=(await r.text()).trim();const [first,...rest]=tx.split(/\r?\n/);return{title:first?.trim()||null,desc:rest.join('\n').trim()||null};}}catch{}}return null;}
 
     function trackProductClick(id,title){try{gtag('event','click_product',{product_id:id,product_name:title});}catch(e){}}
     function trackGroupClick(){try{gtag('event','click_group');}catch(e){}}
 
     async function build(){
       const grid=document.getElementById('grid');grid.innerHTML='';
-      (async()=>{const qr=await firstExisting(['group.jpeg','group.jpg','group.png','group.webp']);if(qr){const a=document.createElement('a');a.className='cardlink';a.href=CONTACT.waInvite?CONTACT.waInvite:qr;a.target=CONTACT.waInvite?'_blank':'_self';a.onclick=trackGroupClick;a.innerHTML=`<article class="card"><div class="thumb" style="display:flex;align-items:center;justify-content:center"><img src="${qr}" alt="WhatsApp Group QR" class="qr-thumb" loading="eager" width="180" height="180"></div><div class="body"><div class="title">${t.groupTitle}</div><p class="desc">${t.groupDesc}</p></div></article>`;grid.appendChild(a);}})();
+      (async()=>{const qr=await firstExisting(['group.jpeg','group.jpg','group.png','group.webp']);if(qr){const a=document.createElement('a');a.className='cardlink';a.href=CONTACT.waInvite?CONTACT.waInvite:qr;a.target=CONTACT.waInvite?'_blank':'_self';a.onclick=trackGroupClick;a.innerHTML=\`<article class="card"><div class="thumb" style="display:flex;align-items:center;justify-content:center"><img src="\${qr}" alt="WhatsApp Group QR" class="qr-thumb" loading="eager" width="180" height="180"></div><div class="body"><div class="title">\${t.groupTitle}</div><p class="desc">\${t.groupDesc}</p></div></article>\`;grid.appendChild(a);}})();
 
       const mf=await (async()=>{for(const u of ['manifest.json','/manifest.json','./manifest.json']){const d=await tryJson(u); if(d) return d;} return null;})() ;
       const ids=mf?.items?.map(x=>x.id)||[1,2,3,4,5,6];
-      const tasks=ids.map(async id=>{const slug=`product-${id}`;let title=null,desc=null,img='';
-        if(mf){const item=mf.items.find(x=>x.id===id);if(item){const ext=item.imgExt||'jpg';img=`assets/imgs/${slug}/1.${ext}`;if(item.title)title=item.title[currentLang]||item.title.en||item.title.zh||null;}}
-        if(!img || !(await existsFast(img))){img=await firstExisting([`assets/imgs/${slug}/1.jpg`,`assets/imgs/${slug}/1.jpeg`,`assets/imgs/${slug}/1.png`,`assets/imgs/${slug}/1.webp`]);}
-        if(!title){const p=await getPreviewFromTxt(slug);if(p){title=p.title||title;desc=p.desc||desc;}}
-        if(!img && !title && !desc) return;
-        if(!title) title=`Product ${id}`; if(!desc) desc='';
-        const href=`products/${slug}.html?lang=${encodeURIComponent(currentLang)}`;
+
+      for(const id of ids){
+        const slug=\`product-\${id}\`;
+        // 固定 png，没图直接跳过
+        const img=\`assets/imgs/\${slug}/1.png\`;
+        if(!(await existsFast(img))) continue;
+
+        const item=mf.items.find(x=>x.id===id);
+        const title=item?.title?.[currentLang]||item?.title?.en||item?.title?.zh||\`Product \${id}\`;
+
+        const href=\`products/\${slug}.html?lang=\${encodeURIComponent(currentLang)}\`;
         const a=document.createElement('a');a.className='cardlink';a.href=href;a.onclick=()=>trackProductClick(id,title);
-        a.innerHTML=`<article class="card">${img?`<img class="thumb" src="${img}" alt="${title}" loading="lazy">`:`<div class="thumb skeleton"></div>`}<div class="body"><div class="title">${title}</div><p class="desc">${desc}</p></div><span class="badge">${currentLang.toUpperCase()}</span></article>`;
+        a.innerHTML=\`<article class="card"><img class="thumb" src="\${img}" alt="\${title}" loading="lazy"><div class="body"><div class="title">\${title}</div></div><span class="badge">\${currentLang.toUpperCase()}</span></article>\`;
         grid.appendChild(a);
-      });
-      await Promise.all(tasks);
+      }
     }
     build();
     document.getElementById('y').textContent=new Date().getFullYear();
