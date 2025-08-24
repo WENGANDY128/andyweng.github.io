@@ -1,203 +1,277 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Eindeepseek – Product 1</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Eindeepseek – Handheld Fan Series</title>
+<style>
+  :root{--bg:#f7f8fa;--text:#222;--muted:#555;--primary:#2b7de9;--border:#e4e6eb;--card:#fff}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
+  header{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#fff;border-bottom:1px solid var(--border)}
+  .brand a{color:var(--text);text-decoration:none;font-weight:800}
+  .lang{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--border);border-radius:999px;padding:6px;background:#fff}
+  .lang button{appearance:none;border:none;cursor:pointer;padding:6px 10px;border-radius:999px;color:var(--muted);background:transparent;font-weight:600}
+  .lang button.active{color:#fff;background:var(--primary)}
 
-  <!-- GA4 -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SP9BZHN30E"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-SP9BZHN30E');
-  </script>
+  .wrap{max-width:1100px;margin:0 auto;padding:18px 16px 56px}
+  .layout{display:grid;gap:18px}
+  @media(min-width:900px){.layout{grid-template-columns:1.15fr .85fr;align-items:start}}
 
-  <!-- Perf hints -->
-  <link rel="dns-prefetch" href="//www.eindeepseek.com">
-  <link rel="preconnect" href="https://www.eindeepseek.com" crossorigin>
+  /* 8款型号卡片 */
+  .model-cards{display:grid;gap:14px;margin-bottom:18px}
+  .model-card{
+    border:2px solid var(--border);border-radius:12px;background:#fff;cursor:pointer;overflow:hidden;
+    transition:transform .14s ease, box-shadow .14s ease, border-color .14s ease;
+  }
+  .model-card:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.08)}
+  .model-card.active{border-color:var(--primary);box-shadow:0 0 0 3px rgba(43,125,233,.18)}
+  .model-card img{width:100%;height:132px;object-fit:cover;display:block;border-bottom:1px solid var(--border)}
+  .model-card .meta{padding:10px 12px}
+  .model-card .name{margin:0;font-weight:800}
+  .model-card .brief{margin:2px 0 0;color:var(--muted);font-size:13px}
+  @media(min-width:560px){.model-cards{grid-template-columns:repeat(2,1fr)}}
+  @media(min-width:900px){.model-cards{grid-template-columns:repeat(4,1fr)}}
 
-  <style>
-    :root{--bg:#f7f8fa;--text:#222;--muted:#555;--primary:#2b7de9;--border:#ddd;--card:#fff;--skeleton:#eef1f5;--shimmer:#f7f8fb}
-    *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
-    header{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#fff;border-bottom:1px solid var(--border)}
-    .brand a{color:var(--text);text-decoration:none;font-weight:800}
-    .lang{display:inline-flex;gap:6px;align-items:center;background:#fff;border:1px solid var(--border);border-radius:999px;padding:6px}
-    .lang button{appearance:none;border:none;cursor:pointer;padding:6px 10px;border-radius:999px;color:var(--muted);background:transparent;font-weight:600}
-    .lang button.active{color:#fff;background:var(--primary)}
-    .wrap{max-width:1100px;margin:0 auto;padding:18px 16px 56px}
-    .layout{display:grid;gap:18px}
-    @media(min-width:900px){.layout{grid-template-columns:1.1fr .9fr;align-items:start}}
-    .title{font-size:28px;font-weight:800;margin:8px 0}
-    .desc{color:var(--muted);line-height:1.6;white-space:pre-wrap;word-wrap:break-word}
+  /* 轮播 */
+  .carousel{position:relative;overflow:hidden;border-radius:14px;border:1px solid var(--border);background:#fff}
+  .track{display:flex;transition:transform .45s ease;will-change:transform}
+  .slide{min-width:100%}
+  .slide img{display:block;width:100%;height:auto;object-fit:cover}
+  .navBtn{position:absolute;top:50%;transform:translateY(-50%);background:#fff;border:1px solid var(--border);border-radius:10px;padding:8px 10px;cursor:pointer}
+  .prev{left:8px}.next{right:8px}
+  .dots{display:flex;justify-content:center;gap:6px;margin-top:10px}
+  .dot{width:8px;height:8px;border-radius:50%;background:#cfd3da;border:none}
+  .dot.active{background:#2b7de9}
 
-    .carousel{position:relative;overflow:hidden;border-radius:14px;border:1px solid var(--border);background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.06)}
-    .track{display:flex;transition:transform .45s ease;will-change:transform}
-    .slide{min-width:100%;user-select:none}
-    .slide img{display:block;width:100%;height:auto;object-fit:cover}
-    .navBtn{position:absolute;top:50%;transform:translateY(-50%);background:#fff;border:1px solid var(--border);color:#333;border-radius:10px;padding:8px 10px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.1)}
-    .prev{left:8px}.next{right:8px}
-    .dots{display:flex;justify-content:center;gap:6px;margin-top:10px}
-    .dot{width:8px;height:8px;border-radius:50%;background:#cfd3da;border:none}
-    .dot.active{background:#2b7de9}
+  .title{font-size:28px;font-weight:800;margin:8px 0}
+  .desc{color:var(--muted);line-height:1.6;white-space:pre-wrap}
 
-    .skeleton{position:relative;overflow:hidden;background:var(--skeleton)}
-    .skeleton::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,var(--shimmer),transparent);animation:shimmer 1.2s infinite}
-    @keyframes shimmer{100%{transform:translateX(100%)}}
-  
-    /* Right-column cards */
-    .box{margin-top:18px;padding:12px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
-    .box h2{margin:0 0 8px;font-size:18px;font-weight:800;color:#111}
-    .specs ul{margin:0;padding-left:18px;color:var(--muted);line-height:1.6}
-    .specs li{margin:2px 0}
-    .details p{margin:0;color:var(--muted);line-height:1.7;white-space:pre-wrap}
-  </style>
+  .box{margin-top:18px;padding:12px;background:#fff;border:1px solid var(--border);border-radius:10px}
+  .box h2{margin:0 0 8px;font-size:18px;font-weight:800;color:#111}
+  .specs ul{margin:0;padding-left:18px;color:var(--muted);line-height:1.6}
+  .specs li{margin:2px 0}
+  .details p{margin:0;color:var(--muted);line-height:1.7;white-space:pre-wrap}
+</style>
 </head>
 <body>
-  <header>
-    <div class="brand"><a id="homeLink" href="../index.html">Eindeepseek</a></div>
-    <div class="lang" id="langSwitcher">
-      <button data-lang="zh">ZH</button>
-      <button data-lang="en">EN</button>
-      <button data-lang="de">DE</button>
-    </div>
-  </header>
+<header>
+  <div class="brand"><a id="homeLink" href="../index.html">Eindeepseek</a></div>
+  <div class="lang" id="langSwitcher">
+    <button data-lang="zh">ZH</button>
+    <button data-lang="en">EN</button>
+    <button data-lang="de">DE</button>
+  </div>
+</header>
 
-  <div class="wrap">
-    <div class="layout">
-      <section>
-        <div class="carousel" id="carousel" aria-label="gallery">
-          <div class="track" id="track">
-            <div class="slide"><div class="skeleton" style="aspect-ratio:4/3;width:100%"></div></div>
-          </div>
-          <button class="navBtn prev" id="prev" aria-label="Prev">◀</button>
-          <button class="navBtn next" id="next" aria-label="Next">▶</button>
-        </div>
-        <div class="dots" id="dots"></div>
-      </section>
-      <section>
-        <h1 class="title" id="title">Product 1</h1>
-        <div class="desc" id="desc"></div>
+<div class="wrap">
+  <div class="layout">
+    <section>
+      <!-- 8款卡片选择 -->
+      <div class="model-cards" id="modelCards"></div>
+
+      <!-- 图片轮播 -->
+      <div class="carousel" id="carousel">
+        <div class="track" id="track"></div>
+        <button class="navBtn prev" id="prev" aria-label="Prev">◀</button>
+        <button class="navBtn next" id="next" aria-label="Next">▶</button>
+      </div>
+      <div class="dots" id="dots"></div>
+    </section>
+
+    <section>
+      <h1 class="title" id="title">Handheld Fan Series</h1>
+      <div class="desc" id="desc"></div>
       <div id="specsBox" class="box specs" style="display:none"><h2 id="specsTitle">参数</h2><ul id="specsList"></ul></div>
       <div id="detailsBox" class="box details" style="display:none"><h2 id="detailsTitle">详细描述</h2><div id="detailsText"></div></div>
-      </section>
-    </div>
+    </section>
   </div>
+</div>
 
-  <script>
-    const PRODUCT_ID=1;
-    const qs=new URLSearchParams(location.search);
-    const currentLang=(qs.get('lang')||localStorage.getItem('lang')||'zh').toLowerCase();
-    localStorage.setItem('lang',currentLang);
-    const home=new URL('../index.html',location.href); home.searchParams.set('lang',currentLang); document.getElementById('homeLink').href=home.toString();
-    [...document.querySelectorAll('#langSwitcher button')].forEach(b=>{if(b.dataset.lang===currentLang)b.classList.add('active');b.onclick=()=>{const url=new URL(location.href);url.searchParams.set('lang',b.dataset.lang);localStorage.setItem('lang',b.dataset.lang);location.href=url.toString();}});
+<script>
+/* ====== 基础状态（语言 & 当前子型号） ====== */
+const qs = new URLSearchParams(location.search);
+const currentLang = (qs.get('lang') || localStorage.getItem('lang') || 'zh').toLowerCase();
+localStorage.setItem('lang', currentLang);
+let SUB_ID = (qs.get('sub') || 'a').toLowerCase(); // a ~ h
 
-    function fetchWithTimeout(url,ms=1200){const ctl=new AbortController();const id=setTimeout(()=>ctl.abort(),ms);return fetch(url,{cache:'no-store',signal:ctl.signal}).finally(()=>clearTimeout(id));}
-    async function jsonFast(url){try{const r=await fetchWithTimeout(url,1500); if(r.ok) return await r.json();}catch{} return null;}
-    async function firstOk(urls){const wrapped=urls.map(u=>fetchWithTimeout(u,1200).then(r=>r.ok?u:Promise.reject(u))); try{return await Promise.any(wrapped);}catch{return ''}}
-    async function exists(u){try{const r=await fetchWithTimeout(u,900); return r.ok;}catch{return false;}}
+// 首页链接保持语言
+const home = new URL('../index.html', location.href); home.searchParams.set('lang', currentLang);
+document.getElementById('homeLink').href = home.toString();
 
-    async function loadTxt(){const slug=`product-${PRODUCT_ID}`; const order=[currentLang,'en','zh','de']; for(const lg of order){const url=`${slug}-${lg}.txt`; try{const r=await fetchWithTimeout(url,1200); if(r.ok){const t=(await r.text()).trim(); const [first,...rest]=t.split(/\r?\n/); return {title:first?.trim()||`Product ${PRODUCT_ID}`, desc:rest.join('\n').trim()||''};}}catch{} } return {title:`Product ${PRODUCT_ID}`,desc:''};}
+// 语言按钮
+[...document.querySelectorAll('#langSwitcher button')].forEach(b=>{
+  if(b.dataset.lang===currentLang) b.classList.add('active');
+  b.onclick=()=>{const u=new URL(location.href);u.searchParams.set('lang',b.dataset.lang);location.href=u.toString();}
+});
 
-    async function resolveExtViaManifest(){const mf=await jsonFast('../manifest.json').catch(()=>null); if(mf?.items){const it=mf.items.find(x=>x.id==PRODUCT_ID); if(it?.imgExt) return it.imgExt;} return '';}
+/* ====== 8款型号清单（可改名 & 简介） ====== */
+const MODELS = [
+  { sub:'a', name:{zh:'C01 折叠风扇', en:'C01 Fold Fan', de:'C01 Klappventilator'}, brief:{zh:'折叠 | 2000mAh', en:'Foldable | 2000mAh', de:'Faltbar | 2000mAh'} },
+  { sub:'b', name:{zh:'C02 手持风扇', en:'C02 Handheld Fan', de:'C02 Handventilator'}, brief:{zh:'便携 | 3档', en:'Portable | 3 speeds', de:'Tragbar | 3 Stufen'} },
+  { sub:'c', name:{zh:'C03 迷你风扇', en:'C03 Mini Fan', de:'C03 Mini-Ventilator'}, brief:{zh:'超轻 | 静音', en:'Ultra light | Quiet', de:'Sehr leicht | Leise'} },
+  { sub:'d', name:{zh:'C04 桌面风扇', en:'C04 Desk Fan', de:'C04 Tischventilator'}, brief:{zh:'桌面 | USB-C', en:'Desktop | USB-C', de:'Tisch | USB-C'} },
+  { sub:'e', name:{zh:'C05 强风版', en:'C05 Turbo', de:'C05 Turbo'}, brief:{zh:'大风量', en:'High airflow', de:'Hoher Luftstrom'} },
+  { sub:'f', name:{zh:'C06 长续航', en:'C06 Long-Life', de:'C06 Lange Laufzeit'}, brief:{zh:'超长续航', en:'Long battery', de:'Lange Akkulaufzeit'} },
+  { sub:'g', name:{zh:'C07 静音版', en:'C07 Silent', de:'C07 Leise'}, brief:{zh:'低噪音', en:'Low noise', de:'Niedriger Lärm'} },
+  { sub:'h', name:{zh:'C08 儿童款', en:'C08 Kids', de:'C08 Kinder'}, brief:{zh:'安全扇叶', en:'Safe blades', de:'Sichere Blätter'} },
+];
+const t = (obj)=> obj?.[currentLang] || obj?.en;
 
-    
-    async function loadParams(productId, lang){
-      const order=[lang,'en','zh','de'];
-      const prefixes=['../assets/txt','/assets/txt'];
-      for(const lg of order){
-        for(const pre of prefixes){
-          const url=`${pre}/product-${productId}/product-${productId}-params-${lg}.txt`;
-          try{
-            const r=await fetchWithTimeout(url,1200);
-            if(r.ok){
-              const lines=(await r.text()).trim().split(/\r?\n/).filter(Boolean);
-              const list=document.getElementById('specsList'); list.innerHTML='';
-              lines.forEach(line=>{
-                const m=line.split(/\s*[:：]\s*/);
-                const k=m[0]||''; const v=m.slice(1).join(':')||'';
-                const li=document.createElement('li');
-                li.textContent = v?`${k}: ${v}`:k;
-                list.appendChild(li);
-              });
-              const titleI18n={zh:'参数',en:'Specs',de:'Spezifikationen'};
-              document.getElementById('specsTitle').textContent=titleI18n[lang]||'Specs';
-              document.getElementById('specsBox').style.display=lines.length?'block':'none';
-              return;
-            }
-          }catch(e){}
+/* ====== 生成 8 个大框框卡片 ====== */
+function buildCards(){
+  const box = document.getElementById('modelCards');
+  box.innerHTML = '';
+  MODELS.forEach(m=>{
+    const card = document.createElement('div');
+    card.className = 'model-card' + (m.sub===SUB_ID ? ' active':'');
+    card.dataset.sub = m.sub;
+
+    const thumbCandidates = [
+      `../assets/imgs/product-1${m.sub}/1.jpg`,
+      `../assets/imgs/product-1${m.sub}/1.png`,
+      `../assets/imgs/product-1${m.sub}/1.webp`,
+      `../assets/imgs/product-1${m.sub}/1.jpeg`
+    ];
+    const thumb = thumbCandidates[0]; // 直接用 jpg；如需更智能可再加探测
+
+    card.innerHTML = \`
+      <img src="\${thumb}" alt="\${t(m.name)||m.sub}" loading="lazy" decoding="async">
+      <div class="meta">
+        <p class="name">\${t(m.name)||m.sub.toUpperCase()}</p>
+        <p class="brief">\${t(m.brief)||''}</p>
+      </div>
+    \`;
+    card.onclick = ()=>{
+      if(SUB_ID===m.sub) return;
+      SUB_ID = m.sub;
+      const url = new URL(location.href);
+      url.searchParams.set('sub', SUB_ID);
+      url.searchParams.set('lang', currentLang);
+      history.replaceState(null,'',url); // 无刷新更新地址
+      buildCards();
+      renderProduct();
+    };
+    box.appendChild(card);
+  });
+}
+
+/* ====== 文案/参数/详情/图片加载 ====== */
+async function loadTxt(sub){
+  const order=[currentLang,'en','zh','de'];
+  for(const lg of order){
+    try{
+      const r=await fetch(\`product-1\${sub}-\${lg}.txt\`,{cache:'no-store'});
+      if(r.ok){
+        const t=await r.text();
+        const lines=t.trim().split(/\r?\n/);
+        const title = (lines[0]||'').trim() || \`Model \${sub.toUpperCase()}\`;
+        const desc  = lines.slice(1).join('\n').trim();
+        return {title, desc};
+      }
+    }catch{}
+  }
+  return {title:\`Model \${sub.toUpperCase()}\`, desc:''};
+}
+
+async function loadParams(sub, lang){
+  const order=[lang,'en','zh','de'];
+  for(const lg of order){
+    try{
+      const r=await fetch(\`../assets/txt/product-1\${sub}/params-\${lg}.txt\`,{cache:'no-store'});
+      if(r.ok){
+        const lines=(await r.text()).trim().split(/\r?\n/).filter(Boolean);
+        const ul=document.getElementById('specsList'); ul.innerHTML='';
+        lines.forEach(line=>{
+          const m=line.split(/\s*[:：]\s*/); const k=m[0]||''; const v=m.slice(1).join(':')||'';
+          const li=document.createElement('li'); li.textContent= v?\`\${k}: \${v}\`:k; ul.appendChild(li);
+        });
+        const i18n={zh:'参数',en:'Specs',de:'Spezifikationen'};
+        document.getElementById('specsTitle').textContent=i18n[lg]||'Specs';
+        document.getElementById('specsBox').style.display = lines.length?'block':'none';
+        return;
+      }
+    }catch{}
+  }
+  document.getElementById('specsBox').style.display='none';
+}
+
+async function loadDetails(sub, lang){
+  const order=[lang,'en','zh','de'];
+  for(const lg of order){
+    try{
+      const r=await fetch(\`../assets/txt/product-1\${sub}/details-\${lg}.txt\`,{cache:'no-store'});
+      if(r.ok){
+        const txt=(await r.text()).trim();
+        if(txt){
+          const i18n={zh:'详细描述',en:'Details',de:'Beschreibung'};
+          document.getElementById('detailsTitle').textContent=i18n[lg]||'Details';
+          document.getElementById('detailsText').textContent=txt;
+          document.getElementById('detailsBox').style.display='block';
+          return;
         }
       }
-      document.getElementById('specsBox').style.display='none';
-    }
+    }catch{}
+  }
+  document.getElementById('detailsBox').style.display='none';
+}
 
-    async function loadDetails(productId, lang){
-      const order=[lang,'en','zh','de'];
-      const prefixes=['../assets/txt','/assets/txt'];
-      for(const lg of order){
-        for(const pre of prefixes){
-          const url=`${pre}/product-${productId}/product-${productId}-details-${lg}.txt`;
-          try{
-            const r=await fetchWithTimeout(url,1200);
-            if(r.ok){
-              const txt=(await r.text()).trim();
-              if(txt){
-                const titleI18n={zh:'详细描述',en:'Details',de:'Beschreibung'};
-                document.getElementById('detailsTitle').textContent=titleI18n[lang]||'Details';
-                document.getElementById('detailsText').textContent=txt;
-                document.getElementById('detailsBox').style.display='block';
-                return;
-              }
-            }
-          }catch(e){}
-        }
-      }
-      document.getElementById('detailsBox').style.display='none';
-    }
-async function loadImages(){
-      const base=`../assets/imgs/product-${PRODUCT_ID}`;
-      let ext = await resolveExtViaManifest();
-      if(!ext){ ext = (await firstOk([`${base}/1.jpg`,`${base}/1.jpeg`,`${base}/1.png`,`${base}/1.webp`])).split('.').pop() || ''; }
-      if(!ext) return [];
+async function loadImages(sub){
+  const base=\`../assets/imgs/product-1\${sub}\`;
+  const exts=['jpg','jpeg','png','webp'];
+  let ext=''; // 识别首张可用格式
+  for(const e of exts){
+    try{ const r=await fetch(\`\${base}/1.\${e}\`,{method:'HEAD'}); if(r.ok){ ext=e; break; } }catch{}
+  }
+  if(!ext) return [];
+  const arr=[];
+  for(let i=1;i<=20;i++){
+    try{ const u=\`\${base}/\${i}.\${ext}\`; const r=await fetch(u,{method:'HEAD'}); if(r.ok) arr.push(u); else break; }catch{}
+  }
+  return arr;
+}
 
-      // 预加载第一张
-      const link=document.createElement('link'); link.rel='preload'; link.as='image'; link.href=`${base}/1.${ext}`; document.head.appendChild(link);
+/* ====== 渲染当前型号 ====== */
+async function renderProduct(){
+  // 标题 & 简介
+  const data = await loadTxt(SUB_ID);
+  document.getElementById('title').textContent = data.title;
+  document.getElementById('desc').textContent  = data.desc;
 
-      // 按已知扩展名加载后续，遇到缺失即停止
-      const imgs=[];
-      for(let i=1;i<=20;i++){
-        const u=`${base}/${i}.${ext}`;
-        if(await exists(u)) imgs.push(u); else break;
-      }
-      return imgs;
-    }
+  // 参数 & 详情
+  await loadParams(SUB_ID, currentLang);
+  await loadDetails(SUB_ID, currentLang);
 
-    (async function init(){
-      const data=await loadTxt(); title.textContent=data.title; desc.textContent=data.desc;
-      await loadParams(PRODUCT_ID,currentLang);
-      await loadDetails(PRODUCT_ID,currentLang);
-      const imgs=await loadImages(); const track=document.getElementById('track'); const dots=document.getElementById('dots');
-      track.innerHTML='';
-      if(imgs.length===0){ document.getElementById('carousel').style.display='none'; return; }
+  // 图片轮播
+  const imgs = await loadImages(SUB_ID);
+  const track=document.getElementById('track');
+  const dots=document.getElementById('dots');
+  const carousel=document.getElementById('carousel');
+  track.innerHTML=''; dots.innerHTML='';
 
-      imgs.forEach((src,idx)=>{
-        const s=document.createElement('div'); s.className='slide';
-        s.innerHTML=`<img src="${src}" alt="${data.title} ${idx+1}" loading="${idx===0?'eager':'lazy'}" decoding="async" fetchpriority="${idx===0?'high':'auto'}">`;
-        track.appendChild(s);
-        const d=document.createElement('button'); d.className='dot'+(idx===0?' active':''); d.setAttribute('aria-label',`Go to ${idx+1}`); d.onclick=()=>go(idx); dots.appendChild(d);
-      });
+  if(!imgs.length){ carousel.style.display='none'; return; }
+  carousel.style.display='block';
 
-      let index=0; const prev=document.getElementById('prev'), next=document.getElementById('next');
-      function update(){ track.style.transform=`translateX(${-index*100}%)`; [...dots.children].forEach((d,i)=>d.classList.toggle('active',i===index)); }
-      function go(i){ index=Math.max(0,Math.min(imgs.length-1,i)); update(); }
-      prev.onclick=()=>go(index-1); next.onclick=()=>go(index+1);
-      let startX=null,dragging=false; track.addEventListener('pointerdown',e=>{dragging=true;startX=e.clientX; track.style.transition='none';});
-      window.addEventListener('pointerup',()=>{if(!dragging)return; dragging=false; track.style.transition='transform .45s ease';});
-      window.addEventListener('pointermove',e=>{if(!dragging)return; const dx=e.clientX-startX; const w=track.clientWidth; const delta=dx/w; track.style.transform=`translateX(${(-index+delta)*100}%)`;});
-      track.addEventListener('pointerup',e=>{if(startX==null)return; const dx=e.clientX-startX; const threshold=40; if(dx>threshold) go(index-1); else if(dx<-threshold) go(index+1); else update(); startX=null;});
-    })();
-  </script>
+  imgs.forEach((src,idx)=>{
+    const s=document.createElement('div'); s.className='slide';
+    s.innerHTML=\`<img src="\${src}" alt="\${data.title} \${idx+1}" loading="\${idx===0?'eager':'lazy'}" decoding="async">\`;
+    track.appendChild(s);
+    const d=document.createElement('button'); d.className='dot'+(idx===0?' active':''); d.onclick=()=>go(idx); dots.appendChild(d);
+  });
+
+  let index=0;
+  function update(){ track.style.transform=\`translateX(\${-index*100}%)\`; [...dots.children].forEach((d,i)=>d.classList.toggle('active',i===index)); }
+  function go(i){ index=Math.max(0,Math.min(imgs.length-1,i)); update(); }
+  document.getElementById('prev').onclick=()=>go(index-1);
+  document.getElementById('next').onclick=()=>go(index+1);
+  update();
+}
+
+/* ====== 启动 ====== */
+(async function init(){
+  buildCards();
+  await renderProduct();
+})();
+</script>
 </body>
 </html>
