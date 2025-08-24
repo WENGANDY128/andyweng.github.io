@@ -46,6 +46,13 @@
     .skeleton{position:relative;overflow:hidden;background:var(--skeleton)}
     .skeleton::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,var(--shimmer),transparent);animation:shimmer 1.2s infinite}
     @keyframes shimmer{100%{transform:translateX(100%)}}
+  
+    /* Right-column cards */
+    .box{margin-top:18px;padding:12px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+    .box h2{margin:0 0 8px;font-size:18px;font-weight:800;color:#111}
+    .specs ul{margin:0;padding-left:18px;color:var(--muted);line-height:1.6}
+    .specs li{margin:2px 0}
+    .details p{margin:0;color:var(--muted);line-height:1.7;white-space:pre-wrap}
   </style>
 </head>
 <body>
@@ -73,6 +80,8 @@
       <section>
         <h1 class="title" id="title">Product 3</h1>
         <div class="desc" id="desc"></div>
+      <div id="specsBox" class="box specs" style="display:none"><h2 id="specsTitle">参数</h2><ul id="specsList"></ul></div>
+      <div id="detailsBox" class="box details" style="display:none"><h2 id="detailsTitle">详细描述</h2><div id="detailsText"></div></div>
       </section>
     </div>
   </div>
@@ -94,7 +103,60 @@
 
     async function resolveExtViaManifest(){const mf=await jsonFast('../manifest.json').catch(()=>null); if(mf?.items){const it=mf.items.find(x=>x.id==PRODUCT_ID); if(it?.imgExt) return it.imgExt;} return '';}
 
-    async function loadImages(){
+    
+    async function loadParams(productId, lang){
+      const order=[lang,'en','zh','de'];
+      const prefixes=['../assets/txt','/assets/txt'];
+      for(const lg of order){
+        for(const pre of prefixes){
+          const url=`${pre}/product-${productId}/product-${productId}-params-${lg}.txt`;
+          try{
+            const r=await fetchWithTimeout(url,1200);
+            if(r.ok){
+              const lines=(await r.text()).trim().split(/\r?\n/).filter(Boolean);
+              const list=document.getElementById('specsList'); list.innerHTML='';
+              lines.forEach(line=>{
+                const m=line.split(/\s*[:：]\s*/);
+                const k=m[0]||''; const v=m.slice(1).join(':')||'';
+                const li=document.createElement('li');
+                li.textContent = v?`${k}: ${v}`:k;
+                list.appendChild(li);
+              });
+              const titleI18n={zh:'参数',en:'Specs',de:'Spezifikationen'};
+              document.getElementById('specsTitle').textContent=titleI18n[lang]||'Specs';
+              document.getElementById('specsBox').style.display=lines.length?'block':'none';
+              return;
+            }
+          }catch(e){}
+        }
+      }
+      document.getElementById('specsBox').style.display='none';
+    }
+
+    async function loadDetails(productId, lang){
+      const order=[lang,'en','zh','de'];
+      const prefixes=['../assets/txt','/assets/txt'];
+      for(const lg of order){
+        for(const pre of prefixes){
+          const url=`${pre}/product-${productId}/product-${productId}-details-${lg}.txt`;
+          try{
+            const r=await fetchWithTimeout(url,1200);
+            if(r.ok){
+              const txt=(await r.text()).trim();
+              if(txt){
+                const titleI18n={zh:'详细描述',en:'Details',de:'Beschreibung'};
+                document.getElementById('detailsTitle').textContent=titleI18n[lang]||'Details';
+                document.getElementById('detailsText').textContent=txt;
+                document.getElementById('detailsBox').style.display='block';
+                return;
+              }
+            }
+          }catch(e){}
+        }
+      }
+      document.getElementById('detailsBox').style.display='none';
+    }
+async function loadImages(){
       const base=`../assets/imgs/product-${PRODUCT_ID}`;
       let ext = await resolveExtViaManifest();
       if(!ext){ ext = (await firstOk([`${base}/1.jpg`,`${base}/1.jpeg`,`${base}/1.png`,`${base}/1.webp`])).split('.').pop() || ''; }
@@ -114,6 +176,8 @@
 
     (async function init(){
       const data=await loadTxt(); title.textContent=data.title; desc.textContent=data.desc;
+      await loadParams(PRODUCT_ID,currentLang);
+      await loadDetails(PRODUCT_ID,currentLang);
       const imgs=await loadImages(); const track=document.getElementById('track'); const dots=document.getElementById('dots');
       track.innerHTML='';
       if(imgs.length===0){ document.getElementById('carousel').style.display='none'; return; }
