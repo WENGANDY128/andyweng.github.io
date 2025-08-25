@@ -4,144 +4,107 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Eindeepseek – Handheld Fan Series</title>
-  <meta name="description" content="Eindeepseek 手持风扇系列 / 多语言切换 / 型号卡片 / 轮播 / 参数与详细描述" />
   <style>
-    :root{
-      --bg:#0b0d10;
-      --card:#111418;
-      --soft:#161a20;
-      --text:#e9eef5;
-      --muted:#9aa4b2;
-      --border:rgba(255,255,255,.08);
-      --primary:#6aa5ff;
-      --primary-2:#2b7de9;
-      --ring: rgba(106,165,255,.4);
-      --shadow:0 10px 25px rgba(0,0,0,.35);
-      --radius:16px;
+    /* --- Base --- */
+    :root {
+      --bg: #f7f8fa;
+      --text: #222;
+      --muted: #555;
+      --card: #fff;
+      --line: #ddd;
+      --brand: #2b7de9;
     }
-    @media (prefers-color-scheme: light){
-      :root{ --bg:#f6f7fb; --card:#ffffff; --soft:#ffffff; --text:#1a1f27; --muted:#5b6573; --border:#e7e9ee; --ring:rgba(43,125,233,.2); --shadow:0 10px 25px rgba(18,29,54,.12); }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background: var(--bg); color: var(--text); }
+
+    /* --- Header --- */
+    header {
+      position: sticky; top: 0; z-index: 10;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; background: var(--card); border-bottom: 1px solid var(--line);
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;background:radial-gradient(1200px 600px at 20% -10%, rgba(106,165,255,.15), transparent 60%),
-                           radial-gradient(1200px 700px at 120% 0%, rgba(43,125,233,.18), transparent 55%),
-                           var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Arial}
-    a{color:var(--text)}
+    .brand a { color: var(--text); text-decoration: none; font-weight: 800; }
 
-    /* Header */
-    header{position:sticky;top:0;z-index:20;background:rgba(17,20,24,.7);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-      border-bottom:1px solid var(--border)}
-    .h-wrap{max-width:1200px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:16px}
-    .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.3px}
-    .brand a{text-decoration:none}
-    .crumbs{margin-left:auto;display:flex;gap:10px;align-items:center}
-    .pill{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--border);border-radius:999px;padding:5px;background:var(--soft)}
-    .pill button{appearance:none;background:transparent;border:none;color:var(--muted);padding:6px 12px;border-radius:999px;cursor:pointer;font-weight:700}
-    .pill button.active{color:#fff;background:var(--primary-2);box-shadow:0 0 0 6px var(--ring)}
+    .lang { display: inline-flex; gap: 6px; align-items: center; border: 1px solid var(--line); border-radius: 999px; padding: 6px; background: var(--card); }
+    .lang button { appearance: none; border: none; cursor: pointer; padding: 6px 10px; border-radius: 999px; color: var(--muted); background: transparent; font-weight: 600; }
+    .lang button.active { color: #fff; background: var(--brand); }
 
-    /* Page */
-    .wrap{max-width:1200px;margin:0 auto;padding:28px 16px 72px}
-    .title{font-size:36px;letter-spacing:.2px;margin:10px 0 6px}
-    .subtitle{color:var(--muted);margin:0 0 22px}
+    /* --- Layout --- */
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 18px 16px 56px; }
+    .title { font-size: 28px; font-weight: 800; margin: 8px 0; }
+    .desc { color: var(--muted); line-height: 1.6; white-space: pre-wrap; margin: 6px 0 0; }
 
-    /* Cards */
-    .model-cards{display:grid;gap:16px;margin:8px 0 18px;grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
-    .model-card{border:1px solid var(--border);border-radius:var(--radius);background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));overflow:hidden;cursor:pointer;transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;box-shadow:var(--shadow)}
-    .model-card:hover{transform:translateY(-4px)}
-    .model-card.active{outline:2px solid var(--primary-2); box-shadow:0 0 0 10px var(--ring), var(--shadow)}
-    .model-card img{width:100%;height:138px;object-fit:cover;display:block;background:#0e1116}
-    .meta{padding:12px 14px;font-weight:700}
+    /* --- Model cards --- */
+    .model-cards { display: grid; gap: 14px; margin: 18px 0; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+    .model-card { border: 2px solid var(--line); border-radius: 12px; background: var(--card); cursor: pointer; overflow: hidden; transition: .2s; }
+    .model-card:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,.05); }
+    .model-card.active { border-color: var(--brand); }
+    .model-card img { width: 100%; height: 132px; object-fit: cover; display: block; background: #f2f3f5; }
+    .meta { padding: 10px 12px; font-weight: 600; }
 
-    /* Layout below: media + details side by side on wide */
-    .grid{display:grid;gap:18px;grid-template-columns:1fr}
-    @media (min-width:980px){ .grid{grid-template-columns: minmax(0,1.2fr) minmax(0,.8fr)} }
+    /* --- Carousel --- */
+    .carousel { position: relative; overflow: hidden; border-radius: 14px; border: 1px solid var(--line); background: var(--card); margin-top: 12px; }
+    .track { display: flex; transition: transform .45s ease; }
+    .slide { min-width: 100%; }
+    .slide img { width: 100%; height: auto; display: block; }
+    .navBtn { position: absolute; top: 50%; transform: translateY(-50%); background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 8px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+    .prev { left: 8px; } .next { right: 8px; }
+    .dots { display: flex; justify-content: center; gap: 6px; margin-top: 10px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: #cfd3da; border: none; cursor: pointer; }
+    .dot.active { background: var(--brand); }
 
-    /* Carousel */
-    .card{border:1px solid var(--border);border-radius:var(--radius);background:var(--card);box-shadow:var(--shadow)}
-    .carousel{position:relative;overflow:hidden}
-    .track{display:flex;transition:transform .45s cubic-bezier(.22,.61,.36,1)}
-    .slide{min-width:100%;background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01))}
-    .slide img{display:block;width:100%;height:auto;aspect-ratio: 16/10;object-fit:cover}
-    .navBtn{position:absolute;top:50%;transform:translateY(-50%);background:var(--soft);border:1px solid var(--border);border-radius:12px;padding:10px;cursor:pointer;color:var(--text)}
-    .navBtn:hover{box-shadow:0 0 0 8px var(--ring)}
-    .prev{left:10px}.next{right:10px}
-    .dots{display:flex;justify-content:center;gap:8px;padding:12px}
-    .dot{width:8px;height:8px;border-radius:50%;background:#3a4350;border:none;cursor:pointer}
-    .dot.active{background:var(--primary)}
-
-    /* Boxes */
-    .box{padding:16px}
-    .box h2{margin:0 0 10px;font-size:18px}
-    .specs{padding:0 0 4px}
-    .specs ul{margin:0;padding-left:18px;color:var(--muted)}
-    .details{white-space:pre-wrap;color:var(--text)}
-
-    /* Small helper */
-    .sr-only{position:absolute;left:-9999px}
+    /* --- Boxes --- */
+    .box { margin-top: 18px; padding: 12px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
+    .box h2 { margin: 0 0 8px; font-size: 18px; font-weight: 800; color: #111; }
   </style>
 </head>
 <body>
-  <!-- Header -->
   <header>
-    <div class="h-wrap">
-      <div class="brand">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 3l9 6-9 6-9-6 9-6Z" fill="currentColor" opacity=".28"/><path d="M21 9v6l-9 6V15l9-6Z" fill="currentColor" opacity=".16"/><path d="M3 9l9 6v6l-9-6V9Z" fill="currentColor" opacity=".09"/></svg>
-        <a id="homeLink" href="../index.html">Eindeepseek</a>
-      </div>
-      <div class="crumbs">
-        <div class="pill" id="langSwitcher" role="tablist" aria-label="Language Switcher">
-          <button data-lang="zh" role="tab">ZH</button>
-          <button data-lang="en" role="tab">EN</button>
-          <button data-lang="de" role="tab">DE</button>
-        </div>
-      </div>
+    <div class="brand"><a id="homeLink" href="../index.html">Eindeepseek</a></div>
+    <div class="lang" id="langSwitcher">
+      <button data-lang="zh">ZH</button>
+      <button data-lang="en">EN</button>
+      <button data-lang="de">DE</button>
     </div>
   </header>
 
-  <main class="wrap">
+  <div class="wrap">
     <h1 class="title" id="title">Handheld Fan Series</h1>
-    <p class="subtitle" id="desc"></p>
+    <p class="desc" id="desc"></p>
 
-    <section class="model-cards" id="modelCards" aria-label="Model selector"></section>
+    <div class="model-cards" id="modelCards"></div>
 
-    <section class="grid" aria-live="polite">
-      <div class="card">
-        <div class="carousel" id="carousel" style="display:none">
-          <div class="track" id="track"></div>
-          <button class="navBtn prev" id="prev" aria-label="Previous">◀</button>
-          <button class="navBtn next" id="next" aria-label="Next">▶</button>
-          <div class="dots" id="dots"></div>
-        </div>
-        <div id="carouselEmpty" class="box" style="display:none;color:var(--muted)">该型号暂无图片。</div>
-      </div>
+    <div class="carousel" id="carousel" style="display:none">
+      <div class="track" id="track"></div>
+      <button class="navBtn prev" id="prev" aria-label="Previous">◀</button>
+      <button class="navBtn next" id="next" aria-label="Next">▶</button>
+    </div>
+    <div class="dots" id="dots"></div>
 
-      <div class="card">
-        <div id="specsBox" class="box specs" style="display:none">
-          <h2 id="specsTitle">参数</h2>
-          <ul id="specsList"></ul>
-        </div>
-        <div id="detailsBox" class="box" style="display:none">
-          <h2 id="detailsTitle">详细描述</h2>
-          <div id="detailsText" class="details"></div>
-        </div>
-      </div>
-    </section>
-  </main>
+    <div id="specsBox" class="box" style="display:none">
+      <h2 id="specsTitle">参数</h2>
+      <ul id="specsList"></ul>
+    </div>
+
+    <div id="detailsBox" class="box" style="display:none">
+      <h2 id="detailsTitle">详细描述</h2>
+      <div id="detailsText"></div>
+    </div>
+  </div>
 
   <script>
-    // --------- 基础状态 ----------
+    // ---------- State ----------
     const qs = new URLSearchParams(location.search);
     const currentLang = (qs.get('lang') || localStorage.getItem('lang') || 'zh').toLowerCase();
     localStorage.setItem('lang', currentLang);
     let SUB_ID = (qs.get('sub') || 'a').toLowerCase();
 
-    // 首页链接带语言参数
+    // Home link keeps lang
     const home = new URL('../index.html', location.href);
     home.searchParams.set('lang', currentLang);
     document.getElementById('homeLink').href = home.toString();
 
-    // 语言按钮
+    // Language switcher
     [...document.querySelectorAll('#langSwitcher button')].forEach(b => {
       if (b.dataset.lang === currentLang) b.classList.add('active');
       b.onclick = () => {
@@ -151,52 +114,50 @@
       };
     });
 
-    // 子型号配置
+    // Models config
     const MODELS = [
-      { sub: 'a', name: { zh: 'C01 折叠风扇', en: 'C01 Fold Fan',   de: 'C01 Klappventilator' } },
-      { sub: 'b', name: { zh: 'C02 手持风扇', en: 'C02 Handheld Fan', de: 'C02 Handventilator' } },
-      { sub: 'c', name: { zh: 'C03 迷你风扇', en: 'C03 Mini Fan',     de: 'C03 Mini-Ventilator' } },
-      { sub: 'd', name: { zh: 'C04 桌面风扇', en: 'C04 Desk Fan',     de: 'C04 Tischventilator' } },
-      { sub: 'e', name: { zh: 'C05 强风版',  en: 'C05 Turbo',         de: 'C05 Turbo' } },
-      { sub: 'f', name: { zh: 'C06 长续航',  en: 'C06 Long-Life',     de: 'C06 Lange Laufzeit' } },
-      { sub: 'g', name: { zh: 'C07 静音版',  en: 'C07 Silent',        de: 'C07 Leise' } },
-      { sub: 'h', name: { zh: 'C08 儿童款',  en: 'C08 Kids',          de: 'C08 Kinder' } }
+      { sub: 'a', name: { zh: 'C01 折叠风扇',   en: 'C01 Fold Fan',    de: 'C01 Klappventilator' } },
+      { sub: 'b', name: { zh: 'C02 手持风扇',   en: 'C02 Handheld Fan', de: 'C02 Handventilator' } },
+      { sub: 'c', name: { zh: 'C03 迷你风扇',   en: 'C03 Mini Fan',     de: 'C03 Mini‑Ventilator' } },
+      { sub: 'd', name: { zh: 'C04 桌面风扇',   en: 'C04 Desk Fan',     de: 'C04 Tischventilator' } },
+      { sub: 'e', name: { zh: 'C05 强风版',     en: 'C05 Turbo',        de: 'C05 Turbo' } },
+      { sub: 'f', name: { zh: 'C06 长续航',     en: 'C06 Long‑Life',     de: 'C06 Lange Laufzeit' } },
+      { sub: 'g', name: { zh: 'C07 静音版',     en: 'C07 Silent',       de: 'C07 Leise' } },
+      { sub: 'h', name: { zh: 'C08 儿童款',     en: 'C08 Kids',         de: 'C08 Kinder' } }
     ];
 
     const i18n = {
-      specs: { zh: '参数', en: 'Specs', de: 'Spezifikationen' },
-      details: { zh: '详细描述', en: 'Details', de: 'Beschreibung' }
+      specs:   { zh: '参数',     en: 'Specs',    de: 'Spezifikationen' },
+      details: { zh: '详细描述', en: 'Details',  de: 'Beschreibung' }
     };
 
-    const t = obj => obj?.[currentLang] || obj?.en;
+    const t = obj => obj?.[currentLang] || obj?.en || '';
 
-    // 路径助手（根据你的目录结构可调整）
-    function imgBase(sub){ return `../assets/imgs/product-1/product-1${sub}`; }
-    function txtBase(sub){ return `../assets/txt/product-1/product-1${sub}`; }
+    // ---------- Path helpers (adjust to your repo structure) ----------
+    function imgBase(sub) { return `../assets/imgs/product-1/product-1${sub}`; }
+    function txtBase(sub) { return `../assets/txt/product-1/product-1${sub}`; }
 
-    // 使用 <img> 预加载检测 PNG 是否存在（兼容 GitHub Pages 不允 HEAD 的情况）
+    // Detect image existence via <img> (GitHub Pages blocks HEAD)
     function existsImage(url){
-      return new Promise(resolve=>{
+      return new Promise(resolve => {
         const im = new Image();
         im.onload = () => resolve(true);
         im.onerror = () => resolve(false);
-        im.loading = 'lazy';
         im.src = url;
       });
     }
 
-    // 构建型号卡片
+    // ---------- Build model cards ----------
     async function buildCards(){
       const box = document.getElementById('modelCards');
       box.innerHTML = '';
       for (const m of MODELS){
         const thumb = `${imgBase(m.sub)}/1.png`;
-        if (!await existsImage(thumb)) continue;
-
+        if (!await existsImage(thumb)) continue; // No assets -> hide card
         const card = document.createElement('div');
         card.className = 'model-card' + (m.sub === SUB_ID ? ' active' : '');
         card.innerHTML = `
-          <img src="${thumb}" alt="${t(m.name)} thumbnail" loading="lazy">
+          <img src="${thumb}" alt="${t(m.name)} thumbnail">
           <div class="meta">${t(m.name)}</div>
         `;
         card.onclick = () => {
@@ -205,28 +166,27 @@
           u.searchParams.set('sub', SUB_ID);
           u.searchParams.set('lang', currentLang);
           history.replaceState(null, '', u.toString());
-          // 重新渲染
-          [...box.children].forEach(c=>c.classList.remove('active'));
+          // Toggle active style
+          [...box.children].forEach(c => c.classList.remove('active'));
           card.classList.add('active');
           renderProduct();
-          window.scrollTo({top:document.querySelector('main').offsetTop - 20, behavior:'smooth'});
         };
         box.appendChild(card);
       }
     }
 
-    // 轮播加载 PNG
+    // ---------- Load assets ----------
     async function loadImages(sub){
       const arr = [];
-      for (let i=1; i<=20; i++){
+      for (let i = 1; i <= 20; i++){
         const u = `${imgBase(sub)}/${i}.png`;
-        if (await existsImage(u)) arr.push(u);
-        else break;
+        // stop at first missing index to avoid gaps
+        if (await existsImage(u)) arr.push(u); else break;
       }
       return arr;
     }
 
-    // 文案加载（按当前语言 -> EN -> ZH -> DE 回退）
+    // Text loader (lang -> en -> zh -> de fallback)
     async function loadTxt(sub){
       const order = [currentLang, 'en', 'zh', 'de'];
       for (const lg of order){
@@ -235,18 +195,19 @@
           const r = await fetch(url);
           if (r.ok){
             const raw = (await r.text()).trim();
-            if (!raw){ continue; }
+            if (!raw) continue; // empty file -> continue fallback
             const lines = raw.split(/\r?\n/);
-            const name = MODELS.find(x=>x.sub===sub)?.name;
+            const name = MODELS.find(x => x.sub === sub)?.name;
             return { title: lines[0] || t(name), desc: lines.slice(1).join('\n') };
           }
         }catch(e){}
       }
-      const name = MODELS.find(x=>x.sub===sub)?.name;
+      // no file -> fallback to built-in name
+      const name = MODELS.find(x => x.sub === sub)?.name;
       return { title: t(name), desc: '' };
     }
 
-    // 参数加载
+    // Params list
     async function loadParams(sub){
       const order = [currentLang, 'en', 'zh', 'de'];
       for (const lg of order){
@@ -257,21 +218,21 @@
             const lines = txt.split(/\r?\n/).filter(Boolean);
             const ul = document.getElementById('specsList');
             ul.innerHTML = '';
-            lines.forEach(line=>{
+            lines.forEach(line => {
               const li = document.createElement('li');
               li.textContent = line;
               ul.appendChild(li);
             });
             document.getElementById('specsTitle').textContent = i18n.specs[lg] || 'Specs';
             document.getElementById('specsBox').style.display = lines.length ? 'block' : 'none';
-            return;
+            return; // done once loaded
           }
         }catch(e){}
       }
       document.getElementById('specsBox').style.display = 'none';
     }
 
-    // 详细描述
+    // Long details
     async function loadDetails(sub){
       const order = [currentLang, 'en', 'zh', 'de'];
       for (const lg of order){
@@ -291,73 +252,72 @@
       document.getElementById('detailsBox').style.display = 'none';
     }
 
-    // 渲染当前子型号
+    // ---------- Render current sub model ----------
     async function renderProduct(){
+      // Title & desc
       const data = await loadTxt(SUB_ID);
       document.getElementById('title').textContent = data.title || '';
-      document.getElementById('desc').textContent  = data.desc || '';
+      document.getElementById('desc').textContent = data.desc || '';
 
+      // Specs & details
       await loadParams(SUB_ID);
       await loadDetails(SUB_ID);
 
+      // Gallery
       const imgs = await loadImages(SUB_ID);
       const track = document.getElementById('track');
-      const dots  = document.getElementById('dots');
+      const dots = document.getElementById('dots');
       const carousel = document.getElementById('carousel');
-      const empty = document.getElementById('carouselEmpty');
+      const prevBtn = document.getElementById('prev');
+      const nextBtn = document.getElementById('next');
 
       track.innerHTML = '';
-      dots.innerHTML  = '';
+      dots.innerHTML = '';
 
       if (!imgs.length){
         carousel.style.display = 'none';
-        empty.style.display = 'block';
+        dots.style.display = 'none';
         return;
       }
-      empty.style.display = 'none';
-      carousel.style.display = 'block';
 
-      imgs.forEach((src, idx)=>{
+      carousel.style.display = 'block';
+      dots.style.display = imgs.length > 1 ? 'flex' : 'none';
+      prevBtn.style.display = nextBtn.style.display = imgs.length > 1 ? 'block' : 'none';
+
+      imgs.forEach((src, idx) => {
         const s = document.createElement('div');
         s.className = 'slide';
-        s.innerHTML = `<img src="${src}" alt="${SUB_ID} ${idx+1}" loading="lazy">`;
+        s.innerHTML = `<img src="${src}" alt="${SUB_ID} image ${idx+1}">`;
         track.appendChild(s);
 
-        const d = document.createElement('button');
-        d.className = 'dot' + (idx===0 ? ' active' : '');
-        d.setAttribute('aria-label', `Go to slide ${idx+1}`);
-        d.onclick = ()=>go(idx);
-        dots.appendChild(d);
+        if (imgs.length > 1){
+          const d = document.createElement('button');
+          d.className = 'dot' + (idx === 0 ? ' active' : '');
+          d.setAttribute('aria-label', `Go to slide ${idx+1}`);
+          d.onclick = () => go(idx);
+          dots.appendChild(d);
+        }
       });
 
       let index = 0;
       function update(){
         track.style.transform = `translateX(${-index*100}%)`;
-        [...dots.children].forEach((d,i)=>d.classList.toggle('active', i===index));
+        if (imgs.length > 1){
+          [...dots.children].forEach((d, i) => d.classList.toggle('active', i === index));
+        }
       }
-      function go(i){ index = Math.max(0, Math.min(imgs.length-1, i)); update(); }
+      function go(i){ index = Math.max(0, Math.min(imgs.length - 1, i)); update(); }
 
-      // Buttons
-      document.getElementById('prev').onclick = ()=>go(index-1);
-      document.getElementById('next').onclick = ()=>go(index+1);
-
-      // Touch swipe
-      let sx = 0, dx = 0;
-      track.addEventListener('touchstart', e=>{ sx = e.touches[0].clientX; dx = 0; }, {passive:true});
-      track.addEventListener('touchmove',  e=>{ dx = e.touches[0].clientX - sx; }, {passive:true});
-      track.addEventListener('touchend',   ()=>{ if (Math.abs(dx) > 40) { dx<0 ? go(index+1) : go(index-1); } dx = 0; }, {passive:true});
-
-      // Keyboard
-      document.addEventListener('keydown', e=>{
-        if (e.key === 'ArrowLeft') go(index-1);
-        if (e.key === 'ArrowRight') go(index+1);
-      });
-
+      prevBtn.onclick = () => go(index - 1);
+      nextBtn.onclick = () => go(index + 1);
       update();
     }
 
-    // 启动
-    (async()=>{ await buildCards(); await renderProduct(); })();
+    // ---------- Init ----------
+    (async () => {
+      await buildCards();
+      await renderProduct();
+    })();
   </script>
 </body>
 </html>
