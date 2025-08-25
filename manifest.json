@@ -2,93 +2,27 @@
   "items": [
     {
       "id": 1,
-      "cover": "1.jpg",
-      "href": "products/product-1.html",
-      "title": {
-        "zh": "手持风扇系列",
-        "en": "Handheld Fan Series",
-        "de": "Handventilator Serie"
-      },
-      "desc": {
-        "zh": "8 款：便携、折叠、迷你、桌面等。",
-        "en": "8 models: portable, foldable, mini, desktop, etc.",
-        "de": "8 Modelle: tragbar, faltbar, mini, Tisch usw."
-      }
+      "title": { "zh": "产品 1", "en": "Product 1", "de": "Produkt 1" }
     },
     {
       "id": 2,
-      "cover": "1.png",
-      "href": "products/product-2.html",
-      "title": {
-        "zh": "产品 2",
-        "en": "Product 2",
-        "de": "Produkt 2"
-      },
-      "desc": {
-        "zh": "简介",
-        "en": "Description",
-        "de": "Beschreibung"
-      }
+      "title": { "zh": "产品 2", "en": "Product 2", "de": "Produkt 2" }
     },
     {
       "id": 3,
-      "cover": "1.png",
-      "href": "products/product-3.html",
-      "title": {
-        "zh": "产品 3",
-        "en": "Product 3",
-        "de": "Produkt 3"
-      },
-      "desc": {
-        "zh": "简介",
-        "en": "Description",
-        "de": "Beschreibung"
-      }
+      "title": { "zh": "产品 3", "en": "Product 3", "de": "Produkt 3" }
     },
     {
       "id": 4,
-      "cover": "1.png",
-      "href": "products/product-4.html",
-      "title": {
-        "zh": "产品 4",
-        "en": "Product 4",
-        "de": "Produkt 4"
-      },
-      "desc": {
-        "zh": "简介",
-        "en": "Description",
-        "de": "Beschreibung"
-      }
+      "title": { "zh": "产品 4", "en": "Product 4", "de": "Produkt 4" }
     },
     {
       "id": 5,
-      "cover": "1.png",
-      "href": "products/product-5.html",
-      "title": {
-        "zh": "产品 5",
-        "en": "Product 5",
-        "de": "Produkt 5"
-      },
-      "desc": {
-        "zh": "简介",
-        "en": "Description",
-        "de": "Beschreibung"
-      }
+      "title": { "zh": "产品 5", "en": "Product 5", "de": "Produkt 5" }
     },
     {
       "id": 6,
-      "cover": "1.png",
-      "href": "products/product-6.html",
-      "title": {
-        "zh": "产品 6",
-        "en": "Product 6",
-        "de": "Produkt 6"
-      },
-      "desc": {
-        "zh": "简介",
-        "en": "Description",
-        "de": "Beschreibung"
-      }
+      "title": { "zh": "产品 6", "en": "Product 6", "de": "Produkt 6" }
     }
   ]
 }
