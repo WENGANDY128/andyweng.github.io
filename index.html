@@ -23,10 +23,11 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Eindeepseek · 产品精选" />
   <meta name="twitter:description" content="多语言产品展示网站：自动读取图片与文案，仅显示有内容的产品。" />
+
   <link rel="dns-prefetch" href="//www.eindeepseek.com">
   <link rel="preconnect" href="https://www.eindeepseek.com" crossorigin>
-
-  <link rel="preload" as="image" href="group.jpeg" />
+  <link rel="preload" as="fetch" href="/manifest.json" crossorigin="anonymous">
+  <link rel="preload" as="image" href="group.jpeg">
 
   <style>
     :root{
@@ -101,7 +102,7 @@
     const I18N={
       zh:{title:'产品展示',sub:'选择语言后会在全站生效；仅显示有内容的产品。',groupTitle:'加入 WhatsApp 群组',groupDesc:'扫码二维码，进入我们的贸易 & 物流交流群。',email:'邮件',whats:'WhatsApp',phone:'电话',wechat:'微信'},
       en:{title:'Products',sub:'Language selection applies site-wide. Only products with content are shown.',groupTitle:'Join WhatsApp Group',groupDesc:'Scan the QR code to join our trade & logistics group.',email:'Email',whats:'WhatsApp',phone:'Phone',wechat:'WeChat'},
-      de:{title:'Produkte',sub:'Die Sprachauswahl gilt für die ganze Seite. Es werden nur Produkte mit Inhalt angezeigt.',groupTitle:'WhatsApp‑Gruppe beitreten',groupDesc:'QR-Code scannen, um unserer Handels‑ & Logistik‑Gruppe beizutreten.',email:'E‑Mail',whats:'WhatsApp',phone:'Telefon',wechat:'WeChat'}
+      de:{title:'Produkte',sub:'Die Sprachauswahl gilt für die ganze Seite. Es werden nur Produkte mit Inhalt angezeigt.',groupTitle:'WhatsApp‑Gruppe beitreten',groupDesc:'QR‑Code scannen, um unserer Handels‑ & Logistik‑Gruppe beizutreten.',email:'E‑Mail',whats:'WhatsApp',phone:'Telefon',wechat:'WeChat'}
     };
     const qs=new URLSearchParams(location.search);
     const currentLang=(qs.get('lang')||localStorage.getItem('lang')||'zh').toLowerCase();
@@ -123,56 +124,79 @@
       <span>🟩 ${t.wechat}: ${CONTACT.wechat}</span>
     `;
 
-    function fetchWithTimeout(url,ms=1200){const ctl=new AbortController();const id=setTimeout(()=>ctl.abort(),ms);return fetch(url,{cache:'no-store',signal:ctl.signal}).finally(()=>clearTimeout(id));}
-    async function tryJson(url){try{const r=await fetchWithTimeout(url,1500);if(r.ok)return await r.json();}catch{}return null;}
-    async function existsFast(url){try{const r=await fetchWithTimeout(url,1000);return r.ok;}catch{return false;}}
+    async function loadManifest(){
+      try{
+        const r=await fetch('/manifest.json');
+        if(r.ok) return await r.json();
+      }catch(e){}
+      return null;
+    }
+
+    // Append card only if image exists (via <img> onload/onerror)
+    function appendProductCard(grid, id, title, currentLang, imgExt){
+      const slug = `product-${id}`;
+      const imgUrl = `assets/imgs/${slug}/1.${imgExt||'png'}`;
+      const href   = `products/${slug}.html?lang=${encodeURIComponent(currentLang)}`;
+
+      const a = document.createElement('a'); a.className='cardlink'; a.href=href;
+      a.innerHTML = `<article class="card" style="display:none">
+          <img class="thumb" src="${imgUrl}" alt="${title}" loading="lazy" decoding="async" width="800" height="600">
+          <div class="body">
+            <div class="title">${title}</div>
+            <p class="desc"></p>
+          </div>
+          <span class="badge">${currentLang.toUpperCase()}</span>
+        </article>`;
+
+      const img = a.querySelector('img');
+      img.onload  = ()=>{ a.firstElementChild.style.display=''; };
+      img.onerror = ()=>{ a.remove(); };
+
+      grid.appendChild(a);
+    }
+
+    // Find and append QR group card if any candidate image exists
+    function tryAppendGroupCard(grid){
+      const cands=['group.jpeg','group.jpg','group.png','group.webp'];
+      let done=false;
+      for(const u of cands){
+        const img=new Image();
+        img.loading='lazy';
+        img.decoding='async';
+        img.width=180; img.height=180;
+        img.onload=()=>{
+          if(done) return; done=true;
+          const a=document.createElement('a'); a.className='cardlink'; a.href=u;
+          a.innerHTML=\`
+            <article class="card">
+              <div class="thumb" style="display:flex;align-items:center;justify-content:center">
+                <img src="\${u}" alt="WhatsApp Group QR" class="qr-thumb" loading="lazy" decoding="async" width="180" height="180">
+              </div>
+              <div class="body">
+                <div class="title">\${t.groupTitle}</div>
+                <p class="desc">\${t.groupDesc}</p>
+              </div>
+            </article>\`;
+          grid.appendChild(a);
+        };
+        img.onerror=()=>{};
+        img.src=u;
+      }
+    }
 
     async function build(){
-      const grid=document.getElementById('grid');grid.innerHTML='';
+      const grid=document.getElementById('grid'); grid.innerHTML='';
 
-      // WhatsApp 群卡片（有任意二维码图片即显示）
-      try{
-        const qrCandidates=['group.jpeg','group.jpg','group.png','group.webp'];
-        let qrFound='';
-        for(const u of qrCandidates){ if(await existsFast(u)){ qrFound=u; break; } }
-        if(qrFound){
-          const a=document.createElement('a');a.className='cardlink';a.href=qrFound;a.onclick=()=>{ try{gtag('event','click_group');}catch(e){} };
-          a.innerHTML=`<article class="card"><div class="thumb" style="display:flex;align-items:center;justify-content:center"><img src="${qrFound}" alt="WhatsApp Group QR" class="qr-thumb" loading="eager" width="180" height="180"></div><div class="body"><div class="title">${t.groupTitle}</div><p class="desc">${t.groupDesc}</p></div></article>`;
-          grid.appendChild(a);
-        }
-      }catch{}
+      // 1) Group card (if any QR image exists)
+      tryAppendGroupCard(grid);
 
-      // 读取 manifest.json（根目录）
-      const mf = await (async()=>{
-        for(const u of ['manifest.json','/manifest.json','./manifest.json']){
-          const d = await tryJson(u); if(d) return d;
-        }
-        return null;
-      })();
-
-      const ids = mf?.items?.map(x=>x.id) || [1,2,3,4,5,6];
-
+      // 2) Product cards (only show when image exists)
+      const mf = await loadManifest();
+      const ids = mf?.items?.map(x=>x.id) || [1];
       for(const id of ids){
-        const slug = `product-${id}`;
-        const img = `assets/imgs/${slug}/1.png`;
-
-        // 规则：没有 1.png 就跳过（不渲染卡片）
-        if(!(await existsFast(img))) continue;
-
-        const item = mf?.items?.find(x=>x.id===id);
+        const item = mf?.items?.find(x=>x.id===id) || {};
         const title = item?.title?.[currentLang] || item?.title?.en || item?.title?.zh || `Product ${id}`;
-
-        const href = `products/${slug}.html?lang=${encodeURIComponent(currentLang)}`;
-        const a = document.createElement('a'); a.className='cardlink'; a.href=href;
-        a.innerHTML = `<article class="card">
-            <img class="thumb" src="${img}" alt="${title}" loading="lazy">
-            <div class="body">
-              <div class="title">${title}</div>
-              <p class="desc"></p>
-            </div>
-            <span class="badge">${currentLang.toUpperCase()}</span>
-          </article>`;
-        grid.appendChild(a);
+        appendProductCard(grid, id, title, currentLang, item?.imgExt || 'png');
       }
     }
 
