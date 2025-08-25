@@ -1,14 +1,3 @@
-<!-- =========================
-File 1: /index.html  (Home)
-Requirements covered:
-- Read manifest.json
-- Show only products whose cover exists at assets/imgs/product-N/1.png (PNG only)
-- Card: cover + title; click -> /products/product-N.html?lang=xx
-- Keep GA4, contact bar, WhatsApp group QR card
-- Language switch (ZH/EN/DE) with texts in I18N
-- Avoid 404 by probing before rendering
-- Keep current language in links
-========================= -->
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -20,29 +9,28 @@ Requirements covered:
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-SP9BZHN30E"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);} gtag('js', new Date());
-    gtag('config', 'G-SP9BZHN30E', {anonymize_ip:true});
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-SP9BZHN30E');
   </script>
 
-  <!-- Basic SEO -->
-  <meta name="description" content="Eindeepseek B2C 产品展示，支持中文/英文/德文，多语言切换；自动从图片目录与文本加载内容。" />
+  <meta name="description" content="Eindeepseek B2C 产品展示，多语言；仅在存在 1.png 时显示卡片。" />
   <meta property="og:title" content="Eindeepseek · 产品精选" />
-  <meta property="og:description" content="多语言产品展示网站：自动读取图片与文案，仅显示有内容的产品。" />
+  <meta property="og:description" content="多语言产品展示网站：自动读取文案，仅显示有内容的产品（只识别 PNG）。" />
   <meta property="og:type" content="website" />
-  <meta property="og:image" content="/group.png" />
+  <meta property="og:image" content="https://www.eindeepseek.com/group.jpeg" />
   <meta property="og:url" content="https://www.eindeepseek.com/" />
   <meta name="twitter:card" content="summary_large_image" />
-
+  <meta name="twitter:title" content="Eindeepseek · 产品精选" />
+  <meta name="twitter:description" content="多语言产品展示网站：自动读取文案，仅显示有内容的产品（只识别 PNG）。" />
   <link rel="dns-prefetch" href="//www.eindeepseek.com">
   <link rel="preconnect" href="https://www.eindeepseek.com" crossorigin>
-
-  <link rel="preload" as="image" href="/group.png" />
 
   <style>
     :root{
       --bg:#f7f8fa; --text:#222; --muted:#555; --primary:#2b7de9;
       --card:#fff; --border:#ddd; --ring:rgba(43,125,233,.18);
-      --skeleton:#eef1f5; --sk2:#f7f8fb;
+      --skeleton:#eef1f5; --skeleton-shimmer:#f7f8fb;
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--text)}
@@ -74,7 +62,7 @@ Requirements covered:
     .cardlink{display:block;text-decoration:none;color:inherit}
 
     .skeleton{position:relative;overflow:hidden;background:var(--skeleton)}
-    .skeleton::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg, transparent, var(--sk2), transparent);animation:shimmer 1.2s infinite}
+    .skeleton::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg, transparent, var(--skeleton-shimmer), transparent);animation:shimmer 1.2s infinite}
     @keyframes shimmer{100%{transform:translateX(100%)}}
 
     .qr-thumb{max-width:180px;max-height:180px;margin:16px auto;display:block;border-radius:10px;border:1px solid var(--border);background:#fff}
@@ -96,10 +84,10 @@ Requirements covered:
     <div class="contactbar" id="contactBar"></div>
 
     <h1 id="heading">产品展示</h1>
-    <p class="lead" id="sub">选择语言后会在全站生效；仅显示有内容的产品。</p>
+    <p class="lead" id="sub">选择语言后会在全站生效；仅显示有内容的产品（只识别 PNG）。</p>
 
     <div class="grid" id="grid">
-      <!-- skeletons -->
+      <!-- skeleton placeholders (初次加载占位) -->
       <div class="card"><div class="thumb skeleton"></div><div class="body"><div class="title skeleton" style="height:18px;width:60%"></div><p class="desc skeleton" style="height:38px"></p></div></div>
       <div class="card"><div class="thumb skeleton"></div><div class="body"><div class="title skeleton" style="height:18px;width:60%"></div><p class="desc skeleton" style="height:38px"></p></div></div>
       <div class="card"><div class="thumb skeleton"></div><div class="body"><div class="title skeleton" style="height:18px;width:60%"></div><p class="desc skeleton" style="height:38px"></p></div></div>
@@ -109,78 +97,98 @@ Requirements covered:
   <footer>© <span id="y"></span> Eindeepseek</footer>
 
   <script>
-    // --- i18n ---
     const I18N={
-      zh:{title:'产品展示',sub:'选择语言后会在全站生效；仅显示有内容的产品。',groupTitle:'加入 WhatsApp 群组',groupDesc:'扫码二维码，进入我们的贸易 & 物流交流群。',email:'邮件',whats:'WhatsApp',phone:'电话',wechat:'微信'},
-      en:{title:'Products',sub:'Language selection applies site-wide. Only products with content are shown.',groupTitle:'Join WhatsApp Group',groupDesc:'Scan the QR code to join our trade & logistics group.',email:'Email',whats:'WhatsApp',phone:'Phone',wechat:'WeChat'},
-      de:{title:'Produkte',sub:'Die Sprachauswahl gilt für die ganze Seite. Es werden nur Produkte mit Inhalt angezeigt.',groupTitle:'WhatsApp‑Gruppe beitreten',groupDesc:'QR‑Code scannen, um unserer Handels‑ & Logistik‑Gruppe beizutreten.',email:'E‑Mail',whats:'WhatsApp',phone:'Telefon',wechat:'WeChat'}
+      zh:{title:'产品展示',sub:'选择语言后会在全站生效；仅显示有内容的产品（只识别 PNG）。',groupTitle:'加入 WhatsApp 群组',groupDesc:'扫码二维码，进入我们的贸易 & 物流交流群。',email:'邮件',whats:'WhatsApp',phone:'电话',wechat:'微信'},
+      en:{title:'Products',sub:'Language selection applies site-wide. Only products with content are shown (PNG only).',groupTitle:'Join WhatsApp Group',groupDesc:'Scan the QR code to join our trade & logistics group.',email:'Email',whats:'WhatsApp',phone:'Phone',wechat:'WeChat'},
+      de:{title:'Produkte',sub:'Die Sprachauswahl gilt für die ganze Seite. Es werden nur Produkte mit Inhalt angezeigt (nur PNG).',groupTitle:'WhatsApp-Gruppe beitreten',groupDesc:'QR-Code scannen, um unserer Handels- & Logistik-Gruppe beizutreten.',email:'E-Mail',whats:'WhatsApp',phone:'Telefon',wechat:'WeChat'}
     };
-
-    // --- language state ---
     const qs=new URLSearchParams(location.search);
     const currentLang=(qs.get('lang')||localStorage.getItem('lang')||'zh').toLowerCase();
     localStorage.setItem('lang',currentLang);
     const t=I18N[currentLang]||I18N.zh;
-    const $=(s)=>document.querySelector(s);
-    $('#heading').textContent=t.title; $('#sub').textContent=t.sub;
-    document.querySelectorAll('#langSwitcher button').forEach(b=>{
+    document.getElementById('heading').textContent=t.title;
+    document.getElementById('sub').textContent=t.sub;
+
+    [...document.querySelectorAll('#langSwitcher button')].forEach(b=>{
       if(b.dataset.lang===currentLang) b.classList.add('active');
       b.onclick=()=>{const lang=b.dataset.lang;localStorage.setItem('lang',lang);const url=new URL(location.href);url.searchParams.set('lang',lang);location.href=url.toString();};
     });
 
-    // --- contacts ---
-    const CONTACT={email:'wengandy128@gmail.com',whatsapp:'+86 15888791812',phone:'+86 15888791812',wechat:'15888791812'};
-    $('#contactBar').innerHTML=`
+    const CONTACT={email:'wengandy128@gmail.com',whatsapp:'+86 15888791812',phone:'+86 15888791812',wechat:'15888791812',waInvite:''};
+    document.getElementById('contactBar').innerHTML=`
       <a href="mailto:${CONTACT.email}">📧 ${t.email}: ${CONTACT.email}</a>
       <a href="https://wa.me/${CONTACT.whatsapp.replace(/[^0-9]/g,'')}" target="_blank" rel="noopener">💬 ${t.whats}</a>
-      <a href="tel:${CONTACT.phone.replace(/\s/g,'')}">📞 ${t.phone}: ${CONTACT.phone}</a>
+      <a href="tel:${CONTACT.phone.replace(/\\s/g,'')}">📞 ${t.phone}: ${CONTACT.phone}</a>
       <span>🟩 ${t.wechat}: ${CONTACT.wechat}</span>
     `;
 
-    // --- tiny fetch helpers (short timeout) ---
-    function fetchWithTimeout(url,ms=1200){
+    // 带超时的 fetch（避免卡死）
+    function fetchWithTimeout(url,ms=1500){
       const ctl=new AbortController(); const id=setTimeout(()=>ctl.abort(),ms);
       return fetch(url,{cache:'no-store',signal:ctl.signal}).finally(()=>clearTimeout(id));
     }
-    async function tryJson(url){try{const r=await fetchWithTimeout(url,1500);if(r.ok)return await r.json();}catch{}return null;}
-    async function exists(url){try{const r=await fetchWithTimeout(url,1000);return r.ok;}catch{return false;}}
+    async function tryJson(url){
+      try{ const r=await fetchWithTimeout(url,2000); if(r.ok) return await r.json(); }
+      catch(e){}
+      return null;
+    }
+    // 只认 PNG；先 HEAD，不行则回退 GET（兼容不支持 HEAD 的环境）
+    async function existsPng(url){
+      try{ const r=await fetchWithTimeout(url,1200); if(r.ok) return true; }catch(e){}
+      try{ const r2=await fetchWithTimeout(url,1200); return r2.ok; }catch(e){ return false; }
+    }
 
     async function build(){
-      const grid=$('#grid'); grid.innerHTML='';
+      const grid=document.getElementById('grid'); grid.innerHTML='';
 
-      // WhatsApp group card (try common names; prefer PNG but allow others to avoid 404 today)
-      const qrCandidates=['/group.png','/group.jpeg','/group.jpg','/group.webp'];
-      let qrFound='';
-      for(const u of qrCandidates){ if(await exists(u)){ qrFound=u; break; } }
-      if(qrFound){
-        const a=document.createElement('a'); a.className='cardlink'; a.href=qrFound; a.target='_blank'; a.rel='noopener';
-        a.onclick=()=>{ try{gtag('event','click_group');}catch(e){} };
-        a.innerHTML=`<article class="card"><div class="thumb" style="display:flex;align-items:center;justify-content:center"><img src="${qrFound}" alt="WhatsApp Group QR" class="qr-thumb" loading="eager" width="180" height="180"></div><div class="body"><div class="title">${t.groupTitle}</div><p class="desc">${t.groupDesc}</p></div></article>`;
-        grid.appendChild(a);
-      }
+      // WhatsApp 群卡片（有任意二维码图片即显示）
+      try{
+        const qrCandidates=['group.jpeg','group.jpg','group.png','group.webp'];
+        for(const u of qrCandidates){
+          if(await existsPng(u)){ // 这里用同一存在探测，但不限制后缀
+            const a=document.createElement('a'); a.className='cardlink'; a.href=u;
+            a.onclick=()=>{ try{gtag('event','click_group');}catch(e){} };
+            a.innerHTML=`<article class="card">
+              <div class="thumb" style="display:flex;align-items:center;justify-content:center">
+                <img src="${u}" alt="WhatsApp Group QR" class="qr-thumb" loading="eager" width="180" height="180">
+              </div>
+              <div class="body">
+                <div class="title">${t.groupTitle}</div>
+                <p class="desc">${t.groupDesc}</p>
+              </div>
+            </article>`;
+            grid.appendChild(a);
+            break;
+          }
+        }
+      }catch{}
 
-      // manifest.json in root
+      // 读取 manifest.json（根目录）
       const mf = await (async()=>{
-        for(const u of ['/manifest.json','./manifest.json','manifest.json']){ const d=await tryJson(u); if(d) return d; }
+        for(const u of ['manifest.json','/manifest.json','./manifest.json']){
+          const d = await tryJson(u); if(d) return d;
+        }
         return null;
       })();
 
-      const ids = mf?.items?.map(x=>x.id) || [1,2,3,4,5,6];
+      // 只遍历 manifest.items，避免默认 [1..6] 带来的多余请求
+      const items = Array.isArray(mf?.items) ? mf.items : [];
 
-      for(const id of ids){
+      for(const it of items){
+        const id = Number(it.id); if(!id) continue;
         const slug = `product-${id}`;
-        const cover = `/assets/imgs/${slug}/1.png`; // PNG only
+        const img = `assets/imgs/${slug}/1.png`; // PNG only
 
-        // Skip card if cover PNG missing (prevents 404)
-        if(!(await exists(cover))) continue;
+        if(!(await existsPng(img))) continue; // 没有 1.png 就跳过
 
-        const item = mf?.items?.find(x=>x.id===id);
-        const title = item?.title?.[currentLang] || item?.title?.en || item?.title?.zh || `Product ${id}`;
+        const title = it?.title?.[currentLang] || it?.title?.en || it?.title?.zh || `Product ${id}`;
+        // 支持自定义 href；否则按默认路径
+        const hrefURL = new URL(it?.href || `products/${slug}.html`, location.href);
+        hrefURL.searchParams.set('lang', currentLang);
 
-        const href = `/products/${slug}.html?lang=${encodeURIComponent(currentLang)}`;
-        const a = document.createElement('a'); a.className='cardlink'; a.href=href;
+        const a = document.createElement('a'); a.className='cardlink'; a.href=hrefURL.toString();
         a.innerHTML = `<article class="card">
-            <img class="thumb" src="${cover}" alt="${title}" loading="lazy">
+            <img class="thumb" src="${img}" alt="${title}" loading="lazy" decoding="async">
             <div class="body">
               <div class="title">${title}</div>
               <p class="desc"></p>
@@ -189,258 +197,17 @@ Requirements covered:
           </article>`;
         grid.appendChild(a);
       }
+
+      if(grid.children.length===0){
+        const div=document.createElement('div');
+        div.style.color='#666';
+        div.textContent='暂无可展示的产品（请检查 /manifest.json 或对应目录下是否存在 1.png）。';
+        grid.appendChild(div);
+      }
     }
 
     build();
     document.getElementById('y').textContent=new Date().getFullYear();
-  </script>
-</body>
-</html>
-
-
-<!-- =========================
-File 2: /products/product-1.html  (Detail template for product-N)
-Usage: duplicate as product-2.html, product-3.html, ...
-Requirements covered:
-- Sub‑models a~h (folders: /assets/imgs/product-N/a/, /b/, ...)
-- PNG only, iterate 1..N.png per sub‑model (no jpg/webp probing)
-- Auto carousel, params (params-zh.txt / params-en.txt / params-de.txt) per sub‑model
-- Details (details-zh.txt / details-en.txt / details-de.txt) per sub‑model
-- Keep ?lang= in links back to home
-- Avoid 404 by probing before rendering
-========================= -->
-<!DOCTYPE html>
-<html lang="zh">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title id="pageTitle">Eindeepseek · 产品详情</title>
-  <meta name="description" content="产品详情页，支持多子型号与多语言文案，图片仅识别 PNG。" />
-
-  <!-- GA4 -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SP9BZHN30E"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);} gtag('js', new Date());
-    gtag('config', 'G-SP9BZHN30E', {anonymize_ip:true});
-  </script>
-
-  <style>
-    :root{--bg:#f7f8fa;--text:#222;--muted:#555;--primary:#2b7de9;--border:#ddd;--card:#fff}
-    *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--text)}
-    header{position:sticky;top:0;z-index:10;display:flex;gap:12px;align-items:center;justify-content:space-between;padding:10px 14px;background:#fff;border-bottom:1px solid var(--border)}
-    a{color:inherit}
-    .brand{font-weight:800}
-    .lang{display:inline-flex;gap:6px;border:1px solid var(--border);border-radius:999px;padding:4px}
-    .lang button{appearance:none;border:none;cursor:pointer;padding:6px 10px;border-radius:999px;color:var(--muted);background:transparent;font-weight:600}
-    .lang button.active{color:#fff;background:var(--primary)}
-
-    .wrap{max-width:1100px;margin:0 auto;padding:16px}
-    .back{display:inline-flex;gap:8px;align-items:center;text-decoration:none;border:1px solid var(--border);padding:6px 10px;border-radius:10px;background:#fff}
-
-    .row{display:grid;gap:16px;grid-template-columns:1fr}
-    @media(min-width:900px){.row{grid-template-columns:1.2fr .8fr}}
-
-    .viewer{background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden}
-    .stage{position:relative;aspect-ratio:4/3;background:#f1f3f5}
-    .stage img{position:absolute;inset:0;margin:auto;max-width:100%;max-height:100%;object-fit:contain}
-    .thumbs{display:flex;gap:8px;flex-wrap:wrap;padding:10px;border-top:1px solid var(--border)}
-    .thumbs img{width:80px;height:60px;object-fit:cover;border:1px solid var(--border);border-radius:8px;cursor:pointer;opacity:.7}
-    .thumbs img.active{opacity:1;outline:2px solid var(--primary)}
-
-    .panel{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px}
-    h1{font-size:22px;margin:6px 0 12px}
-    .muted{color:var(--muted)}
-    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
-    .tabs button{appearance:none;border:1px solid var(--border);background:#fff;padding:6px 10px;border-radius:999px;cursor:pointer}
-    .tabs button.active{border-color:var(--primary);box-shadow:0 0 0 3px rgba(43,125,233,.18)}
-
-    .params,.details{white-space:pre-wrap;line-height:1.6}
-    .section{margin-top:14px}
-  </style>
-</head>
-<body>
-  <header>
-    <div class="brand"><a id="homeLink" href="/">Eindeepseek</a></div>
-    <div class="lang" id="langSwitcher">
-      <button data-lang="zh">ZH</button>
-      <button data-lang="en">EN</button>
-      <button data-lang="de">DE</button>
-    </div>
-  </header>
-
-  <div class="wrap">
-    <a id="back" class="back" href="/">← <span id="backTxt">返回首页</span></a>
-
-    <div class="row">
-      <section class="viewer">
-        <div class="stage" id="stage"></div>
-        <div class="thumbs" id="thumbs"></div>
-      </section>
-      <section class="panel">
-        <h1 id="title">产品标题</h1>
-        <div class="muted" id="subtitle"></div>
-
-        <div class="section">
-          <strong id="variantLabel">子型号</strong>
-          <div class="tabs" id="variants"></div>
-        </div>
-
-        <div class="section">
-          <strong id="paramsLabel">参数</strong>
-          <div class="params" id="paramsBox"></div>
-        </div>
-
-        <div class="section">
-          <strong id="detailsLabel">详情</strong>
-          <div class="details" id="detailsBox"></div>
-        </div>
-      </section>
-    </div>
-  </div>
-
-  <script>
-    // --- i18n ---
-    const I18N={
-      zh:{back:'返回首页',variant:'子型号',params:'参数',details:'详情',untitled:'未命名产品'},
-      en:{back:'Back to Home',variant:'Variants',params:'Parameters',details:'Details',untitled:'Untitled Product'},
-      de:{back:'Zur Startseite',variant:'Varianten',params:'Parameter',details:'Details',untitled:'Unbenanntes Produkt'}
-    };
-
-    // Parse lang & product id from filename
-    const qs=new URLSearchParams(location.search);
-    const lang=(qs.get('lang')||localStorage.getItem('lang')||'zh').toLowerCase();
-    localStorage.setItem('lang',lang);
-    const t=I18N[lang]||I18N.zh;
-
-    // Infer product-N from current path
-    const m=location.pathname.match(/product-(\d+)\.html$/);
-    const pid=m?m[1]:"1";
-
-    // UI text
-    document.getElementById('backTxt').textContent=t.back;
-    document.getElementById('variantLabel').textContent=t.variant;
-    document.getElementById('paramsLabel').textContent=t.params;
-    document.getElementById('detailsLabel').textContent=t.details;
-
-    // Keep lang in links
-    const homeUrl=new URL('/', location.origin); homeUrl.searchParams.set('lang',lang);
-    document.getElementById('homeLink').href=homeUrl.toString();
-    const backUrl=new URL('/?lang='+encodeURIComponent(lang), location.origin);
-    document.getElementById('back').href=backUrl.toString();
-
-    // Lang switcher
-    document.querySelectorAll('#langSwitcher button').forEach(b=>{
-      if(b.dataset.lang===lang) b.classList.add('active');
-      b.onclick=()=>{const L=b.dataset.lang;localStorage.setItem('lang',L);const u=new URL(location.href);u.searchParams.set('lang',L);location.href=u.toString();};
-    });
-
-    // Helpers
-    function fetchWithTimeout(url,ms=1200){const ctl=new AbortController();const id=setTimeout(()=>ctl.abort(),ms);return fetch(url,{cache:'no-store',signal:ctl.signal}).finally(()=>clearTimeout(id));}
-    async function exists(url){try{const r=await fetchWithTimeout(url,1000);return r.ok;}catch{return false;}}
-    async function getText(url){try{const r=await fetchWithTimeout(url,1500);if(r.ok) return await r.text();}catch{}return ''}
-
-    const stage=document.getElementById('stage');
-    const thumbs=document.getElementById('thumbs');
-    const variantsBox=document.getElementById('variants');
-    const paramsBox=document.getElementById('paramsBox');
-    const detailsBox=document.getElementById('detailsBox');
-
-    // Sub-models a..h
-    const letters='abcdefgh'.split('');
-
-    // Build variant list based on folder existence (needs at least 1.png)
-    async function detectVariants(){
-      const found=[];
-      for(const v of letters){
-        const cover=`/assets/imgs/product-${pid}/${v}/1.png`;
-        if(await exists(cover)) found.push(v);
-      }
-      // Fallback: if no sub-folders, try root images (compat)
-      if(found.length===0){ if(await exists(`/assets/imgs/product-${pid}/1.png`)) found.push(''); }
-      return found;
-    }
-
-    // Load images [1..N].png (PNG only)
-    async function loadImages(variant){
-      const imgs=[];
-      for(let i=1;i<=30;i++){ // up to 30 slides; stop at first miss after at least one hit
-        const path = variant ? `/assets/imgs/product-${pid}/${variant}/${i}.png` : `/assets/imgs/product-${pid}/${i}.png`;
-        if(await exists(path)) imgs.push(path); else if(i>1) break; else break;
-      }
-      return imgs;
-    }
-
-    // Render carousel
-    let timer=null, idx=0, slides=[];
-    function show(n){
-      if(!slides.length) { stage.innerHTML=''; return; }
-      idx=(n+slides.length)%slides.length;
-      stage.innerHTML=`<img src="${slides[idx]}" alt="slide ${idx+1}">`;
-      // thumbs state
-      [...thumbs.querySelectorAll('img')].forEach((im,i)=>im.classList.toggle('active',i===idx));
-    }
-    function startAuto(){ clearInterval(timer); timer=setInterval(()=>show(idx+1), 3500); }
-
-    // Render thumbs
-    function renderThumbs(imgs){
-      thumbs.innerHTML='';
-      imgs.forEach((src,i)=>{
-        const im=document.createElement('img'); im.src=src; im.alt=`thumb ${i+1}`; if(i===0) im.classList.add('active');
-        im.onclick=()=>{ show(i); startAuto(); };
-        thumbs.appendChild(im);
-      });
-    }
-
-    // Load text blocks
-    async function loadTexts(variant){
-      const base = variant ? `/assets/imgs/product-${pid}/${variant}` : `/assets/imgs/product-${pid}`;
-      const params = await getText(`${base}/params-${lang}.txt`);
-      const details = await getText(`${base}/details-${lang}.txt`);
-      paramsBox.textContent = params || '';
-      detailsBox.textContent = details || '';
-      document.querySelector('.section:nth-of-type(2)').style.display = params ? '' : 'none';
-      document.querySelector('.section:nth-of-type(3)').style.display = details ? '' : 'none';
-    }
-
-    // Title from manifest if available
-    async function loadTitle(){
-      try{
-        const r=await fetchWithTimeout('/manifest.json',1500); if(!r.ok) throw 0; const mf=await r.json();
-        const item = (mf.items||[]).find(x=>String(x.id)===String(pid));
-        const name = item?.title?.[lang] || item?.title?.en || item?.title?.zh || `${t.untitled} #${pid}`;
-        document.getElementById('title').textContent=name;
-        document.title = `${name} · Eindeepseek`;
-        document.getElementById('subtitle').textContent = item?.subtitle?.[lang] || '';
-      }catch{ document.getElementById('title').textContent = `${t.untitled} #${pid}`; }
-    }
-
-    async function init(){
-      await loadTitle();
-      const vs = await detectVariants();
-      variantsBox.innerHTML='';
-      const useVariants = vs.length>0 && !(vs.length===1 && vs[0]==='');
-
-      if(useVariants){
-        vs.forEach((v,i)=>{
-          const btn=document.createElement('button');
-          btn.textContent=v.toUpperCase(); if(i===0) btn.classList.add('active');
-          btn.onclick=async()=>{ [...variantsBox.children].forEach(x=>x.classList.remove('active')); btn.classList.add('active');
-            slides = await loadImages(v); renderThumbs(slides); show(0); startAuto(); await loadTexts(v);
-          };
-          variantsBox.appendChild(btn);
-        });
-        // trigger first
-        variantsBox.firstElementChild?.click();
-      }else{
-        // No sub-variants: just load root images/texts
-        variantsBox.parentElement.style.display='none';
-        slides = await loadImages(''); renderThumbs(slides); show(0); startAuto(); await loadTexts('');
-      }
-    }
-
-    init();
   </script>
 </body>
 </html>
