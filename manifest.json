@@ -4,9 +4,54 @@
       "id": 1,
       "imgExt": "png",
       "title": {
-        "zh": "手持风扇系列",
-        "en": "Handheld Fan Series",
-        "de": "Handventilator Serie"
+        "zh": "产品 1",
+        "en": "Product 1",
+        "de": "Produkt 1"
+      }
+    },
+    {
+      "id": 2,
+      "imgExt": "png",
+      "title": {
+        "zh": "产品 2",
+        "en": "Product 2",
+        "de": "Produkt 2"
+      }
+    },
+    {
+      "id": 3,
+      "imgExt": "png",
+      "title": {
+        "zh": "产品 3",
+        "en": "Product 3",
+        "de": "Produkt 3"
+      }
+    },
+    {
+      "id": 4,
+      "imgExt": "png",
+      "title": {
+        "zh": "产品 4",
+        "en": "Product 4",
+        "de": "Produkt 4"
+      }
+    },
+    {
+      "id": 5,
+      "imgExt": "png",
+      "title": {
+        "zh": "产品 5",
+        "en": "Product 5",
+        "de": "Produkt 5"
+      }
+    },
+    {
+      "id": 6,
+      "imgExt": "png",
+      "title": {
+        "zh": "产品 6",
+        "en": "Product 6",
+        "de": "Produkt 6"
       }
     }
   ]
