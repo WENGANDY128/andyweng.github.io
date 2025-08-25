@@ -5,57 +5,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Eindeepseek – Handheld Fan Series</title>
   <style>
-    /* --- Base --- */
-    :root {
-      --bg: #f7f8fa;
-      --text: #222;
-      --muted: #555;
-      --card: #fff;
-      --line: #ddd;
-      --brand: #2b7de9;
-    }
+    :root { --bg:#f7f8fa; --text:#222; --muted:#555; --card:#fff; --line:#ddd; --brand:#2b7de9; }
     * { box-sizing: border-box; }
     body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background: var(--bg); color: var(--text); }
-
-    /* --- Header --- */
-    header {
-      position: sticky; top: 0; z-index: 10;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 16px; background: var(--card); border-bottom: 1px solid var(--line);
-    }
+    header { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--card); border-bottom: 1px solid var(--line); }
     .brand a { color: var(--text); text-decoration: none; font-weight: 800; }
-
     .lang { display: inline-flex; gap: 6px; align-items: center; border: 1px solid var(--line); border-radius: 999px; padding: 6px; background: var(--card); }
     .lang button { appearance: none; border: none; cursor: pointer; padding: 6px 10px; border-radius: 999px; color: var(--muted); background: transparent; font-weight: 600; }
     .lang button.active { color: #fff; background: var(--brand); }
-
-    /* --- Layout --- */
     .wrap { max-width: 1100px; margin: 0 auto; padding: 18px 16px 56px; }
     .title { font-size: 28px; font-weight: 800; margin: 8px 0; }
     .desc { color: var(--muted); line-height: 1.6; white-space: pre-wrap; margin: 6px 0 0; }
-
-    /* --- Model cards --- */
-    .model-cards { display: grid; gap: 14px; margin: 18px 0; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+    .model-cards { display: grid; gap: 14px; margin: 18px auto 10px; grid-template-columns: repeat(3, minmax(220px,1fr)); max-width: 900px; }
     .model-card { border: 2px solid var(--line); border-radius: 12px; background: var(--card); cursor: pointer; overflow: hidden; transition: .2s; }
     .model-card:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,.05); }
     .model-card.active { border-color: var(--brand); }
-    .model-card img { width: 100%; height: 132px; object-fit: cover; display: block; background: #f2f3f5; }
+    .model-card img { width: 100%; height: 140px; object-fit: cover; display: block; background: #f2f3f5; }
     .meta { padding: 10px 12px; font-weight: 600; }
-
-    /* --- Carousel --- */
-    .carousel { position: relative; overflow: hidden; border-radius: 14px; border: 1px solid var(--line); background: var(--card); margin-top: 12px; }
+    .productGrid { display: grid; grid-template-columns: 58% 42%; grid-gap: 16px; align-items: start; margin-top: 10px; }
+    .mediaCol { width: 100%; }
+    .infoCol { display: flex; flex-direction: column; gap: 12px; }
+    .carousel { position: relative; overflow: hidden; border-radius: 14px; border: 1px solid var(--line); background: var(--card); }
     .track { display: flex; transition: transform .45s ease; }
     .slide { min-width: 100%; }
     .slide img { width: 100%; height: auto; display: block; }
     .navBtn { position: absolute; top: 50%; transform: translateY(-50%); background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 8px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
     .prev { left: 8px; } .next { right: 8px; }
-    .dots { display: flex; justify-content: center; gap: 6px; margin-top: 10px; }
+    .dots { display: flex; justify-content: center; gap: 6px; margin-top: 8px; }
     .dot { width: 8px; height: 8px; border-radius: 50%; background: #cfd3da; border: none; cursor: pointer; }
     .dot.active { background: var(--brand); }
-
-    /* --- Boxes --- */
-    .box { margin-top: 18px; padding: 12px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
+    .box { padding: 12px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
     .box h2 { margin: 0 0 8px; font-size: 18px; font-weight: 800; color: #111; }
+    @media (max-width: 900px) { .model-cards{grid-template-columns:repeat(3,minmax(160px,1fr));max-width:100%;} .model-card img{height:110px;} .productGrid{grid-template-columns:1fr;} }
+    @media (max-width: 560px) { .model-cards{grid-template-columns:repeat(3,minmax(120px,1fr));} .model-card img{height:90px;} }
   </style>
 </head>
 <body>
@@ -74,47 +56,44 @@
 
     <div class="model-cards" id="modelCards"></div>
 
-    <div class="carousel" id="carousel" style="display:none">
-      <div class="track" id="track"></div>
-      <button class="navBtn prev" id="prev" aria-label="Previous">◀</button>
-      <button class="navBtn next" id="next" aria-label="Next">▶</button>
-    </div>
-    <div class="dots" id="dots"></div>
+    <div class="productGrid">
+      <div class="mediaCol">
+        <div class="carousel" id="carousel" style="display:none">
+          <div class="track" id="track"></div>
+          <button class="navBtn prev" id="prev" aria-label="Previous">◀</button>
+          <button class="navBtn next" id="next" aria-label="Next">▶</button>
+        </div>
+        <div class="dots" id="dots"></div>
+      </div>
 
-    <div id="specsBox" class="box" style="display:none">
-      <h2 id="specsTitle">参数</h2>
-      <ul id="specsList"></ul>
-    </div>
-
-    <div id="detailsBox" class="box" style="display:none">
-      <h2 id="detailsTitle">详细描述</h2>
-      <div id="detailsText"></div>
+      <div class="infoCol">
+        <div id="specsBox" class="box" style="display:none">
+          <h2 id="specsTitle">参数</h2>
+          <ul id="specsList"></ul>
+        </div>
+        <div id="detailsBox" class="box" style="display:none">
+          <h2 id="detailsTitle">详细描述</h2>
+          <div id="detailsText"></div>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
-    // ---------- State ----------
     const qs = new URLSearchParams(location.search);
     const currentLang = (qs.get('lang') || localStorage.getItem('lang') || 'zh').toLowerCase();
     localStorage.setItem('lang', currentLang);
     let SUB_ID = (qs.get('sub') || 'a').toLowerCase();
 
-    // Home link keeps lang
     const home = new URL('../index.html', location.href);
     home.searchParams.set('lang', currentLang);
     document.getElementById('homeLink').href = home.toString();
 
-    // Language switcher
     [...document.querySelectorAll('#langSwitcher button')].forEach(b => {
       if (b.dataset.lang === currentLang) b.classList.add('active');
-      b.onclick = () => {
-        const u = new URL(location.href);
-        u.searchParams.set('lang', b.dataset.lang);
-        location.href = u.toString();
-      };
+      b.onclick = () => { const u = new URL(location.href); u.searchParams.set('lang', b.dataset.lang); location.href = u.toString(); };
     });
 
-    // Models config
     const MODELS = [
       { sub: 'a', name: { zh: 'C01 折叠风扇',   en: 'C01 Fold Fan',    de: 'C01 Klappventilator' } },
       { sub: 'b', name: { zh: 'C02 手持风扇',   en: 'C02 Handheld Fan', de: 'C02 Handventilator' } },
@@ -126,198 +105,67 @@
       { sub: 'h', name: { zh: 'C08 儿童款',     en: 'C08 Kids',         de: 'C08 Kinder' } }
     ];
 
-    const i18n = {
-      specs:   { zh: '参数',     en: 'Specs',    de: 'Spezifikationen' },
-      details: { zh: '详细描述', en: 'Details',  de: 'Beschreibung' }
-    };
-
+    const i18n = { specs:{zh:'参数',en:'Specs',de:'Spezifikationen'}, details:{zh:'详细描述',en:'Details',de:'Beschreibung'} };
     const t = obj => obj?.[currentLang] || obj?.en || '';
 
-    // ---------- Path helpers (adjust to your repo structure) ----------
-    function imgBase(sub) { return `../assets/imgs/product-1/product-1${sub}`; }
-    function txtBase(sub) { return `../assets/txt/product-1/product-1${sub}`; }
+    function imgBase(sub){ return `../assets/imgs/product-1/product-1${sub}`; }
+    function txtBase(sub){ return `../assets/txt/product-1/product-1${sub}`; }
 
-    // Detect image existence via <img> (GitHub Pages blocks HEAD)
-    function existsImage(url){
-      return new Promise(resolve => {
-        const im = new Image();
-        im.onload = () => resolve(true);
-        im.onerror = () => resolve(false);
-        im.src = url;
-      });
-    }
+    function existsImage(url){ return new Promise(resolve=>{ const im=new Image(); im.onload=()=>resolve(true); im.onerror=()=>resolve(false); im.src=url; }); }
 
-    // ---------- Build model cards ----------
     async function buildCards(){
-      const box = document.getElementById('modelCards');
-      box.innerHTML = '';
-      for (const m of MODELS){
-        const thumb = `${imgBase(m.sub)}/1.png`;
-        if (!await existsImage(thumb)) continue; // No assets -> hide card
-        const card = document.createElement('div');
-        card.className = 'model-card' + (m.sub === SUB_ID ? ' active' : '');
-        card.innerHTML = `
-          <img src="${thumb}" alt="${t(m.name)} thumbnail">
-          <div class="meta">${t(m.name)}</div>
-        `;
-        card.onclick = () => {
-          SUB_ID = m.sub;
-          const u = new URL(location.href);
-          u.searchParams.set('sub', SUB_ID);
-          u.searchParams.set('lang', currentLang);
-          history.replaceState(null, '', u.toString());
-          // Toggle active style
-          [...box.children].forEach(c => c.classList.remove('active'));
-          card.classList.add('active');
-          renderProduct();
-        };
+      const box=document.getElementById('modelCards'); box.innerHTML='';
+      for (const m of MODELS.filter(x=>['a','b','c'].includes(x.sub))){
+        const thumb=`${imgBase(m.sub)}/1.png`; if(!await existsImage(thumb)) continue;
+        const card=document.createElement('div');
+        card.className='model-card'+(m.sub===SUB_ID?' active':''); 
+        card.innerHTML=`<img src="${thumb}" alt="${t(m.name)} thumbnail"><div class="meta">${t(m.name)}</div>`;
+        card.onclick=()=>{ SUB_ID=m.sub; const u=new URL(location.href); u.searchParams.set('sub',SUB_ID); u.searchParams.set('lang',currentLang); history.replaceState(null,'',u.toString()); [...box.children].forEach(c=>c.classList.remove('active')); card.classList.add('active'); renderProduct(); };
         box.appendChild(card);
       }
     }
 
-    // ---------- Load assets ----------
     async function loadImages(sub){
-      const arr = [];
-      for (let i = 1; i <= 20; i++){
-        const u = `${imgBase(sub)}/${i}.png`;
-        // stop at first missing index to avoid gaps
-        if (await existsImage(u)) arr.push(u); else break;
-      }
-      return arr;
+      const arr=[]; for(let i=1;i<=20;i++){ const u=`${imgBase(sub)}/${i}.png`; if(await existsImage(u)) arr.push(u); else break; } return arr;
     }
 
-    // Text loader (lang -> en -> zh -> de fallback)
     async function loadTxt(sub){
-      const order = [currentLang, 'en', 'zh', 'de'];
-      for (const lg of order){
-        try{
-          const url = `${txtBase(sub)}-${lg}.txt`;
-          const r = await fetch(url);
-          if (r.ok){
-            const raw = (await r.text()).trim();
-            if (!raw) continue; // empty file -> continue fallback
-            const lines = raw.split(/\r?\n/);
-            const name = MODELS.find(x => x.sub === sub)?.name;
-            return { title: lines[0] || t(name), desc: lines.slice(1).join('\n') };
-          }
-        }catch(e){}
-      }
-      // no file -> fallback to built-in name
-      const name = MODELS.find(x => x.sub === sub)?.name;
-      return { title: t(name), desc: '' };
+      const order=[currentLang,'en','zh','de'];
+      for(const lg of order){ try{ const url=`${txtBase(sub)}-${lg}.txt`; const r=await fetch(url); if(r.ok){ const raw=(await r.text()).trim(); if(!raw) continue; const lines=raw.split(/\r?\n/); const name=MODELS.find(x=>x.sub===sub)?.name; return {title:lines[0]||t(name), desc:lines.slice(1).join('\n')}; } }catch(e){} }
+      const name=MODELS.find(x=>x.sub===sub)?.name; return {title:t(name), desc:''};
     }
 
-    // Params list
     async function loadParams(sub){
-      const order = [currentLang, 'en', 'zh', 'de'];
-      for (const lg of order){
-        try{
-          const r = await fetch(`${txtBase(sub)}/params-${lg}.txt`);
-          if (r.ok){
-            const txt = (await r.text()).trim();
-            const lines = txt.split(/\r?\n/).filter(Boolean);
-            const ul = document.getElementById('specsList');
-            ul.innerHTML = '';
-            lines.forEach(line => {
-              const li = document.createElement('li');
-              li.textContent = line;
-              ul.appendChild(li);
-            });
-            document.getElementById('specsTitle').textContent = i18n.specs[lg] || 'Specs';
-            document.getElementById('specsBox').style.display = lines.length ? 'block' : 'none';
-            return; // done once loaded
-          }
-        }catch(e){}
-      }
-      document.getElementById('specsBox').style.display = 'none';
+      const order=[currentLang,'en','zh','de'];
+      for(const lg of order){ try{ const r=await fetch(`${txtBase(sub)}/params-${lg}.txt`); if(r.ok){ const txt=(await r.text()).trim(); const lines=txt.split(/\r?\n/).filter(Boolean); const ul=document.getElementById('specsList'); ul.innerHTML=''; lines.forEach(line=>{ const li=document.createElement('li'); li.textContent=line; ul.appendChild(li); }); document.getElementById('specsTitle').textContent=i18n.specs[lg]||'Specs'; document.getElementById('specsBox').style.display=lines.length?'block':'none'; return; } }catch(e){} } document.getElementById('specsBox').style.display='none';
     }
 
-    // Long details
     async function loadDetails(sub){
-      const order = [currentLang, 'en', 'zh', 'de'];
-      for (const lg of order){
-        try{
-          const r = await fetch(`${txtBase(sub)}/details-${lg}.txt`);
-          if (r.ok){
-            const txt = (await r.text()).trim();
-            if (txt){
-              document.getElementById('detailsTitle').textContent = i18n.details[lg] || 'Details';
-              document.getElementById('detailsText').textContent = txt;
-              document.getElementById('detailsBox').style.display = 'block';
-              return;
-            }
-          }
-        }catch(e){}
-      }
-      document.getElementById('detailsBox').style.display = 'none';
+      const order=[currentLang,'en','zh','de'];
+      for(const lg of order){ try{ const r=await fetch(`${txtBase(sub)}/details-${lg}.txt`); if(r.ok){ const txt=(await r.text()).trim(); if(txt){ document.getElementById('detailsTitle').textContent=i18n.details[lg]||'Details'; document.getElementById('detailsText').textContent=txt; document.getElementById('detailsBox').style.display='block'; return; } } }catch(e){} } document.getElementById('detailsBox').style.display='none';
     }
 
-    // ---------- Render current sub model ----------
     async function renderProduct(){
-      // Title & desc
-      const data = await loadTxt(SUB_ID);
-      document.getElementById('title').textContent = data.title || '';
-      document.getElementById('desc').textContent = data.desc || '';
+      const data=await loadTxt(SUB_ID);
+      document.getElementById('title').textContent=data.title||'';
+      document.getElementById('desc').textContent=data.desc||'';
+      await loadParams(SUB_ID); await loadDetails(SUB_ID);
 
-      // Specs & details
-      await loadParams(SUB_ID);
-      await loadDetails(SUB_ID);
-
-      // Gallery
-      const imgs = await loadImages(SUB_ID);
-      const track = document.getElementById('track');
-      const dots = document.getElementById('dots');
-      const carousel = document.getElementById('carousel');
-      const prevBtn = document.getElementById('prev');
-      const nextBtn = document.getElementById('next');
-
-      track.innerHTML = '';
-      dots.innerHTML = '';
-
-      if (!imgs.length){
-        carousel.style.display = 'none';
-        dots.style.display = 'none';
-        return;
-      }
-
-      carousel.style.display = 'block';
-      dots.style.display = imgs.length > 1 ? 'flex' : 'none';
-      prevBtn.style.display = nextBtn.style.display = imgs.length > 1 ? 'block' : 'none';
-
-      imgs.forEach((src, idx) => {
-        const s = document.createElement('div');
-        s.className = 'slide';
-        s.innerHTML = `<img src="${src}" alt="${SUB_ID} image ${idx+1}">`;
-        track.appendChild(s);
-
-        if (imgs.length > 1){
-          const d = document.createElement('button');
-          d.className = 'dot' + (idx === 0 ? ' active' : '');
-          d.setAttribute('aria-label', `Go to slide ${idx+1}`);
-          d.onclick = () => go(idx);
-          dots.appendChild(d);
-        }
-      });
-
-      let index = 0;
-      function update(){
-        track.style.transform = `translateX(${-index*100}%)`;
-        if (imgs.length > 1){
-          [...dots.children].forEach((d, i) => d.classList.toggle('active', i === index));
-        }
-      }
-      function go(i){ index = Math.max(0, Math.min(imgs.length - 1, i)); update(); }
-
-      prevBtn.onclick = () => go(index - 1);
-      nextBtn.onclick = () => go(index + 1);
-      update();
+      const imgs=await loadImages(SUB_ID);
+      const track=document.getElementById('track');
+      const dots=document.getElementById('dots');
+      const carousel=document.getElementById('carousel');
+      const prevBtn=document.getElementById('prev'); const nextBtn=document.getElementById('next');
+      track.innerHTML=''; dots.innerHTML='';
+      if(!imgs.length){ carousel.style.display='none'; dots.style.display='none'; return; }
+      carousel.style.display='block'; dots.style.display=imgs.length>1?'flex':'none'; prevBtn.style.display=nextBtn.style.display=imgs.length>1?'block':'none';
+      imgs.forEach((src,idx)=>{ const s=document.createElement('div'); s.className='slide'; s.innerHTML=`<img src="${src}" alt="${SUB_ID} image ${idx+1}">`; track.appendChild(s); if(imgs.length>1){ const d=document.createElement('button'); d.className='dot'+(idx===0?' active':''); d.setAttribute('aria-label',`Go to slide ${idx+1}`); d.onclick=()=>go(idx); dots.appendChild(d);} });
+      let index=0; function update(){ track.style.transform=`translateX(${-index*100}%)`; if(imgs.length>1){ [...dots.children].forEach((d,i)=>d.classList.toggle('active',i===index)); } }
+      function go(i){ index=Math.max(0,Math.min(imgs.length-1,i)); update(); }
+      prevBtn.onclick=()=>go(index-1); nextBtn.onclick=()=>go(index+1); update();
     }
 
-    // ---------- Init ----------
-    (async () => {
-      await buildCards();
-      await renderProduct();
-    })();
+    (async()=>{ await buildCards(); await renderProduct(); })();
   </script>
 </body>
 </html>
