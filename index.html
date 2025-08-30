@@ -84,10 +84,9 @@
     <div class="contactbar" id="contactBar"></div>
 
     <h1 id="heading">产品展示</h1>
-    <p class="lead" id="sub">选择语言后会在全站生效；仅显示有内容的产品（只识别 PNG）。</p>
+    <p class="lead" id="sub"></p>
 
     <div class="grid" id="grid">
-      <!-- skeleton placeholders (初次加载占位) -->
       <div class="card"><div class="thumb skeleton"></div><div class="body"><div class="title skeleton" style="height:18px;width:60%"></div><p class="desc skeleton" style="height:38px"></p></div></div>
       <div class="card"><div class="thumb skeleton"></div><div class="body"><div class="title skeleton" style="height:18px;width:60%"></div><p class="desc skeleton" style="height:38px"></p></div></div>
       <div class="card"><div class="thumb skeleton"></div><div class="body"><div class="title skeleton" style="height:18px;width:60%"></div><p class="desc skeleton" style="height:38px"></p></div></div>
@@ -98,9 +97,9 @@
 
   <script>
     const I18N={
-      zh:{title:'产品展示',sub:'选择语言后会在全站生效；仅显示有内容的产品（只识别 PNG）。',groupTitle:'加入 WhatsApp 群组',groupDesc:'扫码二维码，进入我们的贸易 & 物流交流群。',email:'邮件',whats:'WhatsApp',phone:'电话',wechat:'微信'},
-      en:{title:'Products',sub:'Language selection applies site-wide. Only products with content are shown (PNG only).',groupTitle:'Join WhatsApp Group',groupDesc:'Scan the QR code to join our trade & logistics group.',email:'Email',whats:'WhatsApp',phone:'Phone',wechat:'WeChat'},
-      de:{title:'Produkte',sub:'Die Sprachauswahl gilt für die ganze Seite. Es werden nur Produkte mit Inhalt angezeigt (nur PNG).',groupTitle:'WhatsApp-Gruppe beitreten',groupDesc:'QR-Code scannen, um unserer Handels- & Logistik-Gruppe beizutreten.',email:'E-Mail',whats:'WhatsApp',phone:'Telefon',wechat:'WeChat'}
+      zh:{title:'产品展示',sub:'Eindeepseek 专注消费电子、小家电与工业品的跨境贸易供应，提供 OEM/ODM、现货与定制服务，致力于为全球客户提供优质产品与可靠的物流支持。',groupTitle:'加入 WhatsApp 群组',groupDesc:'扫码二维码，进入我们的贸易 & 物流交流群。',email:'邮件',whats:'WhatsApp',phone:'电话',wechat:'微信'},
+      en:{title:'Products',sub:'Eindeepseek is a cross-border trade supplier of consumer electronics, small appliances and industrial products. We provide OEM/ODM, ready-to-ship and customized services, delivering quality products with reliable logistics support worldwide.',groupTitle:'Join WhatsApp Group',groupDesc:'Scan the QR code to join our trade & logistics group.',email:'Email',whats:'WhatsApp',phone:'Phone',wechat:'WeChat'},
+      de:{title:'Produkte',sub:'Eindeepseek ist ein grenzüberschreitender Handelspartner für Unterhaltungselektronik, Kleingeräte und Industrieprodukte. Wir bieten OEM/ODM, Lagerware und kundenspezifische Lösungen und liefern weltweit qualitativ hochwertige Produkte mit zuverlässiger Logistik.',groupTitle:'WhatsApp-Gruppe beitreten',groupDesc:'QR-Code scannen, um unserer Handels- & Logistik-Gruppe beizutreten.',email:'E-Mail',whats:'WhatsApp',phone:'Telefon',wechat:'WeChat'}
     };
     const qs=new URLSearchParams(location.search);
     const currentLang=(qs.get('lang')||localStorage.getItem('lang')||'zh').toLowerCase();
@@ -118,11 +117,10 @@
     document.getElementById('contactBar').innerHTML=`
       <a href="mailto:${CONTACT.email}">📧 ${t.email}: ${CONTACT.email}</a>
       <a href="https://wa.me/${CONTACT.whatsapp.replace(/[^0-9]/g,'')}" target="_blank" rel="noopener">💬 ${t.whats}</a>
-      <a href="tel:${CONTACT.phone.replace(/\\s/g,'')}">📞 ${t.phone}: ${CONTACT.phone}</a>
+      <a href="tel:${CONTACT.phone.replace(/\s/g,'')}">📞 ${t.phone}: ${CONTACT.phone}</a>
       <span>🟩 ${t.wechat}: ${CONTACT.wechat}</span>
     `;
 
-    // 带超时的 fetch（避免卡死）
     function fetchWithTimeout(url,ms=1500){
       const ctl=new AbortController(); const id=setTimeout(()=>ctl.abort(),ms);
       return fetch(url,{cache:'no-store',signal:ctl.signal}).finally(()=>clearTimeout(id));
@@ -132,7 +130,6 @@
       catch(e){}
       return null;
     }
-    // 只认 PNG；先 HEAD，不行则回退 GET（兼容不支持 HEAD 的环境）
     async function existsPng(url){
       try{ const r=await fetchWithTimeout(url,1200); if(r.ok) return true; }catch(e){}
       try{ const r2=await fetchWithTimeout(url,1200); return r2.ok; }catch(e){ return false; }
@@ -141,11 +138,10 @@
     async function build(){
       const grid=document.getElementById('grid'); grid.innerHTML='';
 
-      // WhatsApp 群卡片（有任意二维码图片即显示）
       try{
         const qrCandidates=['group.jpeg','group.jpg','group.png','group.webp'];
         for(const u of qrCandidates){
-          if(await existsPng(u)){ // 这里用同一存在探测，但不限制后缀
+          if(await existsPng(u)){
             const a=document.createElement('a'); a.className='cardlink'; a.href=u;
             a.onclick=()=>{ try{gtag('event','click_group');}catch(e){} };
             a.innerHTML=`<article class="card">
@@ -163,7 +159,6 @@
         }
       }catch{}
 
-      // 读取 manifest.json（根目录）
       const mf = await (async()=>{
         for(const u of ['manifest.json','/manifest.json','./manifest.json']){
           const d = await tryJson(u); if(d) return d;
@@ -171,18 +166,16 @@
         return null;
       })();
 
-      // 只遍历 manifest.items，避免默认 [1..6] 带来的多余请求
       const items = Array.isArray(mf?.items) ? mf.items : [];
 
       for(const it of items){
         const id = Number(it.id); if(!id) continue;
         const slug = `product-${id}`;
-        const img = `assets/imgs/${slug}/1.png`; // PNG only
+        const img = `assets/imgs/${slug}/1.png`;
 
-        if(!(await existsPng(img))) continue; // 没有 1.png 就跳过
+        if(!(await existsPng(img))) continue;
 
         const title = it?.title?.[currentLang] || it?.title?.en || it?.title?.zh || `Product ${id}`;
-        // 支持自定义 href；否则按默认路径
         const hrefURL = new URL(it?.href || `products/${slug}.html`, location.href);
         hrefURL.searchParams.set('lang', currentLang);
 
