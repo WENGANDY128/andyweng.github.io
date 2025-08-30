@@ -1,1 +1,4 @@
-Tragbarer Faltventilator
+C01 Tragbarer Faltventilator
+Kompakt und klappbar – ideal für unterwegs.
+2000mAh Akku, 3 Stufen, ca. 4–10 Std. Laufzeit; ca. 3 Std. Ladezeit.
+≈5500 U/min, ≈3,5 m/s Luftstrom; Nenn­eingang 5V/1A, max. 5W.

@@ -1,1 +1,4 @@
-Handheld Fold Fan
+C01 Handheld Fold Fan
+Compact, foldable design for easy carry.
+2000mAh battery with 3 speeds, about 4–10h runtime; ~3h to full charge.
+≈5500rpm, ≈3.5m/s airflow; rated input 5V/1A, max power 5W.
