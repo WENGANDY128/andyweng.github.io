@@ -1,1 +1,4 @@
-Tragbarer Hochgeschwindigkeitsventilator (mit Anzeige)
+C03 Hochgeschwindigkeitsventilator
+Starker Luftstrom mit klarer Anzeige am Gerät.
+3000mAh Akku, 4 Stufen / 100‑stufige Feineinstellung, ca. 2–8 Std. Laufzeit; ca. 2 Std. Ladezeit.
+≈14000 U/min, ≈10 m/s; Nenn­eingang 5V/2A, max. 4,5W.
