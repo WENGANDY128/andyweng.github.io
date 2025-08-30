@@ -1,1 +1,4 @@
-Tragbarer Hochgeschwindigkeitsventilator
+C02 Tragbarer Hochgeschwindigkeitsventilator
+Hohe Drehzahl für starken Luftstrom.
+3600mAh Akku, 4 Stufen / 100‑stufige Feineinstellung, ca. 2–8 Std. Laufzeit; ca. 2,6 Std. Ladezeit.
+≈20000 U/min, ≈10 m/s; Nenn­eingang 5V/2A, max. 3,4W.

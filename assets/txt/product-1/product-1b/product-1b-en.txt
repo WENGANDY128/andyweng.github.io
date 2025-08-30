@@ -1,1 +1,4 @@
-High Speed Fan
+C02 High Speed Fan
+High‑rpm drive for powerful airflow.
+3600mAh battery, 4 levels / 100‑step fine control, about 2–8h runtime; ~2.6h to full.
+≈20000rpm, ≈10m/s wind speed; rated input 5V/2A, max power 3.4W.
