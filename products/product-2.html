@@ -33,11 +33,17 @@
     .title{font-size:28px;font-weight:800;margin:8px 0}
     .desc{color:var(--muted);line-height:1.6;white-space:pre-wrap;word-wrap:break-word}
 
-    /* Carousel */
+    /* variant cards — 与 product-1 相同思路 */
+    .models{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:10px}
+    .model{border:2px solid var(--border);border-radius:12px;overflow:hidden;background:#fff;cursor:pointer;transition:.15s}
+    .model.active{border-color:var(--primary)}
+    .model img{width:100%;height:110px;object-fit:cover;display:block;background:#f2f3f5}
+    .model .meta{padding:8px 10px;font-weight:700}
+
+    /* Carousel（按 product-1 的 contain 居中留白 + 圆点/左右箭头） */
     .carousel{position:relative;overflow:hidden;border-radius:14px;border:1px solid var(--border);background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.06)}
     .track{display:flex;transition:transform .45s ease;will-change:transform}
     .slide{min-width:100%;user-select:none;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;background:#f6f7f9}
-    /* contain + 居中，等边留白 */
     .slide img{display:block;width:100%;height:100%;object-fit:contain;background:#f6f7f9}
     .navBtn{position:absolute;top:50%;transform:translateY(-50%);background:#fff;border:1px solid var(--border);color:#333;border-radius:10px;padding:8px 10px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.1)}
     .prev{left:8px}.next{right:8px}
@@ -48,7 +54,7 @@
     .skeleton{position:relative;overflow:hidden;background:var(--skeleton)}
     .skeleton::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,var(--shimmer),transparent);animation:shimmer 1.2s infinite}
     @keyframes shimmer{100%{transform:translateX(100%)}}
-  
+
     /* Right-column cards */
     .box{margin-top:18px;padding:12px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
     .box h2{margin:0 0 8px;font-size:18px;font-weight:800;color:#111}
@@ -70,6 +76,9 @@
   <div class="wrap">
     <div class="layout">
       <section>
+        <!-- 与 product-1 一样的“子款卡片” -->
+        <div class="models" id="models"></div>
+
         <div class="carousel" id="carousel" aria-label="gallery">
           <div class="track" id="track">
             <div class="slide"><div class="skeleton" style="aspect-ratio:4/3;width:100%"></div></div>
@@ -91,6 +100,7 @@
   <script>
     const PRODUCT_ID=2;
     const qs=new URLSearchParams(location.search);
+    let SUB_ID=(qs.get('sub')||'').toLowerCase(); // a / b / c ...
     const currentLang=(qs.get('lang')||localStorage.getItem('lang')||'zh').toLowerCase();
     localStorage.setItem('lang',currentLang);
     const home=new URL('../index.html',location.href); home.searchParams.set('lang',currentLang); document.getElementById('homeLink').href=home.toString();
@@ -98,90 +108,157 @@
 
     function fetchWithTimeout(url,ms=1200){const ctl=new AbortController();const id=setTimeout(()=>ctl.abort(),ms);return fetch(url,{cache:'no-store',signal:ctl.signal}).finally(()=>clearTimeout(id));}
     async function jsonFast(url){try{const r=await fetchWithTimeout(url,1500); if(r.ok) return await r.json();}catch{} return null;}
-    async function firstOk(urls){const wrapped=urls.map(u=>fetchWithTimeout(u,1200).then(r=>r.ok?u:Promise.reject(u))); try{return await Promise.any(wrapped);}catch{return ''}}
     async function exists(u){try{const r=await fetchWithTimeout(u,900); return r.ok;}catch{return false;}}
+    async function firstOk(urls){for(const u of urls){ if(await exists(u)) return u; } return '';}
 
-    async function loadTxt(){const slug=`product-${PRODUCT_ID}`; const order=[currentLang,'en','zh','de']; for(const lg of order){const url=`${slug}-${lg}.txt`; try{const r=await fetchWithTimeout(url,1200); if(r.ok){const t=(await r.text()).trim(); const [first,...rest]=t.split(/\r?\n/); return {title:first?.trim()||`Product ${PRODUCT_ID}`, desc:rest.join('\n').trim()||''};}}catch{} } return {title:`Product ${PRODUCT_ID}`,desc:''};}
+    // ---------- Variant helpers ----------
+    const VARS = ['a','b','c','d'];
+    function imgBase(sub){ return sub?`../assets/imgs/product-${PRODUCT_ID}${sub}`:`../assets/imgs/product-${PRODUCT_ID}`; }
+    function txtRoot(){ return `../assets/txt/product-${PRODUCT_ID}`; }
 
-    async function resolveExtViaManifest(){const mf=await jsonFast('../manifest.json').catch(()=>null); if(mf?.items){const it=mf.items.find(x=>x.id==PRODUCT_ID); if(it?.imgExt) return it.imgExt;} return '';}
+    async function resolveExt(base){
+      return (await firstOk([`${base}/1.jpg`,`${base}/1.jpeg`,`${base}/1.png`,`${base}/1.webp`])).split('.').pop() || '';
+    }
 
-    async function loadParams(productId, lang){
-      const order=[lang,'en','zh','de'];
-      const prefixes=['../assets/txt','/assets/txt'];
+    // Build model cards if thumbnails exist (1.jpg/png/webp)
+    async function buildModels(){
+      const box=document.getElementById('models'); box.innerHTML='';
+      const items=[];
+      for(const s of VARS){
+        const b=imgBase(s);
+        const thumb=await firstOk([`${b}/1.jpg`,`${b}/1.jpeg`,`${b}/1.png`,`${b}/1.webp`]);
+        if(thumb) items.push({sub:s,thumb});
+      }
+      if(!items.length){ box.style.display='none'; return; }
+      if(!items.some(x=>x.sub===SUB_ID)) SUB_ID = SUB_ID || items[0].sub;
+
+      items.forEach(it=>{
+        const div=document.createElement('div'); div.className='model'+(it.sub===SUB_ID?' active':'');
+        const label = it.sub.toUpperCase();
+        div.innerHTML = `<img src="${it.thumb}" alt="2${label} thumb"><div class="meta">2${label}</div>`;
+        div.onclick=()=>{
+          SUB_ID=it.sub;
+          const url=new URL(location.href); url.searchParams.set('sub',SUB_ID); history.replaceState(null,'',url.toString());
+          [...box.children].forEach(c=>c.classList.remove('active')); div.classList.add('active');
+          renderAll();
+        };
+        box.appendChild(div);
+      });
+    }
+
+    // ---------- Data loaders ----------
+    async function loadTitleDesc(){
+      const order=[currentLang,'en','zh','de'];
       for(const lg of order){
-        for(const pre of prefixes){
-          const url=`${pre}/product-${productId}/product-${productId}-params-${lg}.txt`;
-          try{
-            const r=await fetchWithTimeout(url,1200);
-            if(r.ok){
-              const lines=(await r.text()).trim().split(/\r?\n/).filter(Boolean);
-              const list=document.getElementById('specsList'); list.innerHTML='';
-              lines.forEach(line=>{
-                const m=line.split(/\s*[:：]\s*/);
-                const k=m[0]||''; const v=m.slice(1).join(':')||'';
-                const li=document.createElement('li');
-                li.textContent = v?`${k}: ${v}`:k;
-                list.appendChild(li);
-              });
-              const titleI18n={zh:'参数',en:'Specs',de:'Spezifikationen'};
-              document.getElementById('specsTitle').textContent=titleI18n[lang]||'Specs';
-              document.getElementById('specsBox').style.display=lines.length?'block':'none';
-              return;
-            }
-          }catch(e){}
+        const cands = SUB_ID
+          ? [
+              `product-${PRODUCT_ID}${SUB_ID}-${lg}.txt`,                          // 页面同目录，变体
+              `product-${PRODUCT_ID}-${lg}.txt`                                    // 页面同目录，基础
+            ]
+          : [`product-${PRODUCT_ID}-${lg}.txt`];
+        for(const u of cands){
+          if(await exists(u)){ const t=(await (await fetchWithTimeout(u,1200)).text()).trim();
+            const [first,...rest]=t.split(/\r?\n/); return {title:first||`Product ${PRODUCT_ID}`, desc:rest.join('\\n')}; }
+        }
+      }
+      return {title:`Product ${PRODUCT_ID}`, desc:''};
+    }
+
+    async function loadParams(){
+      const order=[currentLang,'en','zh','de'];
+      const pre = txtRoot();
+      for(const lg of order){
+        const cands = SUB_ID
+          ? [
+              `${pre}/product-${PRODUCT_ID}${SUB_ID}/params-${lg}.txt`,           // /product-2/product-2a/params-zh.txt
+              `${pre}/product-${PRODUCT_ID}${SUB_ID}-params-${lg}.txt`,           // /product-2/product-2a-params-zh.txt
+              `${pre}/product-${PRODUCT_ID}-params-${lg}.txt`                     // 基础回退
+            ]
+          : [
+              `${pre}/product-${PRODUCT_ID}-params-${lg}.txt`
+            ];
+        for(const u of cands){
+          if(await exists(u)){
+            const lines=(await (await fetchWithTimeout(u,1200)).text()).trim().split(/\r?\n/).filter(Boolean);
+            const list=document.getElementById('specsList'); list.innerHTML='';
+            lines.forEach(line=>{
+              const m=line.split(/\s*[:：]\s*/);
+              const k=m[0]||''; const v=m.slice(1).join(':')||'';
+              const li=document.createElement('li'); li.textContent=v?`${k}: ${v}`:k;
+              list.appendChild(li);
+            });
+            const titleI18n={zh:'参数',en:'Specs',de:'Spezifikationen'};
+            document.getElementById('specsTitle').textContent=titleI18n[currentLang]||'Specs';
+            document.getElementById('specsBox').style.display=lines.length?'block':'none';
+            return;
+          }
         }
       }
       document.getElementById('specsBox').style.display='none';
     }
 
-    async function loadDetails(productId, lang){
-      const order=[lang,'en','zh','de'];
-      const prefixes=['../assets/txt','/assets/txt'];
+    async function loadDetails(){
+      const order=[currentLang,'en','zh','de'];
+      const pre = txtRoot();
       for(const lg of order){
-        for(const pre of prefixes){
-          const url=`${pre}/product-${productId}/product-${productId}-details-${lg}.txt`;
-          try{
-            const r=await fetchWithTimeout(url,1200);
-            if(r.ok){
-              const txt=(await r.text()).trim();
-              if(txt){
-                const titleI18n={zh:'详细描述',en:'Details',de:'Beschreibung'};
-                document.getElementById('detailsTitle').textContent=titleI18n[lang]||'Details';
-                document.getElementById('detailsText').textContent=txt;
-                document.getElementById('detailsBox').style.display='block';
-                return;
-              }
+        const cands = SUB_ID
+          ? [
+              `${pre}/product-${PRODUCT_ID}${SUB_ID}/details-${lg}.txt`,          // /product-2/product-2a/details-zh.txt
+              `${pre}/product-${PRODUCT_ID}${SUB_ID}-details-${lg}.txt`,          // /product-2/product-2a-details-zh.txt
+              `${pre}/product-${PRODUCT_ID}-details-${lg}.txt`                    // 基础回退
+            ]
+          : [
+              `${pre}/product-${PRODUCT_ID}-details-${lg}.txt`
+            ];
+        for(const u of cands){
+          if(await exists(u)){
+            const txt=(await (await fetchWithTimeout(u,1200)).text()).trim();
+            if(txt){
+              const titleI18n={zh:'详细描述',en:'Details',de:'Beschreibung'};
+              document.getElementById('detailsTitle').textContent=titleI18n[currentLang]||'Details';
+              document.getElementById('detailsText').textContent=txt;
+              document.getElementById('detailsBox').style.display='block';
+              return;
             }
-          }catch(e){}
+          }
         }
       }
       document.getElementById('detailsBox').style.display='none';
     }
 
+    // 按 product-1 的图片逻辑：最多 20 张（1..20），连续命名，遇缺停止；自动识别扩展名
     async function loadImages(){
-      const base=`../assets/imgs/product-${PRODUCT_ID}`;
-      let ext = await resolveExtViaManifest();
-      if(!ext){ ext = (await firstOk([`${base}/1.jpg`,`${base}/1.jpeg`,`${base}/1.png`,`${base}/1.webp`])).split('.').pop() || ''; }
-      if(!ext) return [];
-
-      // 预加载第一张
-      const link=document.createElement('link'); link.rel='preload'; link.as='image'; link.href=`${base}/1.${ext}`; document.head.appendChild(link);
-
-      // 按已知扩展名加载后续，遇到缺失即停止
-      const imgs=[];
-      for(let i=1;i<=20;i++){
-        const u=`${base}/${i}.${ext}`;
-        if(await exists(u)) imgs.push(u); else break;
+      const base = imgBase(SUB_ID);
+      let ext = await resolveExt(base);
+      if(!ext && SUB_ID){
+        // 子款没有时回退到基础款
+        const base2 = imgBase('');
+        ext = await resolveExt(base2);
+        if(!ext) return [];
+        return await loadFromBase(base2, ext);
       }
-      return imgs;
+      if(!ext) return [];
+      return await loadFromBase(base, ext);
+
+      async function loadFromBase(b, e){
+        const link=document.createElement('link'); link.rel='preload'; link.as='image'; link.href=`${b}/1.${e}`; document.head.appendChild(link);
+        const imgs=[];
+        for(let i=1;i<=20;i++){ // 与 product-1 一致
+          const u=`${b}/${i}.${e}`;
+          if(await exists(u)) imgs.push(u); else break;
+        }
+        return imgs;
+      }
     }
 
-    (async function init(){
-      const data=await loadTxt(); title.textContent=data.title; desc.textContent=data.desc;
-      await loadParams(PRODUCT_ID,currentLang);
-      await loadDetails(PRODUCT_ID,currentLang);
-      const imgs=await loadImages(); const track=document.getElementById('track'); const dots=document.getElementById('dots');
-      track.innerHTML='';
+    async function renderAll(){
+      const titleEl=document.getElementById('title'), descEl=document.getElementById('desc');
+      const data=await loadTitleDesc(); titleEl.textContent=data.title; descEl.textContent=data.desc;
+      await loadParams(); await loadDetails();
+
+      const imgs=await loadImages(); 
+      const track=document.getElementById('track'); const dots=document.getElementById('dots');
+      track.innerHTML=''; dots.innerHTML='';
       const carousel=document.getElementById('carousel');
       if(imgs.length===0){ carousel.style.display='none'; return; }
       carousel.style.display='block';
@@ -190,6 +267,7 @@
         const s=document.createElement('div'); s.className='slide';
         s.innerHTML=`<img src="${src}" alt="${data.title} ${idx+1}" loading="${idx===0?'eager':'lazy'}" decoding="async" fetchpriority="${idx===0?'high':'auto'}">`;
         track.appendChild(s);
+
         const d=document.createElement('button'); d.className='dot'+(idx===0?' active':''); d.setAttribute('aria-label',`Go to ${idx+1}`); d.onclick=()=>go(idx); dots.appendChild(d);
       });
 
@@ -197,11 +275,21 @@
       function update(){ track.style.transform=`translateX(${-index*100}%)`; [...dots.children].forEach((d,i)=>d.classList.toggle('active',i===index)); }
       function go(i){ index=Math.max(0,Math.min(imgs.length-1,i)); update(); }
       prev.onclick=()=>go(index-1); next.onclick=()=>go(index+1);
-      let startX=null,dragging=false; track.addEventListener('pointerdown',e=>{dragging=true;startX=e.clientX; track.style.transition='none';});
-      window.addEventListener('pointerup',()=>{if(!dragging)return; dragging=false; track.style.transition='transform .45s ease';});
+
+      // 拖拽/滑动
+      let startX=null,dragging=false;
+      track.addEventListener('pointerdown',e=>{dragging=true;startX=e.clientX; track.style.transition='none'; track.setPointerCapture?.(e.pointerId);});
+      window.addEventListener('pointerup',e=>{if(!dragging)return; dragging=false; track.style.transition='transform .45s ease'; track.releasePointerCapture?.(e.pointerId);});
       window.addEventListener('pointermove',e=>{if(!dragging)return; const dx=e.clientX-startX; const w=track.clientWidth; const delta=dx/w; track.style.transform=`translateX(${(-index+delta)*100}%)`;});
       track.addEventListener('pointerup',e=>{if(startX==null)return; const dx=e.clientX-startX; const threshold=40; if(dx>threshold) go(index-1); else if(dx<-threshold) go(index+1); else update(); startX=null;});
+      window.addEventListener('keydown',e=>{ if(e.key==='ArrowLeft') go(index-1); else if(e.key==='ArrowRight') go(index+1); });
+
       update();
+    }
+
+    (async function init(){
+      await buildModels();
+      await renderAll();
     })();
   </script>
 </body>
