@@ -3,64 +3,50 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Eindeepseek – Product 2</title>
-
-  <!-- GA4 -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SP9BZHN30E"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-SP9BZHN30E');
-  </script>
-
-  <!-- Perf hints -->
-  <link rel="dns-prefetch" href="//www.eindeepseek.com">
-  <link rel="preconnect" href="https://www.eindeepseek.com" crossorigin>
-
+  <title>Eindeepseek – Product 2 Series</title>
   <style>
-    :root{--bg:#f7f8fa;--text:#222;--muted:#555;--primary:#2b7de9;--border:#ddd;--card:#fff;--skeleton:#eef1f5;--shimmer:#f7f8fb}
-    *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
-    header{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#fff;border-bottom:1px solid var(--border)}
-    .brand a{color:var(--text);text-decoration:none;font-weight:800}
-    .lang{display:inline-flex;gap:6px;align-items:center;background:#fff;border:1px solid var(--border);border-radius:999px;padding:6px}
-    .lang button{appearance:none;border:none;cursor:pointer;padding:6px 10px;border-radius:999px;color:var(--muted);background:transparent;font-weight:600}
-    .lang button.active{color:#fff;background:var(--primary)}
-    .wrap{max-width:1100px;margin:0 auto;padding:18px 16px 56px}
-    .layout{display:grid;gap:18px}
-    @media(min-width:900px){.layout{grid-template-columns:1.1fr .9fr;align-items:start}}
-    .title{font-size:28px;font-weight:800;margin:8px 0}
-    .desc{color:var(--muted);line-height:1.6;white-space:pre-wrap;word-wrap:break-word}
+    :root { --bg:#f7f8fa; --text:#222; --muted:#555; --card:#fff; --line:#ddd; --brand:#2b7de9; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background: var(--bg); color: var(--text); }
+    header { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--card); border-bottom: 1px solid var(--line); }
+    .brand a { color: var(--text); text-decoration: none; font-weight: 800; }
+    .lang { display: inline-flex; gap: 6px; align-items: center; border: 1px solid var(--line); border-radius: 999px; padding: 6px; background: var(--card); }
+    .lang button { appearance: none; border: none; cursor: pointer; padding: 6px 10px; border-radius: 999px; color: var(--muted); background: transparent; font-weight: 600; }
+    .lang button.active { color: #fff; background: var(--brand); }
 
-    /* variant cards — 与 product-1 相同思路 */
-    .models{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:10px}
-    .model{border:2px solid var(--border);border-radius:12px;overflow:hidden;background:#fff;cursor:pointer;transition:.15s}
-    .model.active{border-color:var(--primary)}
-    .model img{width:100%;height:110px;object-fit:cover;display:block;background:#f2f3f5}
-    .model .meta{padding:8px 10px;font-weight:700}
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 18px 16px 56px; }
+    .title { font-size: 28px; font-weight: 800; margin: 8px 0; }
+    .desc { color: var(--muted); line-height: 1.6; white-space: pre-wrap; margin: 6px 0 0; }
 
-    /* Carousel（按 product-1 的 contain 居中留白 + 圆点/左右箭头） */
-    .carousel{position:relative;overflow:hidden;border-radius:14px;border:1px solid var(--border);background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.06)}
-    .track{display:flex;transition:transform .45s ease;will-change:transform}
-    .slide{min-width:100%;user-select:none;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;background:#f6f7f9}
-    .slide img{display:block;width:100%;height:100%;object-fit:contain;background:#f6f7f9}
-    .navBtn{position:absolute;top:50%;transform:translateY(-50%);background:#fff;border:1px solid var(--border);color:#333;border-radius:10px;padding:8px 10px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.1)}
-    .prev{left:8px}.next{right:8px}
-    .dots{display:flex;justify-content:center;gap:6px;margin-top:10px}
-    .dot{width:8px;height:8px;border-radius:50%;background:#cfd3da;border:none}
-    .dot.active{background:#2b7de9}
+    .model-cards { display: grid; gap: 14px; margin: 18px auto 10px; grid-template-columns: repeat(3, minmax(220px,1fr)); max-width: 900px; }
+    .model-card { border: 2px solid var(--line); border-radius: 12px; background: var(--card); cursor: pointer; overflow: hidden; transition: .2s; }
+    .model-card:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,.05); }
+    .model-card.active { border-color: var(--brand); }
+    .model-card img { width: 100%; height: 140px; object-fit: cover; display: block; background: #f2f3f5; }
+    .meta { padding: 10px 12px; font-weight: 600; }
 
-    .skeleton{position:relative;overflow:hidden;background:var(--skeleton)}
-    .skeleton::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,var(--shimmer),transparent);animation:shimmer 1.2s infinite}
-    @keyframes shimmer{100%{transform:translateX(100%)}}
+    .productGrid { display: grid; grid-template-columns: 58% 42%; grid-gap: 16px; align-items: start; margin-top: 10px; }
+    .mediaCol { width: 100%; }
+    .infoCol { display: flex; flex-direction: column; gap: 12px; }
 
-    /* Right-column cards */
-    .box{margin-top:18px;padding:12px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
-    .box h2{margin:0 0 8px;font-size:18px;font-weight:800;color:#111}
-    .specs ul{margin:0;padding-left:18px;color:var(--muted);line-height:1.6}
-    .specs li{margin:2px 0}
-    .details p{margin:0;color:var(--muted);line-height:1.7;white-space:pre-wrap}
+    /* 轮播与 product-1 一致：contain + 居中，等边留白 */
+    .carousel { position: relative; overflow: hidden; border-radius: 14px; border: 1px solid var(--line); background: var(--card); aspect-ratio: 16/9; }
+    .track { display: flex; transition: transform .45s ease; height: 100%; }
+    .slide { min-width: 100%; height: 100%; }
+    .slide img { width: 100%; height: 100%; display: block; object-fit: contain; object-position: center center; background:#f2f3f5; }
+
+    .navBtn { position: absolute; top: 50%; transform: translateY(-50%); background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 8px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+    .prev { left: 8px; } .next { right: 8px; }
+
+    .dots { display: flex; justify-content: center; gap: 6px; margin-top: 8px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: #cfd3da; border: none; cursor: pointer; }
+    .dot.active { background: var(--brand); }
+
+    .box { padding: 12px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
+    .box h2 { margin: 0 0 8px; font-size: 18px; font-weight: 800; color: #111; }
+
+    @media (max-width: 900px) { .model-cards{grid-template-columns:repeat(3,minmax(160px,1fr));max-width:100%;} .model-card img{height:110px;} .productGrid{grid-template-columns:1fr;} .carousel{aspect-ratio:4/3;} }
+    @media (max-width: 560px) { .model-cards{grid-template-columns:repeat(3,minmax(120px,1fr));} .model-card img{height:90px;} }
   </style>
 </head>
 <body>
@@ -74,223 +60,229 @@
   </header>
 
   <div class="wrap">
-    <div class="layout">
-      <section>
-        <!-- 与 product-1 一样的“子款卡片” -->
-        <div class="models" id="models"></div>
+    <h1 class="title" id="title">Product 2 Series</h1>
+    <p class="desc" id="desc"></p>
 
-        <div class="carousel" id="carousel" aria-label="gallery">
-          <div class="track" id="track">
-            <div class="slide"><div class="skeleton" style="aspect-ratio:4/3;width:100%"></div></div>
-          </div>
-          <button class="navBtn prev" id="prev" aria-label="Prev">◀</button>
+    <!-- A/B/C 子卡片 -->
+    <div class="model-cards" id="modelCards"></div>
+
+    <div class="productGrid">
+      <div class="mediaCol">
+        <div class="carousel" id="carousel" style="display:none">
+          <div class="track" id="track"></div>
+          <button class="navBtn prev" id="prev" aria-label="Previous">◀</button>
           <button class="navBtn next" id="next" aria-label="Next">▶</button>
         </div>
         <div class="dots" id="dots"></div>
-      </section>
-      <section>
-        <h1 class="title" id="title">Product 2</h1>
-        <div class="desc" id="desc"></div>
-        <div id="specsBox" class="box specs" style="display:none"><h2 id="specsTitle">参数</h2><ul id="specsList"></ul></div>
-        <div id="detailsBox" class="box details" style="display:none"><h2 id="detailsTitle">详细描述</h2><div id="detailsText"></div></div>
-      </section>
+      </div>
+
+      <div class="infoCol">
+        <div id="specsBox" class="box" style="display:none">
+          <h2 id="specsTitle">参数</h2>
+          <ul id="specsList"></ul>
+        </div>
+        <div id="detailsBox" class="box" style="display:none">
+          <h2 id="detailsTitle">详细描述</h2>
+          <div id="detailsText"></div>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
-    const PRODUCT_ID=2;
-    const qs=new URLSearchParams(location.search);
-    let SUB_ID=(qs.get('sub')||'').toLowerCase(); // a / b / c ...
-    const currentLang=(qs.get('lang')||localStorage.getItem('lang')||'zh').toLowerCase();
-    localStorage.setItem('lang',currentLang);
-    const home=new URL('../index.html',location.href); home.searchParams.set('lang',currentLang); document.getElementById('homeLink').href=home.toString();
-    [...document.querySelectorAll('#langSwitcher button')].forEach(b=>{if(b.dataset.lang===currentLang)b.classList.add('active');b.onclick=()=>{const url=new URL(location.href);url.searchParams.set('lang',b.dataset.lang);localStorage.setItem('lang',b.dataset.lang);location.href=url.toString();}});
+    // 语言与子款
+    const qs = new URLSearchParams(location.search);
+    const currentLang = (qs.get('lang') || localStorage.getItem('lang') || 'zh').toLowerCase();
+    localStorage.setItem('lang', currentLang);
+    let SUB_ID = (qs.get('sub') || 'a').toLowerCase();
 
-    function fetchWithTimeout(url,ms=1200){const ctl=new AbortController();const id=setTimeout(()=>ctl.abort(),ms);return fetch(url,{cache:'no-store',signal:ctl.signal}).finally(()=>clearTimeout(id));}
-    async function jsonFast(url){try{const r=await fetchWithTimeout(url,1500); if(r.ok) return await r.json();}catch{} return null;}
-    async function exists(u){try{const r=await fetchWithTimeout(u,900); return r.ok;}catch{return false;}}
-    async function firstOk(urls){for(const u of urls){ if(await exists(u)) return u; } return '';}
+    const home = new URL('../index.html', location.href);
+    home.searchParams.set('lang', currentLang);
+    document.getElementById('homeLink').href = home.toString();
 
-    // ---------- Variant helpers ----------
-    const VARS = ['a','b','c','d'];
-    function imgBase(sub){ return sub?`../assets/imgs/product-${PRODUCT_ID}${sub}`:`../assets/imgs/product-${PRODUCT_ID}`; }
-    function txtRoot(){ return `../assets/txt/product-${PRODUCT_ID}`; }
+    [...document.querySelectorAll('#langSwitcher button')].forEach(b => {
+      if (b.dataset.lang === currentLang) b.classList.add('active');
+      b.onclick = () => {
+        const u = new URL(location.href);
+        u.searchParams.set('lang', b.dataset.lang);
+        u.searchParams.set('sub', SUB_ID); // 保留当前子款
+        location.href = u.toString();
+      };
+    });
 
-    async function resolveExt(base){
-      return (await firstOk([`${base}/1.jpg`,`${base}/1.jpeg`,`${base}/1.png`,`${base}/1.webp`])).split('.').pop() || '';
-    }
+    // A/B/C 名称（若无文案文件，就显示这个）
+    const MODELS = [
+      { sub: 'a', name: { zh: '2A 款', en: '2A', de: '2A' } },
+      { sub: 'b', name: { zh: '2B 款', en: '2B', de: '2B' } },
+      { sub: 'c', name: { zh: '2C 款', en: '2C', de: '2C' } }
+    ];
+    const i18n = { specs:{zh:'参数',en:'Specs',de:'Spezifikationen'}, details:{zh:'详细描述',en:'Details',de:'Beschreibung'} };
+    const t = obj => obj?.[currentLang] || obj?.en || '';
 
-    // Build model cards if thumbnails exist (1.jpg/png/webp)
-    async function buildModels(){
-      const box=document.getElementById('models'); box.innerHTML='';
-      const items=[];
-      for(const s of VARS){
-        const b=imgBase(s);
-        const thumb=await firstOk([`${b}/1.jpg`,`${b}/1.jpeg`,`${b}/1.png`,`${b}/1.webp`]);
-        if(thumb) items.push({sub:s,thumb});
-      }
-      if(!items.length){ box.style.display='none'; return; }
-      if(!items.some(x=>x.sub===SUB_ID)) SUB_ID = SUB_ID || items[0].sub;
+    // 资源基路径（与 product-1 相同规则，仅换 product-2）
+    function imgBase(sub){ return `../assets/imgs/product-2/product-2${sub}`; }
+    function txtBase(sub){ return `../assets/txt/product-2/product-2${sub}`; }
 
-      items.forEach(it=>{
-        const div=document.createElement('div'); div.className='model'+(it.sub===SUB_ID?' active':'');
-        const label = it.sub.toUpperCase();
-        div.innerHTML = `<img src="${it.thumb}" alt="2${label} thumb"><div class="meta">2${label}</div>`;
-        div.onclick=()=>{
-          SUB_ID=it.sub;
-          const url=new URL(location.href); url.searchParams.set('sub',SUB_ID); history.replaceState(null,'',url.toString());
-          [...box.children].forEach(c=>c.classList.remove('active')); div.classList.add('active');
-          renderAll();
-        };
-        box.appendChild(div);
+    function existsImage(url){
+      return new Promise(resolve=>{
+        const im=new Image();
+        im.onload=()=>resolve(true);
+        im.onerror=()=>resolve(false);
+        im.src=url;
       });
     }
 
-    // ---------- Data loaders ----------
-    async function loadTitleDesc(){
-      const order=[currentLang,'en','zh','de'];
-      for(const lg of order){
-        const cands = SUB_ID
-          ? [
-              `product-${PRODUCT_ID}${SUB_ID}-${lg}.txt`,                          // 页面同目录，变体
-              `product-${PRODUCT_ID}-${lg}.txt`                                    // 页面同目录，基础
-            ]
-          : [`product-${PRODUCT_ID}-${lg}.txt`];
-        for(const u of cands){
-          if(await exists(u)){ const t=(await (await fetchWithTimeout(u,1200)).text()).trim();
-            const [first,...rest]=t.split(/\r?\n/); return {title:first||`Product ${PRODUCT_ID}`, desc:rest.join('\\n')}; }
-        }
+    // 构建 A/B/C 子卡片：只要有 1.png 就显示该卡
+    async function buildCards(){
+      const box=document.getElementById('modelCards'); box.innerHTML='';
+      for (const m of MODELS){
+        const thumb=`${imgBase(m.sub)}/1.png`;
+        if(!await existsImage(thumb)) continue;
+        const card=document.createElement('div');
+        card.className='model-card'+(m.sub===SUB_ID?' active':''); 
+        card.innerHTML=`<img src="${thumb}" alt="${t(m.name)} thumbnail"><div class="meta">${t(m.name)}</div>`;
+        card.onclick=()=>{
+          SUB_ID=m.sub;
+          const u=new URL(location.href);
+          u.searchParams.set('sub',SUB_ID);
+          u.searchParams.set('lang',currentLang);
+          history.replaceState(null,'',u.toString());
+          [...box.children].forEach(c=>c.classList.remove('active'));
+          card.classList.add('active');
+          renderProduct();
+        };
+        box.appendChild(card);
       }
-      return {title:`Product ${PRODUCT_ID}`, desc:''};
     }
 
-    async function loadParams(){
+    // 轮播图：1..20，缺图即停；只要有 1.png 就能展示
+    async function loadImages(sub){
+      const arr=[];
+      for(let i=1;i<=20;i++){
+        const u=`${imgBase(sub)}/${i}.png`;
+        if(await existsImage(u)) arr.push(u); else break;
+      }
+      return arr;
+    }
+
+    // 标题/摘要：优先取 txt 第 1 行 + 其余行
+    async function loadTxt(sub){
       const order=[currentLang,'en','zh','de'];
-      const pre = txtRoot();
       for(const lg of order){
-        const cands = SUB_ID
-          ? [
-              `${pre}/product-${PRODUCT_ID}${SUB_ID}/params-${lg}.txt`,           // /product-2/product-2a/params-zh.txt
-              `${pre}/product-${PRODUCT_ID}${SUB_ID}-params-${lg}.txt`,           // /product-2/product-2a-params-zh.txt
-              `${pre}/product-${PRODUCT_ID}-params-${lg}.txt`                     // 基础回退
-            ]
-          : [
-              `${pre}/product-${PRODUCT_ID}-params-${lg}.txt`
-            ];
-        for(const u of cands){
-          if(await exists(u)){
-            const lines=(await (await fetchWithTimeout(u,1200)).text()).trim().split(/\r?\n/).filter(Boolean);
-            const list=document.getElementById('specsList'); list.innerHTML='';
+        try{
+          const url=`${txtBase(sub)}-${lg}.txt`;
+          const r=await fetch(url);
+          if(r.ok){
+            const raw=(await r.text()).trim();
+            if(!raw) continue;
+            const lines=raw.split(/\r?\n/);
+            const name=MODELS.find(x=>x.sub===sub)?.name;
+            return {title:lines[0]||t(name), desc:lines.slice(1).join('\n')};
+          }
+        }catch(e){}
+      }
+      const fallback=MODELS.find(x=>x.sub===sub)?.name;
+      return {title:t(fallback)||'Product 2', desc:''};
+    }
+
+    // 参数：一行一条；无则隐藏
+    async function loadParams(sub){
+      const order=[currentLang,'en','zh','de'];
+      for(const lg of order){
+        try{
+          const r=await fetch(`${txtBase(sub)}/params-${lg}.txt`);
+          if(r.ok){
+            const txt=(await r.text()).trim();
+            const lines=txt.split(/\r?\n/).filter(Boolean);
+            const ul=document.getElementById('specsList');
+            ul.innerHTML='';
             lines.forEach(line=>{
-              const m=line.split(/\s*[:：]\s*/);
-              const k=m[0]||''; const v=m.slice(1).join(':')||'';
-              const li=document.createElement('li'); li.textContent=v?`${k}: ${v}`:k;
-              list.appendChild(li);
+              const li=document.createElement('li');
+              li.textContent=line;
+              ul.appendChild(li);
             });
-            const titleI18n={zh:'参数',en:'Specs',de:'Spezifikationen'};
-            document.getElementById('specsTitle').textContent=titleI18n[currentLang]||'Specs';
+            document.getElementById('specsTitle').textContent=i18n.specs[lg]||'Specs';
             document.getElementById('specsBox').style.display=lines.length?'block':'none';
             return;
           }
-        }
+        }catch(e){}
       }
       document.getElementById('specsBox').style.display='none';
     }
 
-    async function loadDetails(){
+    // 详情：纯文本；无则隐藏
+    async function loadDetails(sub){
       const order=[currentLang,'en','zh','de'];
-      const pre = txtRoot();
       for(const lg of order){
-        const cands = SUB_ID
-          ? [
-              `${pre}/product-${PRODUCT_ID}${SUB_ID}/details-${lg}.txt`,          // /product-2/product-2a/details-zh.txt
-              `${pre}/product-${PRODUCT_ID}${SUB_ID}-details-${lg}.txt`,          // /product-2/product-2a-details-zh.txt
-              `${pre}/product-${PRODUCT_ID}-details-${lg}.txt`                    // 基础回退
-            ]
-          : [
-              `${pre}/product-${PRODUCT_ID}-details-${lg}.txt`
-            ];
-        for(const u of cands){
-          if(await exists(u)){
-            const txt=(await (await fetchWithTimeout(u,1200)).text()).trim();
+        try{
+          const r=await fetch(`${txtBase(sub)}/details-${lg}.txt`);
+          if(r.ok){
+            const txt=(await r.text()).trim();
             if(txt){
-              const titleI18n={zh:'详细描述',en:'Details',de:'Beschreibung'};
-              document.getElementById('detailsTitle').textContent=titleI18n[currentLang]||'Details';
+              document.getElementById('detailsTitle').textContent=i18n.details[lg]||'Details';
               document.getElementById('detailsText').textContent=txt;
               document.getElementById('detailsBox').style.display='block';
               return;
             }
           }
-        }
+        }catch(e){}
       }
       document.getElementById('detailsBox').style.display='none';
     }
 
-    // 按 product-1 的图片逻辑：最多 20 张（1..20），连续命名，遇缺停止；自动识别扩展名
-    async function loadImages(){
-      const base = imgBase(SUB_ID);
-      let ext = await resolveExt(base);
-      if(!ext && SUB_ID){
-        // 子款没有时回退到基础款
-        const base2 = imgBase('');
-        ext = await resolveExt(base2);
-        if(!ext) return [];
-        return await loadFromBase(base2, ext);
-      }
-      if(!ext) return [];
-      return await loadFromBase(base, ext);
+    // 渲染
+    async function renderProduct(){
+      const data=await loadTxt(SUB_ID);
+      document.getElementById('title').textContent=data.title||'';
+      document.getElementById('desc').textContent=data.desc||'';
+      await loadParams(SUB_ID);
+      await loadDetails(SUB_ID);
 
-      async function loadFromBase(b, e){
-        const link=document.createElement('link'); link.rel='preload'; link.as='image'; link.href=`${b}/1.${e}`; document.head.appendChild(link);
-        const imgs=[];
-        for(let i=1;i<=20;i++){ // 与 product-1 一致
-          const u=`${b}/${i}.${e}`;
-          if(await exists(u)) imgs.push(u); else break;
-        }
-        return imgs;
-      }
-    }
-
-    async function renderAll(){
-      const titleEl=document.getElementById('title'), descEl=document.getElementById('desc');
-      const data=await loadTitleDesc(); titleEl.textContent=data.title; descEl.textContent=data.desc;
-      await loadParams(); await loadDetails();
-
-      const imgs=await loadImages(); 
-      const track=document.getElementById('track'); const dots=document.getElementById('dots');
-      track.innerHTML=''; dots.innerHTML='';
+      const imgs=await loadImages(SUB_ID);
+      const track=document.getElementById('track');
+      const dots=document.getElementById('dots');
       const carousel=document.getElementById('carousel');
-      if(imgs.length===0){ carousel.style.display='none'; return; }
+      const prevBtn=document.getElementById('prev');
+      const nextBtn=document.getElementById('next');
+
+      track.innerHTML=''; dots.innerHTML='';
+      if(!imgs.length){
+        carousel.style.display='none';
+        dots.style.display='none';
+        return;
+      }
       carousel.style.display='block';
+      dots.style.display=imgs.length>1?'flex':'none';
+      prevBtn.style.display=nextBtn.style.display=imgs.length>1?'block':'none';
 
       imgs.forEach((src,idx)=>{
-        const s=document.createElement('div'); s.className='slide';
-        s.innerHTML=`<img src="${src}" alt="${data.title} ${idx+1}" loading="${idx===0?'eager':'lazy'}" decoding="async" fetchpriority="${idx===0?'high':'auto'}">`;
+        const s=document.createElement('div');
+        s.className='slide';
+        s.innerHTML=`<img src="${src}" alt="${SUB_ID} image ${idx+1}">`;
         track.appendChild(s);
-
-        const d=document.createElement('button'); d.className='dot'+(idx===0?' active':''); d.setAttribute('aria-label',`Go to ${idx+1}`); d.onclick=()=>go(idx); dots.appendChild(d);
+        if(imgs.length>1){
+          const d=document.createElement('button');
+          d.className='dot'+(idx===0?' active':''); 
+          d.setAttribute('aria-label',`Go to slide ${idx+1}`);
+          d.onclick=()=>go(idx);
+          dots.appendChild(d);
+        }
       });
 
-      let index=0; const prev=document.getElementById('prev'), next=document.getElementById('next');
-      function update(){ track.style.transform=`translateX(${-index*100}%)`; [...dots.children].forEach((d,i)=>d.classList.toggle('active',i===index)); }
+      let index=0;
+      function update(){
+        track.style.transform=`translateX(${-index*100}%)`;
+        if(imgs.length>1){
+          [...dots.children].forEach((d,i)=>d.classList.toggle('active',i===index));
+        }
+      }
       function go(i){ index=Math.max(0,Math.min(imgs.length-1,i)); update(); }
-      prev.onclick=()=>go(index-1); next.onclick=()=>go(index+1);
-
-      // 拖拽/滑动
-      let startX=null,dragging=false;
-      track.addEventListener('pointerdown',e=>{dragging=true;startX=e.clientX; track.style.transition='none'; track.setPointerCapture?.(e.pointerId);});
-      window.addEventListener('pointerup',e=>{if(!dragging)return; dragging=false; track.style.transition='transform .45s ease'; track.releasePointerCapture?.(e.pointerId);});
-      window.addEventListener('pointermove',e=>{if(!dragging)return; const dx=e.clientX-startX; const w=track.clientWidth; const delta=dx/w; track.style.transform=`translateX(${(-index+delta)*100}%)`;});
-      track.addEventListener('pointerup',e=>{if(startX==null)return; const dx=e.clientX-startX; const threshold=40; if(dx>threshold) go(index-1); else if(dx<-threshold) go(index+1); else update(); startX=null;});
-      window.addEventListener('keydown',e=>{ if(e.key==='ArrowLeft') go(index-1); else if(e.key==='ArrowRight') go(index+1); });
-
+      prevBtn.onclick=()=>go(index-1);
+      nextBtn.onclick=()=>go(index+1);
       update();
     }
 
-    (async function init(){
-      await buildModels();
-      await renderAll();
-    })();
+    (async()=>{ await buildCards(); await renderProduct(); })();
   </script>
 </body>
 </html>
