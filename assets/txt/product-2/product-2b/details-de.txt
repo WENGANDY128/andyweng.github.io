@@ -1,0 +1,4 @@
+Auswahl‑ & Konfigurationstipps
+• Für Saugen bzw. Blasen geeignete Verrohrung/Filterung wählen; Ansaugfilter und Ausblasschalldämpfer vorsehen.
+• Sicherheit: Überströmventil gegen Überlast/Überdruck einsetzen und korrekt einstellen.
+• Energieeinsparung: Drehzahlregelung per FU möglich; Motorkühlung und Schutz bei niedriger Frequenz beachten.

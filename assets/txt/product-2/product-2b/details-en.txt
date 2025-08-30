@@ -1,0 +1,4 @@
+Selection & Configuration Tips
+• For vacuum vs. pressure duties use appropriate piping and filtration; fit inlet filters and outlet silencers.
+• Safety: add a relief valve to prevent over‑load/over‑pressure; set the cracking pressure properly.
+• Energy saving: VFD speed control supported; ensure motor cooling and protection at low frequency.
