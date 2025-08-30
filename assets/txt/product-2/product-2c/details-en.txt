@@ -1,0 +1,5 @@
+Installation & Operation Notes
+• Always use an inlet filter and clean it regularly to avoid particle ingress and wear.
+• Long piping and many elbows increase pressure drop; check equivalent length and upsize if necessary.
+• A relief valve protects the motor in blocked or abnormal conditions by venting pressure.
+• With VFD operation, ensure adequate cooling at low speed; set proper minimum frequency and protections.

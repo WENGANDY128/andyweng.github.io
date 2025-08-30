@@ -1,0 +1,10 @@
+Gehäuse: Druckguss‑Aluminium
+Stufe: einstufig (ein Laufrad)
+Isolierklasse/Schutz: F / IP54 (optional IP55)
+Frequenz/Spannung: 50/60 Hz; 1/3‑phasig 220/380/415 V (modellabhängig)
+Lager: langlebig, wartungsfrei
+Anschlüsse: Gewinde oder Flansch (je nach Modell)
+Geräuschpegel: ca. 60–75 dB(A) @1 m (modellabhängig)
+Umgebung: −10…40 °C; sauberes, trockenes Medium
+Montage: Fußmontage (optional Flansch/Schwingungsdämpfer)
+Normen: CE, RoHS

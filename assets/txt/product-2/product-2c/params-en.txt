@@ -1,0 +1,10 @@
+Housing: die‑cast aluminum
+Stage: single stage (single impeller)
+Insulation/Protection: Class F / IP54 (IP55 optional)
+Frequency/Voltage: 50/60 Hz; 1/3‑phase 220/380/415 V (model dependent)
+Bearings: long‑life, maintenance‑free
+Ports: threaded or flange connection (by model)
+Noise level: approx. 60–75 dB(A) @1 m (model dependent)
+Ambient: −10 to 40 °C; clean, dry medium
+Mounting: foot mounting (flange/anti‑vibration optional)
+Compliance: CE, RoHS

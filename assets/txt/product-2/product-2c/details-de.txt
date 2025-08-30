@@ -1,0 +1,5 @@
+Montage‑ & Betriebshinweise
+• Ansaugfilter zwingend einsetzen und regelmäßig reinigen, um Partikeleintrag und Verschleiß zu vermeiden.
+• Lange Leitungen und viele Bögen erhöhen den Druckverlust; äquivalente Länge prüfen und ggf. größer dimensionieren.
+• Ein Überströmventil schützt bei Blockade/Fehlbetrieb durch Druckablass den Motor.
+• Bei FU‑Betrieb auf ausreichende Kühlung bei niedriger Drehzahl achten; Mindestfrequenz und Schutzfunktionen setzen.
