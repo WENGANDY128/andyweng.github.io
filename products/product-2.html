@@ -110,7 +110,7 @@
       b.onclick = () => { const u = new URL(location.href); u.searchParams.set('lang', b.dataset.lang); location.href = u.toString(); };
     });
 
-    // ==== A/B/C 三卡片名称（已按你的要求改：A=款式，B=应用，C=参数）====
+    // A/B/C 三卡片名称（作为兜底；实际标题优先读 txt 第一行）
     const MODELS = [
       { sub: 'a', name: { zh: '款式',       en: 'Styles',         de: 'Stile' } },
       { sub: 'b', name: { zh: '应用',       en: 'Applications',   de: 'Anwendungen' } },
@@ -123,15 +123,39 @@
     function imgBase(sub){ return `../assets/imgs/product-2/product-2${sub}`; }
     function txtBase(sub){ return `../assets/txt/product-2/product-2${sub}`; }
 
-    function existsImage(url){ return new Promise(resolve=>{ const im=new Image(); im.onload=()=>resolve(true); im.onerror=()=>resolve(false); im.src=url; }); }
+    function existsImage(url){
+      return new Promise(resolve=>{ const im=new Image(); im.onload=()=>resolve(true); im.onerror=()=>resolve(false); im.src=url; });
+    }
+
+    // 新增：优先用 txt 第一行作为卡片标题，失败回退 MODELS
+    const _titleCache = {};
+    async function fetchTitle(sub) {
+      const cacheKey = `${sub}:${currentLang}`;
+      if (_titleCache[cacheKey]) return _titleCache[cacheKey];
+      const order = [currentLang, 'en', 'zh', 'de'];
+      for (const lg of order) {
+        try {
+          const url = `${txtBase(sub)}-${lg}.txt`;
+          const r = await fetch(url, { cache: 'no-store' });
+          if (!r.ok) continue;
+          const text = (await r.text()).trim();
+          if (!text) continue;
+          const first = text.split(/\\r?\\n/)[0].trim();
+          if (first) { _titleCache[cacheKey] = first; return first; }
+        } catch {}
+      }
+      const name = MODELS.find(x => x.sub === sub)?.name;
+      return (_titleCache[cacheKey] = (name?.[currentLang] || name?.en || `Product ${sub.toUpperCase()}`));
+    }
 
     async function buildCards(){
       const box=document.getElementById('modelCards'); box.innerHTML='';
       for (const m of MODELS){
         const thumb=`${imgBase(m.sub)}/1.png`; if(!await existsImage(thumb)) continue;
+        const title = await fetchTitle(m.sub);
         const card=document.createElement('div');
         card.className='model-card'+(m.sub===SUB_ID?' active':''); 
-        card.innerHTML=`<img src="${thumb}" alt="${t(m.name)} thumbnail"><div class="meta">${t(m.name)}</div>`;
+        card.innerHTML=`<img src="${thumb}" alt="${title} thumbnail"><div class="meta">${title}</div>`;
         card.onclick=()=>{ SUB_ID=m.sub; const u=new URL(location.href); u.searchParams.set('sub',SUB_ID); u.searchParams.set('lang',currentLang); history.replaceState(null,'',u.toString()); [...box.children].forEach(c=>c.classList.remove('active')); card.classList.add('active'); renderProduct(); };
         box.appendChild(card);
       }
@@ -143,18 +167,57 @@
 
     async function loadTxt(sub){
       const order=[currentLang,'en','zh','de'];
-      for(const lg of order){ try{ const url=`${txtBase(sub)}-${lg}.txt`; const r=await fetch(url); if(r.ok){ const raw=(await r.text()).trim(); if(!raw) continue; const lines=raw.split(/\\r?\\n/); return {title:lines[0], desc:lines.slice(1).join('\\n')}; } }catch(e){} }
+      for(const lg of order){
+        try{
+          const url=`${txtBase(sub)}-${lg}.txt`;
+          const r=await fetch(url);
+          if(r.ok){
+            const raw=(await r.text()).trim();
+            if(!raw) continue;
+            const lines=raw.split(/\\r?\\n/);
+            return {title:lines[0], desc:lines.slice(1).join('\\n')};
+          }
+        }catch(e){}
+      }
       return {title:'', desc:''};
     }
 
     async function loadParams(sub){
       const order=[currentLang,'en','zh','de'];
-      for(const lg of order){ try{ const r=await fetch(`${txtBase(sub)}/params-${lg}.txt`); if(r.ok){ const txt=(await r.text()).trim(); const lines=txt.split(/\\r?\\n/).filter(Boolean); const ul=document.getElementById('specsList'); ul.innerHTML=''; lines.forEach(line=>{ const li=document.createElement('li'); li.textContent=line; ul.appendChild(li); }); document.getElementById('specsTitle').textContent=i18n.specs[lg]||'Specs'; document.getElementById('specsBox').style.display=lines.length?'block':'none'; return; } }catch(e){} } document.getElementById('specsBox').style.display='none';
+      for(const lg of order){
+        try{
+          const r=await fetch(`${txtBase(sub)}/params-${lg}.txt`);
+          if(r.ok){
+            const txt=(await r.text()).trim();
+            const lines=txt.split(/\\r?\\n/).filter(Boolean);
+            const ul=document.getElementById('specsList'); ul.innerHTML='';
+            lines.forEach(line=>{ const li=document.createElement('li'); li.textContent=line; ul.appendChild(li); });
+            document.getElementById('specsTitle').textContent=i18n.specs[lg]||'Specs';
+            document.getElementById('specsBox').style.display=lines.length?'block':'none';
+            return;
+          }
+        }catch(e){}
+      }
+      document.getElementById('specsBox').style.display='none';
     }
 
     async function loadDetails(sub){
       const order=[currentLang,'en','zh','de'];
-      for(const lg of order){ try{ const r=await fetch(`${txtBase(sub)}/details-${lg}.txt`); if(r.ok){ const txt=(await r.text()).trim(); if(txt){ document.getElementById('detailsTitle').textContent=i18n.details[lg]||'Details'; document.getElementById('detailsText').textContent=txt; document.getElementById('detailsBox').style.display='block'; return; } } }catch(e){} } document.getElementById('detailsBox').style.display='none';
+      for(const lg of order){
+        try{
+          const r=await fetch(`${txtBase(sub)}/details-${lg}.txt`);
+          if(r.ok){
+            const txt=(await r.text()).trim();
+            if(txt){
+              document.getElementById('detailsTitle').textContent=i18n.details[lg]||'Details';
+              document.getElementById('detailsText').textContent=txt;
+              document.getElementById('detailsBox').style.display='block';
+              return;
+            }
+          }
+        }catch(e){}
+      }
+      document.getElementById('detailsBox').style.display='none';
     }
 
     async function renderProduct(){
@@ -171,7 +234,14 @@
       track.innerHTML=''; dots.innerHTML='';
       if(!imgs.length){ carousel.style.display='none'; dots.style.display='none'; return; }
       carousel.style.display='block'; dots.style.display=imgs.length>1?'flex':'none'; prevBtn.style.display=nextBtn.style.display=imgs.length>1?'block':'none';
-      imgs.forEach((src,idx)=>{ const s=document.createElement('div'); s.className='slide'; s.innerHTML=`<img src="${src}" alt="${SUB_ID} image ${idx+1}">`; track.appendChild(s); if(imgs.length>1){ const d=document.createElement('button'); d.className='dot'+(idx===0?' active':''); d.setAttribute('aria-label',`Go to slide ${idx+1}`); d.onclick=()=>go(idx); dots.appendChild(d);} });
+      imgs.forEach((src,idx)=>{
+        const s=document.createElement('div'); s.className='slide';
+        s.innerHTML=`<img src="${src}" alt="${SUB_ID} image ${idx+1}">`;
+        track.appendChild(s);
+        if(imgs.length>1){
+          const d=document.createElement('button'); d.className='dot'+(idx===0?' active':''); d.setAttribute('aria-label',`Go to slide ${idx+1}`); d.onclick=()=>go(idx); dots.appendChild(d);
+        }
+      });
       let index=0; function update(){ track.style.transform=`translateX(${-index*100}%)`; if(imgs.length>1){ [...dots.children].forEach((d,i)=>d.classList.toggle('active',i===index)); } }
       function go(i){ index=Math.max(0,Math.min(imgs.length-1,i)); update(); }
       prevBtn.onclick=()=>go(index-1); nextBtn.onclick=()=>go(index+1); update();
