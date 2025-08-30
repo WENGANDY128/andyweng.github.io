@@ -1,10 +1,9 @@
-Type: Handheld Fan
-Size: 51 × 55 × 163 mm
-Weight: 163 g
-Battery: 2000 mAh
-Endurance: 4–10 h (3 speeds)
-Input: 5V/1A
-Max Power: 5 W
-Air Speed: 3.5 m/s
-RPM: 5500
-Origin: China
+Product Size: 61*55*163mm
+Battery Capacity: 2000mAh
+Speed: 5500rpm
+Airflow: 3.5m/s
+Product Weight: 163g
+Max Power: 5W
+Rated Input: 5V/1A
+Operating Time: 4h–10h (3 speed levels)
+Charging Time: 3h
