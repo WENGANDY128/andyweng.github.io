@@ -1,10 +1,9 @@
-Typ: Handventilator
-Größe: 51 × 55 × 163 mm
-Gewicht: 163 g
-Akku: 2000 mAh
-Laufzeit: 4–10 Std (3 Stufen)
-Eingang: 5V/1A
-Max. Leistung: 5 W
-Luftgeschwindigkeit: 3.5 m/s
-Drehzahl: 5500 U/min
-Herkunft: China
+Produktgröße: 52*40*129mm
+Akkukapazität: 3600mAh
+Drehzahl: 20000rpm
+Luftstrom: 10m/s
+Produktgewicht: 167g
+Maximale Leistung: 3.4W
+Nenneingang: 5V/2A
+Betriebsdauer: 2h–8h (4 Stufen / 100-stufige Einstellung)
+Ladezeit: 2.6h
