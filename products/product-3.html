@@ -3,23 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Eindeepseek – Product 3</title>
-
-  <!-- GA4 -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SP9BZHN30E"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-SP9BZHN30E');
-  </script>
-
-  <!-- Perf hints -->
-  <link rel="dns-prefetch" href="//www.eindeepseek.com">
-  <link rel="preconnect" href="https://www.eindeepseek.com" crossorigin>
-
+  <title>Eindeepseek – Product 3 (Ocean Freight Update)</title>
+  <meta name="description" content="Ocean freight rate update gallery with fullscreen zoomable lightbox (ZH/EN/DE)." />
   <style>
-    :root{--bg:#f7f8fa;--text:#222;--muted:#555;--primary:#2b7de9;--border:#ddd;--card:#fff;--skeleton:#eef1f5;--shimmer:#f7f8fb}
+    :root{--bg:#f7f8fa;--text:#222;--muted:#555;--primary:#2b7de9;--card:#fff;--border:#ddd}
     *{box-sizing:border-box}
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
     header{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#fff;border-bottom:1px solid var(--border)}
@@ -28,31 +15,23 @@
     .lang button{appearance:none;border:none;cursor:pointer;padding:6px 10px;border-radius:999px;color:var(--muted);background:transparent;font-weight:600}
     .lang button.active{color:#fff;background:var(--primary)}
     .wrap{max-width:1100px;margin:0 auto;padding:18px 16px 56px}
-    .layout{display:grid;gap:18px}
-    @media(min-width:900px){.layout{grid-template-columns:1.1fr .9fr;align-items:start}}
-    .title{font-size:28px;font-weight:800;margin:8px 0}
-    .desc{color:var(--muted);line-height:1.6;white-space:pre-wrap;word-wrap:break-word}
-
-    .carousel{position:relative;overflow:hidden;border-radius:14px;border:1px solid var(--border);background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.06)}
-    .track{display:flex;transition:transform .45s ease;will-change:transform}
-    .slide{min-width:100%;user-select:none}
-    .slide img{display:block;width:100%;height:auto;object-fit:cover}
-    .navBtn{position:absolute;top:50%;transform:translateY(-50%);background:#fff;border:1px solid var(--border);color:#333;border-radius:10px;padding:8px 10px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.1)}
-    .prev{left:8px}.next{right:8px}
-    .dots{display:flex;justify-content:center;gap:6px;margin-top:10px}
-    .dot{width:8px;height:8px;border-radius:50%;background:#cfd3da;border:none}
-    .dot.active{background:#2b7de9}
-
-    .skeleton{position:relative;overflow:hidden;background:var(--skeleton)}
-    .skeleton::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,var(--shimmer),transparent);animation:shimmer 1.2s infinite}
-    @keyframes shimmer{100%{transform:translateX(100%)}}
-  
-    /* Right-column cards */
-    .box{margin-top:18px;padding:12px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
-    .box h2{margin:0 0 8px;font-size:18px;font-weight:800;color:#111}
-    .specs ul{margin:0;padding-left:18px;color:var(--muted);line-height:1.6}
-    .specs li{margin:2px 0}
-    .details p{margin:0;color:var(--muted);line-height:1.7;white-space:pre-wrap}
+    h1{font-size:28px;margin:8px 0}
+    p.lead{color:var(--muted);margin:0 0 12px}
+    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+    @media (max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:560px){.grid{grid-template-columns:1fr}}
+    .card{border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--card);cursor:pointer;transition:.18s}
+    .card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.08)}
+    .thumb{width:100%;aspect-ratio:4/3;object-fit:cover;background:#eef1f5;display:block}
+    .cap{padding:8px 10px;font-weight:600}
+    /* Lightbox */
+    .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;z-index:30}
+    .lightbox.show{display:flex}
+    .stage{position:relative;width:100%;height:100%;touch-action:none;user-select:none;overflow:hidden}
+    .stage img{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(1);transform-origin:center center;max-width:none;max-height:none}
+    .tools{position:fixed;top:12px;right:12px;display:flex;gap:8px}
+    .btn{background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px 10px;cursor:pointer;font-weight:700}
+    .hint{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);color:#fff;opacity:.8;font-size:12px}
   </style>
 </head>
 <body>
@@ -66,138 +45,117 @@
   </header>
 
   <div class="wrap">
-    <div class="layout">
-      <section>
-        <div class="carousel" id="carousel" aria-label="gallery">
-          <div class="track" id="track">
-            <div class="slide"><div class="skeleton" style="aspect-ratio:4/3;width:100%"></div></div>
-          </div>
-          <button class="navBtn prev" id="prev" aria-label="Prev">◀</button>
-          <button class="navBtn next" id="next" aria-label="Next">▶</button>
-        </div>
-        <div class="dots" id="dots"></div>
-      </section>
-      <section>
-        <h1 class="title" id="title">Product 3</h1>
-        <div class="desc" id="desc"></div>
-      <div id="specsBox" class="box specs" style="display:none"><h2 id="specsTitle">参数</h2><ul id="specsList"></ul></div>
-      <div id="detailsBox" class="box details" style="display:none"><h2 id="detailsTitle">详细描述</h2><div id="detailsText"></div></div>
-      </section>
+    <h1 id="title">Product 3</h1>
+    <p class="lead" id="sub">Ocean freight rate update — click any image to view full-size and zoom.</p>
+
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="box" aria-modal="true" role="dialog">
+    <div class="stage" id="stage">
+      <img id="big" alt="full preview">
     </div>
+    <div class="tools">
+      <button class="btn" id="zin">＋</button>
+      <button class="btn" id="zout">－</button>
+      <button class="btn" id="fit">⟳</button>
+      <button class="btn" id="close">✕</button>
+    </div>
+    <div class="hint" id="hint">Wheel to zoom · drag to pan · double‑click to toggle zoom · Esc to close</div>
   </div>
 
   <script>
-    const PRODUCT_ID=3;
+    const I18N={
+      zh:{title:'海运价格更新',sub:'本页用于展示海运价目表与截图。点击任意图片可全屏查看、缩放与拖拽（支持长图 full.png）。',cap:'海运价格'},
+      en:{title:'Ocean Freight Rate Update',sub:'This page shows ocean rate sheets and screenshots. Click any image to open fullscreen with zoom & pan (long image full.png supported).',cap:'Freight Sheet'},
+      de:{title:'Seefracht‑Preisupdate',sub:'Diese Seite zeigt Seefracht‑Tarife und Screenshots. Bild anklicken für Vollbild mit Zoom & Pan (lange Grafik full.png unterstützt).',cap:'Frachttarif'}
+    };
     const qs=new URLSearchParams(location.search);
-    const currentLang=(qs.get('lang')||localStorage.getItem('lang')||'zh').toLowerCase();
-    localStorage.setItem('lang',currentLang);
-    const home=new URL('../index.html',location.href); home.searchParams.set('lang',currentLang); document.getElementById('homeLink').href=home.toString();
-    [...document.querySelectorAll('#langSwitcher button')].forEach(b=>{if(b.dataset.lang===currentLang)b.classList.add('active');b.onclick=()=>{const url=new URL(location.href);url.searchParams.set('lang',b.dataset.lang);localStorage.setItem('lang',b.dataset.lang);location.href=url.toString();}});
+    const lang=(qs.get('lang')||localStorage.getItem('lang')||'zh').toLowerCase();
+    localStorage.setItem('lang',lang);
+    const t=(k)=>I18N[lang]?.[k]||I18N.en[k];
 
-    function fetchWithTimeout(url,ms=1200){const ctl=new AbortController();const id=setTimeout(()=>ctl.abort(),ms);return fetch(url,{cache:'no-store',signal:ctl.signal}).finally(()=>clearTimeout(id));}
-    async function jsonFast(url){try{const r=await fetchWithTimeout(url,1500); if(r.ok) return await r.json();}catch{} return null;}
-    async function firstOk(urls){const wrapped=urls.map(u=>fetchWithTimeout(u,1200).then(r=>r.ok?u:Promise.reject(u))); try{return await Promise.any(wrapped);}catch{return ''}}
-    async function exists(u){try{const r=await fetchWithTimeout(u,900); return r.ok;}catch{return false;}}
+    document.getElementById('title').textContent=t('title');
+    document.getElementById('sub').textContent=t('sub');
 
-    async function loadTxt(){const slug=`product-${PRODUCT_ID}`; const order=[currentLang,'en','zh','de']; for(const lg of order){const url=`${slug}-${lg}.txt`; try{const r=await fetchWithTimeout(url,1200); if(r.ok){const t=(await r.text()).trim(); const [first,...rest]=t.split(/\r?\n/); return {title:first?.trim()||`Product ${PRODUCT_ID}`, desc:rest.join('\n').trim()||''};}}catch{} } return {title:`Product ${PRODUCT_ID}`,desc:''};}
+    // Lang switcher
+    [...document.querySelectorAll('#langSwitcher button')].forEach(b=>{
+      if(b.dataset.lang===lang) b.classList.add('active');
+      b.onclick=()=>{const u=new URL(location.href);u.searchParams.set('lang',b.dataset.lang);localStorage.setItem('lang',b.dataset.lang);location.href=u.toString();};
+    });
+    const home=new URL('../index.html',location.href); home.searchParams.set('lang',lang); document.getElementById('homeLink').href=home.toString();
 
-    async function resolveExtViaManifest(){const mf=await jsonFast('../manifest.json').catch(()=>null); if(mf?.items){const it=mf.items.find(x=>x.id==PRODUCT_ID); if(it?.imgExt) return it.imgExt;} return '';}
+    // Build gallery from /assets/imgs/product-3/1..20.(png/jpg/jpeg/webp)
+    const exts=['png','jpg','jpeg','webp'];
+    function probe(src){ return new Promise(res=>{ const im=new Image(); im.onload=()=>res(src); im.onerror=()=>res(''); im.src=src; }); }
+    async function firstExisting(paths){ for(const p of paths){ const ok=await probe(p); if(ok) return ok; } return ''; }
 
-    
-    async function loadParams(productId, lang){
-      const order=[lang,'en','zh','de'];
-      const prefixes=['../assets/txt','/assets/txt'];
-      for(const lg of order){
-        for(const pre of prefixes){
-          const url=`${pre}/product-${productId}/product-${productId}-params-${lg}.txt`;
-          try{
-            const r=await fetchWithTimeout(url,1200);
-            if(r.ok){
-              const lines=(await r.text()).trim().split(/\r?\n/).filter(Boolean);
-              const list=document.getElementById('specsList'); list.innerHTML='';
-              lines.forEach(line=>{
-                const m=line.split(/\s*[:：]\s*/);
-                const k=m[0]||''; const v=m.slice(1).join(':')||'';
-                const li=document.createElement('li');
-                li.textContent = v?`${k}: ${v}`:k;
-                list.appendChild(li);
-              });
-              const titleI18n={zh:'参数',en:'Specs',de:'Spezifikationen'};
-              document.getElementById('specsTitle').textContent=titleI18n[lang]||'Specs';
-              document.getElementById('specsBox').style.display=lines.length?'block':'none';
-              return;
-            }
-          }catch(e){}
-        }
-      }
-      document.getElementById('specsBox').style.display='none';
-    }
-
-    async function loadDetails(productId, lang){
-      const order=[lang,'en','zh','de'];
-      const prefixes=['../assets/txt','/assets/txt'];
-      for(const lg of order){
-        for(const pre of prefixes){
-          const url=`${pre}/product-${productId}/product-${productId}-details-${lg}.txt`;
-          try{
-            const r=await fetchWithTimeout(url,1200);
-            if(r.ok){
-              const txt=(await r.text()).trim();
-              if(txt){
-                const titleI18n={zh:'详细描述',en:'Details',de:'Beschreibung'};
-                document.getElementById('detailsTitle').textContent=titleI18n[lang]||'Details';
-                document.getElementById('detailsText').textContent=txt;
-                document.getElementById('detailsBox').style.display='block';
-                return;
-              }
-            }
-          }catch(e){}
-        }
-      }
-      document.getElementById('detailsBox').style.display='none';
-    }
-async function loadImages(){
-      const base=`../assets/imgs/product-${PRODUCT_ID}`;
-      let ext = await resolveExtViaManifest();
-      if(!ext){ ext = (await firstOk([`${base}/1.jpg`,`${base}/1.jpeg`,`${base}/1.png`,`${base}/1.webp`])).split('.').pop() || ''; }
-      if(!ext) return [];
-
-      // 预加载第一张
-      const link=document.createElement('link'); link.rel='preload'; link.as='image'; link.href=`${base}/1.${ext}`; document.head.appendChild(link);
-
-      // 按已知扩展名加载后续，遇到缺失即停止
-      const imgs=[];
+    async function build(){
+      const grid=document.getElementById('grid');
       for(let i=1;i<=20;i++){
-        const u=`${base}/${i}.${ext}`;
-        if(await exists(u)) imgs.push(u); else break;
+        const base=`../assets/imgs/product-3/${i}`;
+        const src=await firstExisting(exts.map(e=>`${base}.${e}`));
+        if(!src) continue;
+        const card=document.createElement('div');
+        card.className='card';
+        card.innerHTML=`<img class="thumb" src="${src}" alt="${t('cap')} ${i}" loading="lazy"><div class="cap">${t('cap')} ${i}</div>`;
+        card.onclick=()=>openLightbox(src);
+        grid.appendChild(card);
       }
-      return imgs;
+      if(!grid.children.length){
+        const d=document.createElement('div'); d.style.color='#666'; d.textContent='No images found under /assets/imgs/product-3/ (1.png / 1.jpg …)';
+        grid.appendChild(d);
+      }
     }
 
-    (async function init(){
-      const data=await loadTxt(); title.textContent=data.title; desc.textContent=data.desc;
-      await loadParams(PRODUCT_ID,currentLang);
-      await loadDetails(PRODUCT_ID,currentLang);
-      const imgs=await loadImages(); const track=document.getElementById('track'); const dots=document.getElementById('dots');
-      track.innerHTML='';
-      if(imgs.length===0){ document.getElementById('carousel').style.display='none'; return; }
+    // Lightbox zoom/pan
+    const box=document.getElementById('box');
+    const big=document.getElementById('big');
+    const stage=document.getElementById('stage');
+    let scale=1, tx=0, ty=0, startX=0, startY=0, dragging=false, naturalW=0, naturalH=0;
 
-      imgs.forEach((src,idx)=>{
-        const s=document.createElement('div'); s.className='slide';
-        s.innerHTML=`<img src="${src}" alt="${data.title} ${idx+1}" loading="${idx===0?'eager':'lazy'}" decoding="async" fetchpriority="${idx===0?'high':'auto'}">`;
-        track.appendChild(s);
-        const d=document.createElement('button'); d.className='dot'+(idx===0?' active':''); d.setAttribute('aria-label',`Go to ${idx+1}`); d.onclick=()=>go(idx); dots.appendChild(d);
+    function apply(){ big.style.transform=`translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(${scale})`; }
+    function fit(){ scale=1; tx=0; ty=0; apply(); }
+    function zoomAt(cx,cy,delta){ 
+      const prev=scale;
+      scale=Math.min(8,Math.max(1,scale*(delta>0?1.2:1/1.2)));
+      const rect=big.getBoundingClientRect();
+      const dx=cx-rect.left-rect.width/2;
+      const dy=cy-rect.top-rect.height/2;
+      tx += dx/prev - dx/scale;
+      ty += dy/prev - dy/scale;
+      apply();
+    }
+
+    function openLightbox(src){
+      // Try full.* beside /assets/imgs/product-3/
+      const fullBase='../assets/imgs/product-3/full';
+      firstExisting(exts.map(e=>`${fullBase}.${e}`)).then(best=>{
+        big.src=best || src;
       });
+      big.onload=()=>{ naturalW=big.naturalWidth; naturalH=big.naturalHeight; fit(); };
+      box.classList.add('show');
+    }
+    function closeBox(){ box.classList.remove('show'); }
 
-      let index=0; const prev=document.getElementById('prev'), next=document.getElementById('next');
-      function update(){ track.style.transform=`translateX(${-index*100}%)`; [...dots.children].forEach((d,i)=>d.classList.toggle('active',i===index)); }
-      function go(i){ index=Math.max(0,Math.min(imgs.length-1,i)); update(); }
-      prev.onclick=()=>go(index-1); next.onclick=()=>go(index+1);
-      let startX=null,dragging=false; track.addEventListener('pointerdown',e=>{dragging=true;startX=e.clientX; track.style.transition='none';});
-      window.addEventListener('pointerup',()=>{if(!dragging)return; dragging=false; track.style.transition='transform .45s ease';});
-      window.addEventListener('pointermove',e=>{if(!dragging)return; const dx=e.clientX-startX; const w=track.clientWidth; const delta=dx/w; track.style.transform=`translateX(${(-index+delta)*100}%)`;});
-      track.addEventListener('pointerup',e=>{if(startX==null)return; const dx=e.clientX-startX; const threshold=40; if(dx>threshold) go(index-1); else if(dx<-threshold) go(index+1); else update(); startX=null;});
-    })();
+    // Events
+    document.getElementById('close').onclick=closeBox;
+    document.getElementById('fit').onclick=fit;
+    document.getElementById('zin').onclick=()=>zoomAt(window.innerWidth/2,window.innerHeight/2,1);
+    document.getElementById('zout').onclick=()=>zoomAt(window.innerWidth/2,window.innerHeight/2,-1);
+    box.addEventListener('click',e=>{ if(e.target===box) closeBox(); });
+    window.addEventListener('keydown',e=>{ if(e.key==='Escape') closeBox(); });
+
+    stage.addEventListener('wheel',e=>{ e.preventDefault(); zoomAt(e.clientX,e.clientY, e.deltaY<0?1:-1 ); }, {passive:false});
+
+    stage.addEventListener('pointerdown',e=>{ dragging=true; startX=e.clientX; startY=e.clientY; stage.setPointerCapture(e.pointerId); });
+    stage.addEventListener('pointerup',e=>{ dragging=false; stage.releasePointerCapture(e.pointerId); });
+    stage.addEventListener('pointermove',e=>{ if(!dragging) return; tx += e.clientX-startX; ty += e.clientY-startY; startX=e.clientX; startY=e.clientY; apply(); });
+
+    stage.addEventListener('dblclick',e=>{ e.preventDefault(); scale = (scale===1?2:1); apply(); });
+
+    build();
   </script>
 </body>
 </html>
