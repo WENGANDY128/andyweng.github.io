@@ -5,15 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Eindeepseek · 产品精选</title>
 
-  <!-- GA4 -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SP9BZHN30E"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-SP9BZHN30E');
-  </script>
-
+  <!-- SEO / OpenGraph -->
   <meta name="description" content="Eindeepseek B2C 产品展示，多语言；仅在存在 1.png 时显示卡片。" />
   <meta property="og:title" content="Eindeepseek · 产品精选" />
   <meta property="og:description" content="多语言产品展示网站：自动读取文案，仅显示有内容的产品（只识别 PNG）。" />
@@ -23,6 +15,8 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Eindeepseek · 产品精选" />
   <meta name="twitter:description" content="多语言产品展示网站：自动读取文案，仅显示有内容的产品（只识别 PNG）。" />
+
+  <!-- Perf hints -->
   <link rel="dns-prefetch" href="//www.eindeepseek.com">
   <link rel="preconnect" href="https://www.eindeepseek.com" crossorigin>
 
@@ -63,11 +57,20 @@
 
     .skeleton{position:relative;overflow:hidden;background:var(--skeleton)}
     .skeleton::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg, transparent, var(--skeleton-shimmer), transparent);animation:shimmer 1.2s infinite}
-    @keyframes shimmer{100%{transform:translateX(100%)}}
 
     .qr-thumb{max-width:180px;max-height:180px;margin:16px auto;display:block;border-radius:10px;border:1px solid var(--border);background:#fff}
 
     footer{border-top:1px solid var(--border);text-align:center;padding:14px;color:var(--muted);margin-top:26px}
+
+    /* Cookie banner */
+    .cookie-wrap{position:fixed;left:0;right:0;bottom:0;z-index:50;display:none}
+    .cookie-bar{max-width:1200px;margin:10px auto;background:#111;color:#fff;border-radius:12px;padding:14px;border:1px solid #000a;display:flex;flex-wrap:wrap;gap:10px;align-items:center;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+    .cookie-bar p{margin:0;line-height:1.5;flex:1 1 320px;color:#e6e6e6}
+    .cookie-bar a{color:#9ec5ff}
+    .cookie-actions{display:flex;gap:8px}
+    .cookie-actions button{cursor:pointer;border:none;border-radius:10px;padding:8px 12px;font-weight:700}
+    .cookie-accept{background:#2b7de9;color:#fff}
+    .cookie-reject{background:#fff;color:#111;border:1px solid #ccc}
   </style>
 </head>
 <body>
@@ -95,22 +98,52 @@
 
   <footer>© <span id="y"></span> Eindeepseek</footer>
 
+  <!-- Cookie banner (only shows for EN/DE) -->
+  <div class="cookie-wrap" id="cookieWrap" aria-live="polite">
+    <div class="cookie-bar">
+      <p id="cookieText">
+        We use cookies (only Google Analytics) to understand traffic and improve our site. You can accept or reject non-essential cookies.
+        See our <a href="/privacy.html" target="_blank" rel="noopener">Privacy Notice</a>.
+      </p>
+      <div class="cookie-actions">
+        <button class="cookie-reject" id="cookieReject">Reject</button>
+        <button class="cookie-accept" id="cookieAccept">Accept</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    const I18N={
+    /* ---------- i18n ----------- */
+    const I18N = {
       zh:{title:'产品展示',sub:'Eindeepseek 专注消费电子、小家电与工业品的跨境贸易供应，提供 OEM/ODM、现货与定制服务，致力于为全球客户提供优质产品与可靠的物流支持。',groupTitle:'加入 WhatsApp 群组',groupDesc:'扫码二维码，进入我们的贸易 & 物流交流群。',email:'邮件',whats:'WhatsApp',phone:'电话',wechat:'微信'},
       en:{title:'Products',sub:'Eindeepseek is a cross-border trade supplier of consumer electronics, small appliances and industrial products. We provide OEM/ODM, ready-to-ship and customized services, delivering quality products with reliable logistics support worldwide.',groupTitle:'Join WhatsApp Group',groupDesc:'Scan the QR code to join our trade & logistics group.',email:'Email',whats:'WhatsApp',phone:'Phone',wechat:'WeChat'},
       de:{title:'Produkte',sub:'Eindeepseek ist ein grenzüberschreitender Handelspartner für Unterhaltungselektronik, Kleingeräte und Industrieprodukte. Wir bieten OEM/ODM, Lagerware und kundenspezifische Lösungen und liefern weltweit qualitativ hochwertige Produkte mit zuverlässiger Logistik.',groupTitle:'WhatsApp-Gruppe beitreten',groupDesc:'QR-Code scannen, um unserer Handels- & Logistik-Gruppe beizutreten.',email:'E-Mail',whats:'WhatsApp',phone:'Telefon',wechat:'WeChat'}
     };
-    const qs=new URLSearchParams(location.search);
-    const currentLang=(qs.get('lang')||localStorage.getItem('lang')||'zh').toLowerCase();
-    localStorage.setItem('lang',currentLang);
-    const t=I18N[currentLang]||I18N.zh;
-    document.getElementById('heading').textContent=t.title;
-    document.getElementById('sub').textContent=t.sub;
+    const COOKIE_TXT = {
+      en:{
+        text:'We use cookies (only Google Analytics) to understand traffic and improve our site. You can accept or reject non-essential cookies. See our <a href="/privacy.html" target="_blank" rel="noopener">Privacy Notice</a>.',
+        accept:'Accept', reject:'Reject'
+      },
+      de:{
+        text:'Wir verwenden Cookies (nur Google Analytics), um den Traffic zu verstehen und unsere Website zu verbessern. Sie können nicht notwendige Cookies akzeptieren oder ablehnen. Siehe unsere <a href="/privacy.html" target="_blank" rel="noopener">Datenschutzhinweise</a>.',
+        accept:'Akzeptieren', reject:'Ablehnen'
+      }
+    };
+
+    /* ---------- language & UI texts ---------- */
+    const qs = new URLSearchParams(location.search);
+    const currentLang = (qs.get('lang') || localStorage.getItem('lang') || 'zh').toLowerCase();
+    localStorage.setItem('lang', currentLang);
+    const t = I18N[currentLang] || I18N.zh;
+    document.getElementById('heading').textContent = t.title;
+    document.getElementById('sub').textContent = t.sub;
 
     [...document.querySelectorAll('#langSwitcher button')].forEach(b=>{
       if(b.dataset.lang===currentLang) b.classList.add('active');
-      b.onclick=()=>{const lang=b.dataset.lang;localStorage.setItem('lang',lang);const url=new URL(location.href);url.searchParams.set('lang',lang);location.href=url.toString();};
+      b.onclick=()=>{
+        const lang=b.dataset.lang;localStorage.setItem('lang',lang);
+        const url=new URL(location.href);url.searchParams.set('lang',lang);location.href=url.toString();
+      };
     });
 
     const CONTACT={email:'wengandy128@gmail.com',whatsapp:'+86 15888791812',phone:'+86 15888791812',wechat:'15888791812',waInvite:''};
@@ -121,6 +154,59 @@
       <span>🟩 ${t.wechat}: ${CONTACT.wechat}</span>
     `;
 
+    /* ---------- cookie consent + GA ---------- */
+    const GA_ID = 'G-SP9BZHN30E';
+    function loadGA(){
+      if(window.__gaLoaded) return;
+      window.__gaLoaded = true;
+      const s=document.createElement('script');
+      s.async=true; s.src=`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
+      document.head.appendChild(s);
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){ dataLayer.push(arguments); }
+      window.gtag = gtag;
+      gtag('js', new Date());
+      gtag('config', GA_ID);
+    }
+    function disableGA(){ window['ga-disable-'+GA_ID] = true; }
+
+    const consentKey='cookieConsent:v1';
+    const saved = localStorage.getItem(consentKey);
+
+    // zh: 不展示弹窗，直接启用 GA
+    if(currentLang==='zh'){
+      loadGA();
+    }else{
+      // 非中文：没有记录则显示；已记录则按选择执行
+      const wrap = document.getElementById('cookieWrap');
+      const cTxt = COOKIE_TXT[currentLang] || COOKIE_TXT.en;
+      document.getElementById('cookieText').innerHTML = cTxt.text;
+      document.getElementById('cookieAccept').textContent = cTxt.accept;
+      document.getElementById('cookieReject').textContent = cTxt.reject;
+
+      function show(){ wrap.style.display='block'; }
+      function hide(){ wrap.style.display='none'; }
+
+      if(!saved){
+        disableGA(); // 默认不加载
+        show();
+      }else{
+        try{
+          const st = JSON.parse(saved);
+          if(st.status==='accepted') loadGA(); else disableGA();
+        }catch{ disableGA(); }
+      }
+      document.getElementById('cookieAccept').onclick=()=>{
+        localStorage.setItem(consentKey, JSON.stringify({status:'accepted',ts:Date.now()}));
+        hide(); loadGA();
+      };
+      document.getElementById('cookieReject').onclick=()=>{
+        localStorage.setItem(consentKey, JSON.stringify({status:'rejected',ts:Date.now()}));
+        hide(); disableGA();
+      };
+    }
+
+    /* ---------- content building ---------- */
     function fetchWithTimeout(url,ms=1500){
       const ctl=new AbortController(); const id=setTimeout(()=>ctl.abort(),ms);
       return fetch(url,{cache:'no-store',signal:ctl.signal}).finally(()=>clearTimeout(id));
