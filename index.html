@@ -115,10 +115,44 @@
   <script>
     /* ---------- i18n ----------- */
     const I18N = {
-      zh:{title:'产品展示',sub:'Eindeepseek 专注消费电子、小家电与工业品的跨境贸易供应，提供 OEM/ODM、现货与定制服务，致力于为全球客户提供优质产品与可靠的物流支持。',groupTitle:'加入 WhatsApp 群组',groupDesc:'扫码二维码，进入我们的贸易 & 物流交流群。',email:'邮件',whats:'WhatsApp',phone:'电话',wechat:'微信'},
-      en:{title:'Products',sub:'Eindeepseek is a cross-border trade supplier of consumer electronics, small appliances and industrial products. We provide OEM/ODM, ready-to-ship and customized services, delivering quality products with reliable logistics support worldwide.',groupTitle:'Join WhatsApp Group',groupDesc:'Scan the QR code to join our trade & logistics group.',email:'Email',whats:'WhatsApp',phone:'Phone',wechat:'WeChat'},
-      de:{title:'Produkte',sub:'Eindeepseek ist ein grenzüberschreitender Handelspartner für Unterhaltungselektronik, Kleingeräte und Industrieprodukte. Wir bieten OEM/ODM, Lagerware und kundenspezifische Lösungen und liefern weltweit qualitativ hochwertige Produkte mit zuverlässiger Logistik.',groupTitle:'WhatsApp-Gruppe beitreten',groupDesc:'QR-Code scannen, um unserer Handels- & Logistik-Gruppe beizutreten.',email:'E-Mail',whats:'WhatsApp',phone:'Telefon',wechat:'WeChat'}
+      zh:{
+        title:'产品展示',
+        sub:'Eindeepseek 专注消费电子、小家电与工业品的跨境贸易供应，提供 OEM/ODM、现货与定制服务，致力于为全球客户提供优质产品与可靠的物流支持。',
+        groupTitle:'加入 WhatsApp 群组',
+        groupDesc:'扫码二维码，进入我们的贸易 & 物流交流群。',
+        email:'邮件',whats:'WhatsApp',phone:'电话',wechat:'微信',
+        /* 新增：资讯卡文案 */
+        cbamTitle:'CBAM 2026：需交“碳证”，<50t/年或可免',
+        cbamDesc:'时间线/默认值/成本与我们能提供的合规+低碳运价方案。',
+        depTitle:'研究：美国对欧进口依赖超过对中国',
+        depDesc:'关键数字与两条打法（美线做到岸透明，欧线做合规省心）。'
+      },
+      en:{
+        title:'Products',
+        sub:'Eindeepseek is a cross-border trade supplier of consumer electronics, small appliances and industrial products. We provide OEM/ODM, ready-to-ship and customized services, delivering quality products with reliable logistics support worldwide.',
+        groupTitle:'Join WhatsApp Group',
+        groupDesc:'Scan the QR code to join our trade & logistics group.',
+        email:'Email',whats:'WhatsApp',phone:'Phone',wechat:'WeChat',
+        /* New: insight copy */
+        cbamTitle:'CBAM 2026: Certificates required; <50t/year may be exempt',
+        cbamDesc:'Timeline, default values, cost structure + our compliance & low-carbon offer.',
+        depTitle:'Study: US import dependence on EU now exceeds China',
+        depDesc:'Key numbers & playbooks: transparent landed cost (US), compliance-first (EU).'
+      },
+      de:{
+        title:'Produkte',
+        sub:'Eindeepseek ist ein grenzüberschreitender Handelspartner für Unterhaltungselektronik, Kleingeräte und Industrieprodukte. Wir bieten OEM/ODM, Lagerware und kundenspezifische Lösungen und liefern weltweit qualitativ hochwertige Produkte mit zuverlässiger Logistik.',
+        groupTitle:'WhatsApp-Gruppe beitreten',
+        groupDesc:'QR-Code scannen, um unserer Handels- & Logistik-Gruppe beizutreten.',
+        email:'E-Mail',whats:'WhatsApp',phone:'Telefon',wechat:'WeChat',
+        /* Neu: Insight-Texte */
+        cbamTitle:'CBAM 2026: Zertifikate Pflicht; <50 t/Jahr evtl. befreit',
+        cbamDesc:'Zeitplan, Default-Werte, Kostenstruktur + unser Compliance/Low-Carbon-Paket.',
+        depTitle:'Studie: US-Importabhängigkeit von der EU überholt China',
+        depDesc:'Kerndaten & Playbooks: transparente Landed Costs (US), Compliance-Fokus (EU).'
+      }
     };
+
     const COOKIE_TXT = {
       en:{
         text:'We use cookies (only Google Analytics) to understand traffic and improve our site. You can accept or reject non-essential cookies. See our <a href="/privacy.html" target="_blank" rel="noopener">Privacy Notice</a>.',
@@ -150,7 +184,7 @@
     document.getElementById('contactBar').innerHTML=`
       <a href="mailto:${CONTACT.email}">📧 ${t.email}: ${CONTACT.email}</a>
       <a href="https://wa.me/${CONTACT.whatsapp.replace(/[^0-9]/g,'')}" target="_blank" rel="noopener">💬 ${t.whats}</a>
-      <a href="tel:${CONTACT.phone.replace(/\s/g,'')}">📞 ${t.phone}: ${CONTACT.phone}</a>
+      <a href="tel:${CONTACT.phone.replace(/\\s/g,'')}">📞 ${t.phone}: ${CONTACT.phone}</a>
       <span>🟩 ${t.wechat}: ${CONTACT.wechat}</span>
     `;
 
@@ -221,9 +255,58 @@
       try{ const r2=await fetchWithTimeout(url,1200); return r2.ok; }catch(e){ return false; }
     }
 
+    /* ---------- 新增：资讯卡配置 & 渲染 ---------- */
+    const INSIGHT_CARDS = [
+      {
+        href: '/insights/cbam-2026.html',        // 你的 CBAM 一页文
+        img:  'assets/insights/cbam.png',        // 可选：没有也行
+        badge:'EU·CBAM',
+        titleKey:'cbamTitle', descKey:'cbamDesc'
+      },
+      {
+        href: '/insights/us-eu-dependency.html', // 你的 US-EU 研究一页文
+        img:  'assets/insights/us-eu.png',       // 可选：没有也行
+        badge:'Market',
+        titleKey:'depTitle', descKey:'depDesc'
+      }
+    ];
+
+    async function addInsightCards(grid){
+      for(const c of INSIGHT_CARDS){
+        const tl = (I18N[currentLang] && I18N[currentLang][c.titleKey]) || I18N.en[c.titleKey];
+        const ds = (I18N[currentLang] && I18N[currentLang][c.descKey])  || I18N.en[c.descKey];
+
+        let thumb = `<div class="thumb" style="display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px">ℹ️</div>`;
+        try{
+          if(c.img && await existsPng(c.img)){
+            thumb = `<img class="thumb" src="${c.img}" alt="${tl}" loading="lazy" decoding="async">`;
+          }
+        }catch{}
+
+        const a = document.createElement('a');
+        a.className = 'cardlink';
+        a.href = c.href;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.innerHTML = `<article class="card">
+            ${thumb}
+            <div class="body">
+              <div class="title">${tl}</div>
+              <p class="desc">${ds}</p>
+            </div>
+            <span class="badge">${c.badge}</span>
+          </article>`;
+        grid.appendChild(a);
+      }
+    }
+
     async function build(){
       const grid=document.getElementById('grid'); grid.innerHTML='';
 
+      /* 先渲染资讯卡 —— 打开首页就能看到 */
+      await addInsightCards(grid);
+
+      /* 再渲染群二维码卡 */
       try{
         const qrCandidates=['group.jpeg','group.jpg','group.png','group.webp'];
         for(const u of qrCandidates){
@@ -245,6 +328,7 @@
         }
       }catch{}
 
+      /* 产品卡渲染（保持原逻辑） */
       const mf = await (async()=>{
         for(const u of ['manifest.json','/manifest.json','./manifest.json']){
           const d = await tryJson(u); if(d) return d;
