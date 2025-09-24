@@ -372,5 +372,174 @@
     build();
     document.getElementById('y').textContent=new Date().getFullYear();
   </script>
+  <!-- FX Widget: paste this just before </body> -->
+<script>
+(() => {
+  const CCY = ['CNY','USD','EUR','TWD'];            // 可自定义币种
+  const DEC = 4;                                    // 小数位
+  const POLL_MS = 5 * 60 * 1000;                    // 每 5 分钟刷新一次（可改）
+  const STORE = 'fxWidget:v1';
+
+  // ---- styles (use your design tokens where possible) ----
+  const css = `
+  :root{--fx-bg:#111;--fx-fg:#fff;--fx-line:#333;--fx-shadow:0 8px 28px rgba(0,0,0,.35);}
+  .fx-fab{position:fixed;right:16px;bottom:16px;z-index:99998;border:0;border-radius:999px;
+    padding:12px 14px;background:var(--primary,#2b7de9);color:#fff;font-weight:800;cursor:pointer;
+    box-shadow:0 6px 20px rgba(0,0,0,.18)}
+  .fx-wrap{position:fixed;right:16px;bottom:72px;z-index:99999;background:var(--fx-bg);color:var(--fx-fg);
+    border:1px solid #000;border-radius:14px;box-shadow:var(--fx-shadow);width:320px;max-width:calc(100vw - 32px);display:none}
+  .fx-head{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--fx-line)}
+  .fx-title{font-weight:800}
+  .fx-close{all:unset;cursor:pointer;background:#222;border:1px solid var(--fx-line);padding:4px 8px;border-radius:8px}
+  .fx-body{padding:12px}
+  .fx-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:center}
+  .fx-input,.fx-select{width:100%;padding:8px;border-radius:8px;border:1px solid var(--fx-line);background:#222;color:#fff}
+  .fx-arrow{color:#bbb;text-align:center}
+  .fx-out{margin-top:10px;padding:10px;border:1px solid var(--fx-line);border-radius:10px;background:#1b1b1b;display:flex;align-items:center;justify-content:space-between;min-height:40px}
+  .fx-tools{padding:10px;display:flex;gap:8px}
+  .fx-btn{cursor:pointer;border:1px solid var(--fx-line);background:#222;color:#fff;border-radius:8px;padding:6px 10px}
+  .fx-foot{padding:10px;font-size:12px;color:#9aa;display:flex;justify-content:space-between;border-top:1px solid var(--fx-line)}
+  .fx-link{color:#9ec5ff;text-decoration:none}
+  `;
+  const style = document.createElement('style'); style.textContent = css; document.head.appendChild(style);
+
+  // ---- dom ----
+  const fab = document.createElement('button');
+  fab.className = 'fx-fab';
+  fab.type = 'button';
+  fab.setAttribute('aria-label','Open FX converter');
+  fab.textContent = '汇率';
+
+  const wrap = document.createElement('section');
+  wrap.className = 'fx-wrap';
+  wrap.setAttribute('role','dialog');
+  wrap.setAttribute('aria-modal','false');
+  wrap.innerHTML = `
+    <div class="fx-head">
+      <div class="fx-title">实时汇率换算</div>
+      <button class="fx-close" type="button" aria-label="Close">×</button>
+    </div>
+    <div class="fx-body">
+      <div class="fx-grid">
+        <input class="fx-input" id="fx-amt" type="number" min="0" step="0.01" placeholder="金额">
+        <select class="fx-select" id="fx-from"></select>
+        <div class="fx-arrow">→</div>
+        <select class="fx-select" id="fx-to"></select>
+      </div>
+      <div class="fx-out">
+        <span id="fx-res">—</span>
+        <span id="fx-ts"></span>
+      </div>
+      <div class="fx-tools">
+        <button class="fx-btn" id="fx-swap" type="button">交换</button>
+        <button class="fx-btn" id="fx-refresh" type="button">刷新</button>
+      </div>
+    </div>
+    <div class="fx-foot">
+      <span>数据源：exchangerate.host</span>
+      <a class="fx-link" href="https://exchangerate.host" target="_blank" rel="noopener">API</a>
+    </div>
+  `;
+
+  document.body.appendChild(fab);
+  document.body.appendChild(wrap);
+
+  const $ = sel => wrap.querySelector(sel);
+  const amt = $('#fx-amt'), fromSel = $('#fx-from'), toSel = $('#fx-to'), res = $('#fx-res'), ts = $('#fx-ts');
+
+  // init selects
+  CCY.forEach(c=>{
+    const o1 = document.createElement('option'); o1.value=c; o1.textContent=c; fromSel.appendChild(o1);
+    const o2 = document.createElement('option'); o2.value=c; o2.textContent=c; toSel.appendChild(o2);
+  });
+
+  // restore last state
+  try{
+    const saved = JSON.parse(localStorage.getItem(STORE) || '{}');
+    fromSel.value = saved.from || 'CNY';
+    toSel.value = saved.to || 'USD';
+    amt.value = saved.amt ?? 100;
+  }catch{ fromSel.value='CNY'; toSel.value='USD'; amt.value=100; }
+
+  // ---- rates cache & fetch with fallback ----
+  let cache = { base: null, ts: 0, rates: null };
+  const now = () => Date.now();
+
+  async function fetchRates(base){
+    // primary
+    try{
+      const u = `https://api.exchangerate.host/latest?base=${encodeURIComponent(base)}`;
+      const r = await fetch(u, { cache: 'no-store' });
+      if(!r.ok) throw new Error('host http');
+      const j = await r.json();
+      if(!j || !j.rates) throw new Error('host json');
+      cache = { base: j.base || base, ts: now(), rates: j.rates };
+      ts.textContent = j.date || '';
+      return;
+    }catch(e){}
+    // fallback
+    const u2 = `https://open.er-api.com/v6/latest/${encodeURIComponent(base)}`;
+    const r2 = await fetch(u2, { cache: 'no-store' });
+    const j2 = await r2.json();
+    if(j2 && j2.rates){
+      cache = { base: j2.base_code || base, ts: now(), rates: j2.rates };
+      ts.textContent = (j2.time_last_update_utc || '').replace(' at','');
+      return;
+    }
+    throw new Error('rate fetch failed');
+  }
+
+  function fmt(n){ return Number(n).toLocaleString(undefined,{ maximumFractionDigits: DEC }); }
+
+  let polling = null;
+  async function compute(){
+    const a = parseFloat(amt.value || '0');
+    const from = fromSel.value, to = toSel.value;
+    // persist
+    localStorage.setItem(STORE, JSON.stringify({ amt: amt.value, from, to }));
+    if(!a){ res.textContent='—'; return; }
+    try{
+      if(cache.base !== from || !cache.rates || (now() - cache.ts) > POLL_MS){
+        res.textContent = '加载中…';
+        await fetchRates(from);
+      }
+      const rate = cache.rates[to];
+      if(rate == null){ res.textContent='N/A'; return; }
+      const out = a * rate;
+      res.textContent = `${from} ${fmt(a)} = ${to} ${fmt(out)}`;
+    }catch(e){
+      res.textContent = '网络错误';
+    }
+  }
+
+  // listeners
+  [amt, fromSel, toSel].forEach(el => el.addEventListener('input', compute));
+  $('#fx-swap').addEventListener('click', () => { const f=fromSel.value; fromSel.value=toSel.value; toSel.value=f; compute(); });
+  $('#fx-refresh').addEventListener('click', () => { cache.base=null; compute(); });
+  wrap.querySelector('.fx-close').addEventListener('click', () => { wrap.style.display='none'; });
+
+  // FAB toggle + keyboard
+  fab.addEventListener('click', () => {
+    const show = wrap.style.display !== 'block';
+    wrap.style.display = show ? 'block' : 'none';
+    if(show){ compute(); amt.focus(); }
+  });
+  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') wrap.style.display='none'; });
+
+  // auto refresh loop while open
+  function startPolling(){
+    if(polling) return;
+    polling = setInterval(() => {
+      if(wrap.style.display === 'block'){ cache.base=null; compute(); }
+    }, POLL_MS);
+  }
+  function stopPolling(){ if(polling){ clearInterval(polling); polling=null; } }
+  document.addEventListener('visibilitychange', () => { document.hidden ? stopPolling() : startPolling(); });
+  startPolling();
+
+  // first render
+  compute();
+})();
+</script>
 </body>
 </html>
