@@ -371,57 +371,120 @@
 
     build();
     document.getElementById('y').textContent=new Date().getFullYear();
-  </script>
-  <!-- FX Widget: paste this just before </body> -->
+</script>
+
+<!-- ▼▼ 新增：多语言实时汇率（预览条 + 大号换算浮窗） ▼▼ -->
 <script>
 (() => {
-  const CCY = ['CNY','USD','EUR','TWD'];            // 可自定义币种
-  const DEC = 4;                                    // 小数位
-  const POLL_MS = 5 * 60 * 1000;                    // 每 5 分钟刷新一次（可改）
-  const STORE = 'fxWidget:v1';
+  /* ---------- config ---------- */
+  const CCY = ['CNY','USD','EUR','TWD'];              // 可自行增删
+  const SUMMARY_PAIRS = [                             // 预览条展示的三组
+    ['USD','CNY'],
+    ['EUR','USD'],
+    ['EUR','CNY'],
+  ];
+  const DEC = 4;                                      // 小数位
+  const POLL_MS = 5 * 60 * 1000;                      // 5 分钟自动刷新
+  const STORE = 'fxWidget:v2';
 
-  // ---- styles (use your design tokens where possible) ----
+  /* ---------- i18n (auto from URL/localStorage) ---------- */
+  const qs = new URLSearchParams(location.search);
+  const lang = (qs.get('lang') || localStorage.getItem('lang') || 'zh').toLowerCase();
+  const I18N = {
+    zh: {
+      title: '实时汇率换算',
+      amount: '金额',
+      swap: '交换',
+      refresh: '刷新',
+      source: '数据源：exchangerate.host',
+      loading: '加载中…',
+      error: '网络错误',
+      na: '不可用',
+      hint: '点击展开换算',
+    },
+    en: {
+      title: 'Live FX Converter',
+      amount: 'Amount',
+      swap: 'Swap',
+      refresh: 'Refresh',
+      source: 'Source: exchangerate.host',
+      loading: 'Loading…',
+      error: 'Network error',
+      na: 'N/A',
+      hint: 'Click to expand',
+    },
+    de: {
+      title: 'Live Wechselkursrechner',
+      amount: 'Betrag',
+      swap: 'Tauschen',
+      refresh: 'Aktualisieren',
+      source: 'Quelle: exchangerate.host',
+      loading: 'Laden…',
+      error: 'Netzwerkfehler',
+      na: 'Nicht verfügbar',
+      hint: 'Klicken zum Öffnen',
+    }
+  };
+  const T = I18N[lang] || I18N.zh;
+
+  /* ---------- styles ---------- */
   const css = `
-  :root{--fx-bg:#111;--fx-fg:#fff;--fx-line:#333;--fx-shadow:0 8px 28px rgba(0,0,0,.35);}
-  .fx-fab{position:fixed;right:16px;bottom:16px;z-index:99998;border:0;border-radius:999px;
-    padding:12px 14px;background:var(--primary,#2b7de9);color:#fff;font-weight:800;cursor:pointer;
-    box-shadow:0 6px 20px rgba(0,0,0,.18)}
-  .fx-wrap{position:fixed;right:16px;bottom:72px;z-index:99999;background:var(--fx-bg);color:var(--fx-fg);
-    border:1px solid #000;border-radius:14px;box-shadow:var(--fx-shadow);width:320px;max-width:calc(100vw - 32px);display:none}
-  .fx-head{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--fx-line)}
-  .fx-title{font-weight:800}
-  .fx-close{all:unset;cursor:pointer;background:#222;border:1px solid var(--fx-line);padding:4px 8px;border-radius:8px}
-  .fx-body{padding:12px}
-  .fx-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:center}
-  .fx-input,.fx-select{width:100%;padding:8px;border-radius:8px;border:1px solid var(--fx-line);background:#222;color:#fff}
-  .fx-arrow{color:#bbb;text-align:center}
-  .fx-out{margin-top:10px;padding:10px;border:1px solid var(--fx-line);border-radius:10px;background:#1b1b1b;display:flex;align-items:center;justify-content:space-between;min-height:40px}
-  .fx-tools{padding:10px;display:flex;gap:8px}
-  .fx-btn{cursor:pointer;border:1px solid var(--fx-line);background:#222;color:#fff;border-radius:8px;padding:6px 10px}
-  .fx-foot{padding:10px;font-size:12px;color:#9aa;display:flex;justify-content:space-between;border-top:1px solid var(--fx-line)}
+  :root{--fx-bg:#111;--fx-fg:#fff;--fx-line:#333;--fx-shadow:0 14px 44px rgba(0,0,0,.4);}
+  /* 预览条（默认显示） */
+  .fx-mini{position:fixed;right:16px;bottom:16px;z-index:99998;display:flex;gap:10px;align-items:center;
+    padding:12px 14px;border-radius:16px;background:var(--card,#fff);color:var(--text,#111);
+    border:1px solid var(--border,#ddd);box-shadow:0 6px 22px rgba(0,0,0,.12);cursor:pointer}
+  .fx-pill{display:flex;gap:8px;align-items:center;font-weight:800;
+    background:var(--primary,#2b7de9);color:#fff;border-radius:999px;padding:8px 12px}
+  .fx-rates{display:flex;gap:10px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+  .fx-rate{background:#f1f3f5;border:1px solid #e3e6ea;border-radius:10px;padding:6px 8px}
+  .fx-hint{font-size:12px;color:#888;margin-left:4px}
+  /* 大号浮窗（点击展开） */
+  .fx-wrap{position:fixed;right:16px;bottom:84px;z-index:99999;background:var(--fx-bg);color:var(--fx-fg);
+    border:1px solid #000;border-radius:18px;box-shadow:var(--fx-shadow);width:420px;max-width:calc(100vw - 32px);display:none}
+  .fx-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--fx-line)}
+  .fx-title{font-weight:900;font-size:18px;letter-spacing:.2px}
+  .fx-close{all:unset;cursor:pointer;background:#222;border:1px solid var(--fx-line);padding:6px 10px;border-radius:10px}
+  .fx-body{padding:16px}
+  .fx-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:center}
+  .fx-input,.fx-select{width:100%;padding:12px;border-radius:12px;border:1px solid var(--fx-line);background:#222;color:#fff;font-size:16px}
+  .fx-arrow{color:#bbb;text-align:center;font-size:18px}
+  .fx-out{margin-top:12px;padding:12px;border:1px solid var(--fx-line);border-radius:12px;background:#1b1b1b;display:flex;align-items:center;justify-content:space-between;min-height:48px;font-size:16px}
+  .fx-tools{padding:12px;display:flex;gap:10px}
+  .fx-btn{cursor:pointer;border:1px solid var(--fx-line);background:#222;color:#fff;border-radius:10px;padding:8px 12px;font-weight:700}
+  .fx-foot{padding:12px;font-size:12px;color:#9aa;display:flex;justify-content:space-between;border-top:1px solid var(--fx-line)}
   .fx-link{color:#9ec5ff;text-decoration:none}
   `;
-  const style = document.createElement('style'); style.textContent = css; document.head.appendChild(style);
+  const style = document.createElement('style');
+  style.textContent = css;
+  document.head.appendChild(style);
 
-  // ---- dom ----
-  const fab = document.createElement('button');
-  fab.className = 'fx-fab';
-  fab.type = 'button';
-  fab.setAttribute('aria-label','Open FX converter');
-  fab.textContent = '汇率';
+  /* ---------- DOM: 预览条 ---------- */
+  const mini = document.createElement('div');
+  mini.className = 'fx-mini';
+  mini.innerHTML = `
+    <div class="fx-pill">FX</div>
+    <div class="fx-rates" id="fx-mini-rates">
+      <span class="fx-rate">—</span>
+      <span class="fx-rate">—</span>
+      <span class="fx-rate">—</span>
+    </div>
+    <span class="fx-hint">${T.hint}</span>
+  `;
 
+  /* ---------- DOM: 浮窗 ---------- */
   const wrap = document.createElement('section');
   wrap.className = 'fx-wrap';
   wrap.setAttribute('role','dialog');
   wrap.setAttribute('aria-modal','false');
   wrap.innerHTML = `
     <div class="fx-head">
-      <div class="fx-title">实时汇率换算</div>
+      <div class="fx-title">${T.title}</div>
       <button class="fx-close" type="button" aria-label="Close">×</button>
     </div>
     <div class="fx-body">
       <div class="fx-grid">
-        <input class="fx-input" id="fx-amt" type="number" min="0" step="0.01" placeholder="金额">
+        <input class="fx-input" id="fx-amt" type="number" min="0" step="0.01" placeholder="${T.amount}">
         <select class="fx-select" id="fx-from"></select>
         <div class="fx-arrow">→</div>
         <select class="fx-select" id="fx-to"></select>
@@ -431,59 +494,58 @@
         <span id="fx-ts"></span>
       </div>
       <div class="fx-tools">
-        <button class="fx-btn" id="fx-swap" type="button">交换</button>
-        <button class="fx-btn" id="fx-refresh" type="button">刷新</button>
+        <button class="fx-btn" id="fx-swap" type="button">${T.swap}</button>
+        <button class="fx-btn" id="fx-refresh" type="button">${T.refresh}</button>
       </div>
     </div>
     <div class="fx-foot">
-      <span>数据源：exchangerate.host</span>
+      <span>${T.source}</span>
       <a class="fx-link" href="https://exchangerate.host" target="_blank" rel="noopener">API</a>
     </div>
   `;
 
-  document.body.appendChild(fab);
+  document.body.appendChild(mini);
   document.body.appendChild(wrap);
 
   const $ = sel => wrap.querySelector(sel);
   const amt = $('#fx-amt'), fromSel = $('#fx-from'), toSel = $('#fx-to'), res = $('#fx-res'), ts = $('#fx-ts');
+  const miniRatesEl = mini.querySelector('#fx-mini-rates');
 
-  // init selects
-  CCY.forEach(c=>{
-    const o1 = document.createElement('option'); o1.value=c; o1.textContent=c; fromSel.appendChild(o1);
-    const o2 = document.createElement('option'); o2.value=c; o2.textContent=c; toSel.appendChild(o2);
-  });
+  /* ---------- 初始化下拉 ---------- */
+  (function initSelects(){
+    CCY.forEach(c=>{
+      const o1 = document.createElement('option'); o1.value=c; o1.textContent=c; fromSel.appendChild(o1);
+      const o2 = document.createElement('option'); o2.value=c; o2.textContent=c; toSel.appendChild(o2);
+    });
+    try{
+      const saved = JSON.parse(localStorage.getItem(STORE) || '{}');
+      fromSel.value = saved.from || 'CNY';
+      toSel.value = saved.to || 'USD';
+      amt.value = saved.amt ?? 100;
+    }catch{ fromSel.value='CNY'; toSel.value='USD'; amt.value=100; }
+  })();
 
-  // restore last state
-  try{
-    const saved = JSON.parse(localStorage.getItem(STORE) || '{}');
-    fromSel.value = saved.from || 'CNY';
-    toSel.value = saved.to || 'USD';
-    amt.value = saved.amt ?? 100;
-  }catch{ fromSel.value='CNY'; toSel.value='USD'; amt.value=100; }
-
-  // ---- rates cache & fetch with fallback ----
-  let cache = { base: null, ts: 0, rates: null };
+  /* ---------- 汇率缓存与拉取（主源 + 备源） ---------- */
+  let cache = { base: null, ts: 0, rates: null, date: '' };
   const now = () => Date.now();
 
   async function fetchRates(base){
-    // primary
+    // 主源
     try{
       const u = `https://api.exchangerate.host/latest?base=${encodeURIComponent(base)}`;
       const r = await fetch(u, { cache: 'no-store' });
       if(!r.ok) throw new Error('host http');
       const j = await r.json();
       if(!j || !j.rates) throw new Error('host json');
-      cache = { base: j.base || base, ts: now(), rates: j.rates };
-      ts.textContent = j.date || '';
+      cache = { base: j.base || base, ts: now(), rates: j.rates, date: j.date || '' };
       return;
     }catch(e){}
-    // fallback
+    // 备源
     const u2 = `https://open.er-api.com/v6/latest/${encodeURIComponent(base)}`;
     const r2 = await fetch(u2, { cache: 'no-store' });
     const j2 = await r2.json();
     if(j2 && j2.rates){
-      cache = { base: j2.base_code || base, ts: now(), rates: j2.rates };
-      ts.textContent = (j2.time_last_update_utc || '').replace(' at','');
+      cache = { base: j2.base_code || base, ts: now(), rates: j2.rates, date: (j2.time_last_update_utc || '').replace(' at','') };
       return;
     }
     throw new Error('rate fetch failed');
@@ -491,53 +553,78 @@
 
   function fmt(n){ return Number(n).toLocaleString(undefined,{ maximumFractionDigits: DEC }); }
 
-  let polling = null;
+  /* ---------- 计算与渲染 ---------- */
   async function compute(){
     const a = parseFloat(amt.value || '0');
     const from = fromSel.value, to = toSel.value;
-    // persist
     localStorage.setItem(STORE, JSON.stringify({ amt: amt.value, from, to }));
-    if(!a){ res.textContent='—'; return; }
     try{
+      // 当缓存过期或基准变化时刷新（采用 from 作为基准）
       if(cache.base !== from || !cache.rates || (now() - cache.ts) > POLL_MS){
-        res.textContent = '加载中…';
+        res.textContent = T.loading;
         await fetchRates(from);
       }
-      const rate = cache.rates[to];
-      if(rate == null){ res.textContent='N/A'; return; }
-      const out = a * rate;
-      res.textContent = `${from} ${fmt(a)} = ${to} ${fmt(out)}`;
+      // 浮窗结果
+      if(a){
+        const rate = cache.rates[to];
+        if(rate == null){ res.textContent = T.na; ts.textContent=''; }
+        else { res.textContent = `${from} ${fmt(a)} = ${to} ${fmt(a * rate)}`; ts.textContent = cache.date; }
+      }else{
+        res.textContent = '—'; ts.textContent = cache.date || '';
+      }
+      // 预览条三组
+      renderMiniRates();
     }catch(e){
-      res.textContent = '网络错误';
+      res.textContent = T.error;
+      miniRatesEl.innerHTML = `<span class="fx-rate">${T.error}</span>`;
     }
   }
 
-  // listeners
-  [amt, fromSel, toSel].forEach(el => el.addEventListener('input', compute));
-  $('#fx-swap').addEventListener('click', () => { const f=fromSel.value; fromSel.value=toSel.value; toSel.value=f; compute(); });
-  $('#fx-refresh').addEventListener('click', () => { cache.base=null; compute(); });
-  wrap.querySelector('.fx-close').addEventListener('click', () => { wrap.style.display='none'; });
+  function getCross(baseRates, from, to){
+    if(from === cache.base){ return baseRates[to]; }
+    if(to === cache.base){ return 1 / baseRates[from]; }
+    // 交叉： (to/base) / (from/base)
+    return (baseRates[to] != null && baseRates[from] != null) ? (baseRates[to] / baseRates[from]) : null;
+  }
 
-  // FAB toggle + keyboard
-  fab.addEventListener('click', () => {
+  function renderMiniRates(){
+    const out = [];
+    for(const [a,b] of SUMMARY_PAIRS){
+      // 使用当前 cache.base 的表，做交叉汇率
+      const rate = getCross(cache.rates || {}, a, b);
+      out.push(`<span class="fx-rate">${a}/${b} ${rate != null ? fmt(rate) : T.na}</span>`);
+    }
+    miniRatesEl.innerHTML = out.join('');
+  }
+
+  /* ---------- 交互 ---------- */
+  [amt, fromSel, toSel].forEach(el => el.addEventListener('input', compute));
+  wrap.querySelector('.fx-close').addEventListener('click', () => { wrap.style.display='none'; });
+  document.getElementById('fx-refresh')?.addEventListener('click', () => { cache.base=null; compute(); });
+  document.getElementById('fx-swap')?.addEventListener('click', () => {
+    const f = fromSel.value; fromSel.value = toSel.value; toSel.value = f; compute();
+  });
+
+  // 预览条点击 -> 展开/收起
+  mini.addEventListener('click', () => {
     const show = wrap.style.display !== 'block';
     wrap.style.display = show ? 'block' : 'none';
     if(show){ compute(); amt.focus(); }
   });
+
+  // ESC 关闭
   document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') wrap.style.display='none'; });
 
-  // auto refresh loop while open
-  function startPolling(){
-    if(polling) return;
-    polling = setInterval(() => {
-      if(wrap.style.display === 'block'){ cache.base=null; compute(); }
-    }, POLL_MS);
-  }
-  function stopPolling(){ if(polling){ clearInterval(polling); polling=null; } }
-  document.addEventListener('visibilitychange', () => { document.hidden ? stopPolling() : startPolling(); });
-  startPolling();
+  // 自动刷新（仅展开时）
+  let timer = setInterval(() => {
+    if(wrap.style.display === 'block'){ cache.base=null; compute(); }
+  }, POLL_MS);
+  document.addEventListener('visibilitychange', () => {
+    if(document.hidden){ clearInterval(timer); timer=null; }
+    else if(!timer){ timer=setInterval(()=>{ if(wrap.style.display === 'block'){ cache.base=null; compute(); } }, POLL_MS); }
+  });
 
-  // first render
+  // 首次渲染
   compute();
 })();
 </script>
