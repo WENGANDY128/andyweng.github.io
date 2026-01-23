@@ -16,7 +16,6 @@
   <meta name="twitter:title" content="Eindeepseek · 产品精选" />
   <meta name="twitter:description" content="多语言产品展示网站：自动读取文案，仅显示有内容的产品（只识别 PNG）。" />
 
-  <!-- Perf hints -->
   <link rel="dns-prefetch" href="//www.eindeepseek.com">
   <link rel="preconnect" href="https://www.eindeepseek.com" crossorigin>
 
@@ -26,7 +25,7 @@
       --card:#fff; --border:#ddd; --ring:rgba(43,125,233,.18);
       --skeleton:#eef1f5; --skeleton-shimmer:#f7f8fb;
 
-      /* ✅ cookie 出现时自动顶起 FX 的偏移 */
+      /* cookie 出现时用于顶起 FX */
       --cookie-offset: 0px;
     }
     *{box-sizing:border-box}
@@ -45,51 +44,44 @@
     .contactbar a,.contactbar span{background:#fff;border:1px solid var(--border);padding:8px 10px;border-radius:10px;color:var(--text);text-decoration:none;font-size:14px}
     .contactbar a:hover{background:#f1f5ff;border-color:#cfe0ff}
 
-    .grid{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:24px}
+    .grid{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:24px;align-items:start}
     @media(min-width:640px){.grid{grid-template-columns:repeat(2,1fr)}}
     @media(min-width:960px){.grid{grid-template-columns:repeat(3,1fr)}}
 
-    .card{position:relative;overflow:hidden;border-radius:14px;background:var(--card);border:1px solid var(--border);
-      box-shadow:0 2px 10px rgba(0,0,0,.06);transform:translateY(6px);opacity:0;animation:rise .45s ease forwards;
-      transition:transform .18s ease, box-shadow .18s ease;
-
-      /* ✅ 统一卡片高度结构 */
-      display:flex; flex-direction:column; height:100%;
+    .card{
+      position:relative;overflow:hidden;border-radius:14px;background:var(--card);border:1px solid var(--border);
+      box-shadow:0 2px 10px rgba(0,0,0,.06);
+      transform:translateY(6px);opacity:0;animation:rise .45s ease forwards;
+      transition:transform .18s ease, box-shadow .18s ease
     }
     .card:hover{transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,.12)}
     @keyframes rise{to{transform:none;opacity:1}}
 
     .thumb{aspect-ratio:4/3;width:100%;display:block;object-fit:cover;background:#f1f3f5}
 
-    .body{padding:12px 14px 16px; flex:1;} /* ✅ body 吃掉剩余空间 */
+    .body{padding:12px 14px 16px}
     .title{font-weight:800;margin:2px 0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#111}
 
     .desc{
       color:var(--muted);margin:0;line-height:1.55;
       display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
-
-      /* ✅ 即使没有 desc 也保留两行高度，避免产品卡变矮 */
-      min-height: calc(1.55em * 2);
+      min-height: calc(1.55em * 2); /* 保留两行高度 */
     }
 
     .badge{position:absolute;top:10px;left:10px;background:#111;color:#fff;padding:2px 8px;border-radius:999px;font-size:12px;opacity:.85}
 
-    .cardlink{display:block;text-decoration:none;color:inherit; height:100%;}
-    .grid > a.cardlink{height:100%;} /* ✅ grid 里每个 a 都撑满 */
+    .cardlink{display:block;text-decoration:none;color:inherit}
 
     .skeleton{position:relative;overflow:hidden;background:var(--skeleton)}
     .skeleton::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg, transparent, var(--skeleton-shimmer), transparent);animation:shimmer 1.2s infinite}
+    @keyframes shimmer{to{transform:translateX(100%)}}
 
     .qr-thumb{max-width:180px;max-height:180px;margin:16px auto;display:block;border-radius:10px;border:1px solid var(--border);background:#fff}
 
     footer{border-top:1px solid var(--border);text-align:center;padding:14px;color:var(--muted);margin-top:26px}
 
     /* Cookie banner */
-    .cookie-wrap{
-      position:fixed;left:0;right:0;bottom:0;
-      z-index:100000; /* ✅ 必须高于 FX */
-      display:none
-    }
+    .cookie-wrap{position:fixed;left:0;right:0;bottom:0;z-index:100000;display:none}
     .cookie-bar{
       max-width:1200px;margin:10px auto;background:#111;color:#fff;border-radius:12px;padding:14px;border:1px solid #000a;
       display:flex;flex-wrap:wrap;gap:10px;align-items:center;box-shadow:0 6px 24px rgba(0,0,0,.25)
@@ -191,18 +183,22 @@
     };
 
     /* ---------- language & UI texts ---------- */
-    const qs = new URLSearchParams(location.search);
-    const currentLang = (qs.get('lang') || localStorage.getItem('lang') || 'zh').toLowerCase();
+    const pageQS = new URLSearchParams(location.search);
+    const currentLang = (pageQS.get('lang') || localStorage.getItem('lang') || 'zh').toLowerCase();
     localStorage.setItem('lang', currentLang);
     const t = I18N[currentLang] || I18N.zh;
+
     document.getElementById('heading').textContent = t.title;
     document.getElementById('sub').textContent = t.sub;
 
     [...document.querySelectorAll('#langSwitcher button')].forEach(b=>{
       if(b.dataset.lang===currentLang) b.classList.add('active');
       b.onclick=()=>{
-        const lang=b.dataset.lang;localStorage.setItem('lang',lang);
-        const url=new URL(location.href);url.searchParams.set('lang',lang);location.href=url.toString();
+        const lang=b.dataset.lang;
+        localStorage.setItem('lang',lang);
+        const url=new URL(location.href);
+        url.searchParams.set('lang',lang);
+        location.href=url.toString();
       };
     });
 
@@ -234,19 +230,16 @@
     const consentKey='cookieConsent:v1';
     const saved = localStorage.getItem(consentKey);
 
-    /* ✅ cookie 出现时自动计算高度并顶起 FX */
+    // cookie 顶起 FX
     const cookieWrap = document.getElementById('cookieWrap');
     const cookieBar  = document.getElementById('cookieBar');
     function setCookieOffset(px){
       document.documentElement.style.setProperty('--cookie-offset', (px || 0) + 'px');
     }
     function calcCookieOffset(){
-      // cookieBar 高度 + 外边距（大约 20px）
-      const h = (cookieBar?.offsetHeight || 0) + 20;
-      return h;
+      return (cookieBar?.offsetHeight || 0) + 20;
     }
 
-    // zh: 不展示弹窗，直接启用 GA
     if(currentLang==='zh'){
       loadGA();
       setCookieOffset(0);
@@ -266,14 +259,14 @@
       }
 
       if(!saved){
-        disableGA(); // 默认不加载
+        disableGA();
         show();
       }else{
         try{
           const st = JSON.parse(saved);
           if(st.status==='accepted') loadGA(); else disableGA();
         }catch{ disableGA(); }
-        hide(); // 有记录就不显示，并确保 offset=0
+        hide();
       }
 
       document.getElementById('cookieAccept').onclick=()=>{
@@ -285,7 +278,6 @@
         hide(); disableGA();
       };
 
-      // 视口变化时重新计算 cookie 高度（如果正在显示）
       window.addEventListener('resize', ()=>{
         if(cookieWrap.style.display==='block'){
           setCookieOffset(calcCookieOffset());
@@ -294,33 +286,31 @@
     }
 
     /* ---------- content building ---------- */
-    function fetchWithTimeout(url,ms=1500){
-      const ctl=new AbortController(); const id=setTimeout(()=>ctl.abort(),ms);
+    function fetchWithTimeout(url,ms=2500){
+      const ctl=new AbortController();
+      const id=setTimeout(()=>ctl.abort(),ms);
       return fetch(url,{cache:'no-store',signal:ctl.signal}).finally(()=>clearTimeout(id));
     }
     async function tryJson(url){
-      try{ const r=await fetchWithTimeout(url,2000); if(r.ok) return await r.json(); }
-      catch(e){}
+      try{ const r=await fetchWithTimeout(url,2500); if(r.ok) return await r.json(); }catch(e){}
       return null;
     }
     async function existsAny(url){
-      try{ const r=await fetchWithTimeout(url,1200); return r.ok; }catch(e){ return false; }
+      try{ const r=await fetchWithTimeout(url,1800); return r.ok; }catch(e){ return false; }
     }
 
-    /* ---------- 资讯卡配置 & 渲染 ---------- */
+    // ✅ 资讯卡：不再做“存在性预检测”，改为 img onerror 自动 fallback
+    function insightThumbHTML(img, altText){
+      const safeAlt = (altText || '').replace(/"/g,'&quot;');
+      return `
+        <img class="thumb" src="${img}" alt="${safeAlt}" loading="lazy" decoding="async"
+          onerror="this.outerHTML='<div class=&quot;thumb&quot; style=&quot;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px&quot;>ℹ️</div>'">
+      `;
+    }
+
     const INSIGHT_CARDS = [
-      {
-        href: '/insights/cbam-2026.html',
-        img:  '/insights/1.png',
-        badge:'EU·CBAM',
-        titleKey:'cbamTitle', descKey:'cbamDesc'
-      },
-      {
-        href: '/insights/us-eu-dependency.html',
-        img:  '/insights/2.png',
-        badge:'Market',
-        titleKey:'depTitle', descKey:'depDesc'
-      }
+      { href:'/insights/cbam-2026.html', img:'/insights/1.png', badge:'EU·CBAM', titleKey:'cbamTitle', descKey:'cbamDesc' },
+      { href:'/insights/us-eu-dependency.html', img:'/insights/2.png', badge:'Market',  titleKey:'depTitle',  descKey:'depDesc' }
     ];
 
     async function addInsightCards(grid){
@@ -328,20 +318,13 @@
         const tl = (I18N[currentLang] && I18N[currentLang][c.titleKey]) || I18N.en[c.titleKey];
         const ds = (I18N[currentLang] && I18N[currentLang][c.descKey])  || I18N.en[c.descKey];
 
-        let thumb = `<div class="thumb" style="display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px">ℹ️</div>`;
-        try{
-          if(c.img && await existsAny(c.img)){
-            thumb = `<img class="thumb" src="${c.img}" alt="${tl}" loading="lazy" decoding="async">`;
-          }
-        }catch{}
-
         const a = document.createElement('a');
         a.className = 'cardlink';
         a.href = c.href;
         a.target = '_blank';
         a.rel = 'noopener';
         a.innerHTML = `<article class="card">
-            ${thumb}
+            ${insightThumbHTML(c.img, tl)}
             <div class="body">
               <div class="title">${tl}</div>
               <p class="desc">${ds}</p>
@@ -353,12 +336,13 @@
     }
 
     async function build(){
-      const grid=document.getElementById('grid'); grid.innerHTML='';
+      const grid=document.getElementById('grid');
+      grid.innerHTML='';
 
-      // 先渲染资讯卡
+      // 资讯卡
       await addInsightCards(grid);
 
-      // 再渲染群二维码卡
+      // 群二维码卡（保留原逻辑：找到存在的文件再渲染）
       try{
         const qrCandidates=['group.jpeg','group.jpg','group.png','group.webp'];
         for(const u of qrCandidates){
@@ -380,7 +364,7 @@
         }
       }catch{}
 
-      // 产品卡渲染
+      // 产品卡
       const mf = await (async()=>{
         for(const u of ['manifest.json','/manifest.json','./manifest.json']){
           const d = await tryJson(u); if(d) return d;
@@ -404,8 +388,6 @@
         const a = document.createElement('a');
         a.className='cardlink';
         a.href=hrefURL.toString();
-
-        // ✅ 产品卡即使没 desc，也会占两行高度（由 CSS min-height 保证）
         a.innerHTML = `<article class="card">
             <img class="thumb" src="${img}" alt="${title}" loading="lazy" decoding="async">
             <div class="body">
@@ -416,52 +398,61 @@
           </article>`;
         grid.appendChild(a);
       }
-
-      if(grid.children.length===0){
-        const div=document.createElement('div');
-        div.style.color='#666';
-        div.textContent='暂无可展示的产品（请检查 /manifest.json 或对应目录下是否存在 1.png）。';
-        grid.appendChild(div);
-      }
     }
 
     build();
     document.getElementById('y').textContent=new Date().getFullYear();
   </script>
 
-  <!-- ▼▼ 多语言实时汇率（预览条 + 大号换算浮窗） ▼▼ -->
+  <!-- ▼▼ FX：支持底部条 / 侧边缩小（手机默认侧边） ▼▼ -->
   <script>
   (() => {
-    /* ---------- config ---------- */
     const CCY = ['CNY','USD','EUR','TWD'];
-    const SUMMARY_PAIRS = [
-      ['USD','CNY'],
-      ['EUR','USD'],
-      ['EUR','CNY'],
-    ];
+    const SUMMARY_PAIRS = [['USD','CNY'],['EUR','USD'],['EUR','CNY']];
     const DEC = 4;
     const POLL_MS = 5 * 60 * 1000;
-    const STORE = 'fxWidget:v2';
+    const STORE = 'fxWidget:v3';
+    const DOCK_KEY = 'fxDock:v1'; // bottom | side
 
-    /* ---------- i18n ---------- */
-    const qs = new URLSearchParams(location.search);
-    const lang = (qs.get('lang') || localStorage.getItem('lang') || 'zh').toLowerCase();
+    const fxQS = new URLSearchParams(location.search);
+    const lang = (fxQS.get('lang') || localStorage.getItem('lang') || 'zh').toLowerCase();
+
     const I18N = {
-      zh: { title:'实时汇率换算', amount:'金额', swap:'交换', refresh:'刷新', source:'数据源：exchangerate.host', loading:'加载中…', error:'网络错误', na:'不可用', hint:'点击展开换算' },
-      en: { title:'Live FX Converter', amount:'Amount', swap:'Swap', refresh:'Refresh', source:'Source: exchangerate.host', loading:'Loading…', error:'Network error', na:'N/A', hint:'Click to expand' },
-      de: { title:'Live Wechselkursrechner', amount:'Betrag', swap:'Tauschen', refresh:'Aktualisieren', source:'Quelle: exchangerate.host', loading:'Laden…', error:'Netzwerkfehler', na:'Nicht verfügbar', hint:'Klicken zum Öffnen' }
+      zh:{ title:'实时汇率换算',amount:'金额',swap:'交换',refresh:'刷新',source:'数据源：exchangerate.host',loading:'加载中…',error:'网络错误',na:'不可用',
+          hintBottom:'点击展开换算',hintSide:'点我换算',dockSide:'缩到侧边',dockBottom:'放到底部' },
+      en:{ title:'Live FX Converter',amount:'Amount',swap:'Swap',refresh:'Refresh',source:'Source: exchangerate.host',loading:'Loading…',error:'Network error',na:'N/A',
+          hintBottom:'Click to expand',hintSide:'Tap to open',dockSide:'Dock to side',dockBottom:'Dock to bottom' },
+      de:{ title:'Live Wechselkursrechner',amount:'Betrag',swap:'Tauschen',refresh:'Aktualisieren',source:'Quelle: exchangerate.host',loading:'Laden…',error:'Netzwerkfehler',na:'Nicht verfügbar',
+          hintBottom:'Klicken zum Öffnen',hintSide:'Tippen zum Öffnen',dockSide:'An Seite',dockBottom:'Unten' }
     };
     const T = I18N[lang] || I18N.zh;
 
-    /* ---------- styles ---------- */
+    const isMobile = window.matchMedia && window.matchMedia('(max-width: 640px)').matches;
+
+    let dock = localStorage.getItem(DOCK_KEY);
+    if(dock !== 'bottom' && dock !== 'side'){
+      dock = isMobile ? 'side' : 'bottom';
+      localStorage.setItem(DOCK_KEY, dock);
+    }
+    function applyDock(){
+      document.documentElement.setAttribute('data-fx-dock', dock);
+      hint.textContent = (dock === 'side') ? T.hintSide : T.hintBottom;
+      dockBtn.textContent = (dock === 'side') ? T.dockBottom : T.dockSide;
+    }
+    function toggleDock(){
+      dock = (dock === 'side') ? 'bottom' : 'side';
+      localStorage.setItem(DOCK_KEY, dock);
+      applyDock();
+    }
+
     const css = `
     :root{--fx-bg:#111;--fx-fg:#fff;--fx-line:#333;--fx-shadow:0 14px 44px rgba(0,0,0,.4);}
+
     .fx-mini{
-      position:fixed;right:16px;
-      bottom: calc(16px + var(--cookie-offset, 0px)); /* ✅ 被 cookie 顶起 */
-      z-index:99998;display:flex;gap:10px;align-items:center;
+      position:fixed;z-index:99998;display:flex;gap:10px;align-items:center;
       padding:12px 14px;border-radius:16px;background:var(--card,#fff);color:var(--text,#111);
-      border:1px solid var(--border,#ddd);box-shadow:0 6px 22px rgba(0,0,0,.12);cursor:pointer
+      border:1px solid var(--border,#ddd);box-shadow:0 6px 22px rgba(0,0,0,.12);cursor:pointer;
+      right:16px; bottom: calc(16px + var(--cookie-offset, 0px));
     }
     .fx-pill{display:flex;gap:8px;align-items:center;font-weight:800;background:var(--primary,#2b7de9);color:#fff;border-radius:999px;padding:8px 12px}
     .fx-rates{display:flex;gap:10px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
@@ -469,14 +460,17 @@
     .fx-hint{font-size:12px;color:#888;margin-left:4px}
 
     .fx-wrap{
-      position:fixed;right:16px;
-      bottom: calc(84px + var(--cookie-offset, 0px)); /* ✅ 被 cookie 顶起 */
+      position:fixed;right:16px;bottom: calc(84px + var(--cookie-offset, 0px));
       z-index:99999;background:var(--fx-bg);color:var(--fx-fg);
-      border:1px solid #000;border-radius:18px;box-shadow:var(--fx-shadow);width:420px;max-width:calc(100vw - 32px);display:none
+      border:1px solid #000;border-radius:18px;box-shadow:var(--fx-shadow);
+      width:420px;max-width:calc(100vw - 32px);display:none
     }
-    .fx-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--fx-line)}
+    .fx-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--fx-line);gap:10px}
     .fx-title{font-weight:900;font-size:18px;letter-spacing:.2px}
+    .fx-head-right{display:flex;gap:8px;align-items:center}
+    .fx-btn-mini{all:unset;cursor:pointer;background:#222;border:1px solid var(--fx-line);padding:6px 10px;border-radius:10px;font-weight:800;color:#fff;font-size:12px}
     .fx-close{all:unset;cursor:pointer;background:#222;border:1px solid var(--fx-line);padding:6px 10px;border-radius:10px}
+
     .fx-body{padding:16px}
     .fx-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:center}
     .fx-input,.fx-select{width:100%;padding:12px;border-radius:12px;border:1px solid var(--fx-line);background:#222;color:#fff;font-size:16px}
@@ -486,12 +480,46 @@
     .fx-btn{cursor:pointer;border:1px solid var(--fx-line);background:#222;color:#fff;border-radius:10px;padding:8px 12px;font-weight:700}
     .fx-foot{padding:12px;font-size:12px;color:#9aa;display:flex;justify-content:space-between;border-top:1px solid var(--fx-line)}
     .fx-link{color:#9ec5ff;text-decoration:none}
+
+    /* ===== 侧边缩小模式 ===== */
+    html[data-fx-dock="side"] .fx-mini{
+      bottom:auto;
+      top: calc(50% - 28px);
+      right: 8px;
+      padding:10px 10px;
+      border-radius:999px;
+      gap:8px;
+      transform: translateY(-50%);
+    }
+    html[data-fx-dock="side"] .fx-rates{display:none;}
+    html[data-fx-dock="side"] .fx-hint{display:none;}
+    html[data-fx-dock="side"] .fx-pill{padding:10px 12px;}
+    html[data-fx-dock="side"] .fx-mini::after{
+      content:"FX";
+      font-weight:900;
+      margin-left:6px;
+      color:var(--text,#111);
+      opacity:.85;
+    }
+    /* 侧边模式下，弹窗位置更居中 */
+    html[data-fx-dock="side"] .fx-wrap{
+      bottom:auto;
+      top: 50%;
+      right: 16px;
+      transform: translateY(-50%);
+    }
+    @media(max-width:640px){
+      html[data-fx-dock="side"] .fx-wrap{
+        right: 12px;
+        width: min(420px, calc(100vw - 24px));
+      }
+    }
     `;
     const style = document.createElement('style');
     style.textContent = css;
     document.head.appendChild(style);
 
-    /* ---------- DOM: 预览条 ---------- */
+    /* ---------- DOM ---------- */
     const mini = document.createElement('div');
     mini.className = 'fx-mini';
     mini.innerHTML = `
@@ -501,10 +529,9 @@
         <span class="fx-rate">—</span>
         <span class="fx-rate">—</span>
       </div>
-      <span class="fx-hint">${T.hint}</span>
+      <span class="fx-hint" id="fx-hint">${T.hintBottom}</span>
     `;
 
-    /* ---------- DOM: 浮窗 ---------- */
     const wrap = document.createElement('section');
     wrap.className = 'fx-wrap';
     wrap.setAttribute('role','dialog');
@@ -512,7 +539,10 @@
     wrap.innerHTML = `
       <div class="fx-head">
         <div class="fx-title">${T.title}</div>
-        <button class="fx-close" type="button" aria-label="Close">×</button>
+        <div class="fx-head-right">
+          <button class="fx-btn-mini" id="fx-dock" type="button"></button>
+          <button class="fx-close" type="button" aria-label="Close">×</button>
+        </div>
       </div>
       <div class="fx-body">
         <div class="fx-grid">
@@ -539,11 +569,17 @@
     document.body.appendChild(mini);
     document.body.appendChild(wrap);
 
+    const hint = mini.querySelector('#fx-hint');
+    const miniRatesEl = mini.querySelector('#fx-mini-rates');
+    const dockBtn = wrap.querySelector('#fx-dock');
+
+    applyDock();
+    dockBtn.addEventListener('click', (e)=>{ e.stopPropagation(); toggleDock(); });
+
     const $ = sel => wrap.querySelector(sel);
     const amt = $('#fx-amt'), fromSel = $('#fx-from'), toSel = $('#fx-to'), res = $('#fx-res'), ts = $('#fx-ts');
-    const miniRatesEl = mini.querySelector('#fx-mini-rates');
 
-    /* ---------- 初始化下拉 ---------- */
+    /* ---------- init selects ---------- */
     (function initSelects(){
       CCY.forEach(c=>{
         const o1 = document.createElement('option'); o1.value=c; o1.textContent=c; fromSel.appendChild(o1);
@@ -554,10 +590,12 @@
         fromSel.value = saved.from || 'CNY';
         toSel.value = saved.to || 'USD';
         amt.value = saved.amt ?? 100;
-      }catch{ fromSel.value='CNY'; toSel.value='USD'; amt.value=100; }
+      }catch{
+        fromSel.value='CNY'; toSel.value='USD'; amt.value=100;
+      }
     })();
 
-    /* ---------- 汇率缓存与拉取（主源 + 备源） ---------- */
+    /* ---------- rate fetch (primary + fallback) ---------- */
     let cache = { base: null, ts: 0, rates: null, date: '' };
     const now = () => Date.now();
 
@@ -581,12 +619,30 @@
       throw new Error('rate fetch failed');
     }
 
-    function fmt(n){ return Number(n).toLocaleString(undefined,{ maximumFractionDigits: 4 }); }
+    function fmt(n){
+      return Number(n).toLocaleString(undefined,{ maximumFractionDigits: DEC });
+    }
+
+    function getCross(baseRates, from, to){
+      if(from === cache.base) return baseRates[to];
+      if(to === cache.base) return 1 / baseRates[from];
+      return (baseRates[to] != null && baseRates[from] != null) ? (baseRates[to] / baseRates[from]) : null;
+    }
+
+    function renderMiniRates(){
+      const out = [];
+      for(const [a,b] of SUMMARY_PAIRS){
+        const rate = getCross(cache.rates || {}, a, b);
+        out.push(`<span class="fx-rate">${a}/${b} ${rate != null ? fmt(rate) : T.na}</span>`);
+      }
+      miniRatesEl.innerHTML = out.join('');
+    }
 
     async function compute(){
       const a = parseFloat(amt.value || '0');
       const from = fromSel.value, to = toSel.value;
       localStorage.setItem(STORE, JSON.stringify({ amt: amt.value, from, to }));
+
       try{
         if(cache.base !== from || !cache.rates || (now() - cache.ts) > POLL_MS){
           res.textContent = T.loading;
@@ -606,25 +662,12 @@
       }
     }
 
-    function getCross(baseRates, from, to){
-      if(from === cache.base){ return baseRates[to]; }
-      if(to === cache.base){ return 1 / baseRates[from]; }
-      return (baseRates[to] != null && baseRates[from] != null) ? (baseRates[to] / baseRates[from]) : null;
-    }
-
-    function renderMiniRates(){
-      const out = [];
-      for(const [a,b] of SUMMARY_PAIRS){
-        const rate = getCross(cache.rates || {}, a, b);
-        out.push(`<span class="fx-rate">${a}/${b} ${rate != null ? fmt(rate) : T.na}</span>`);
-      }
-      miniRatesEl.innerHTML = out.join('');
-    }
-
+    /* ---------- interactions ---------- */
     [amt, fromSel, toSel].forEach(el => el.addEventListener('input', compute));
+
     wrap.querySelector('.fx-close').addEventListener('click', () => { wrap.style.display='none'; });
-    document.getElementById('fx-refresh')?.addEventListener('click', () => { cache.base=null; compute(); });
-    document.getElementById('fx-swap')?.addEventListener('click', () => {
+    $('#fx-refresh')?.addEventListener('click', () => { cache.base=null; compute(); });
+    $('#fx-swap')?.addEventListener('click', () => {
       const f = fromSel.value; fromSel.value = toSel.value; toSel.value = f; compute();
     });
 
@@ -639,6 +682,7 @@
     let timer = setInterval(() => {
       if(wrap.style.display === 'block'){ cache.base=null; compute(); }
     }, POLL_MS);
+
     document.addEventListener('visibilitychange', () => {
       if(document.hidden){ clearInterval(timer); timer=null; }
       else if(!timer){ timer=setInterval(()=>{ if(wrap.style.display === 'block'){ cache.base=null; compute(); } }, POLL_MS); }
