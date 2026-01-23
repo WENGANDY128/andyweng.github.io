@@ -25,6 +25,9 @@
       --bg:#f7f8fa; --text:#222; --muted:#555; --primary:#2b7de9;
       --card:#fff; --border:#ddd; --ring:rgba(43,125,233,.18);
       --skeleton:#eef1f5; --skeleton-shimmer:#f7f8fb;
+
+      /* ✅ cookie 出现时自动顶起 FX 的偏移 */
+      --cookie-offset: 0px;
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--text)}
@@ -45,15 +48,34 @@
     .grid{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:24px}
     @media(min-width:640px){.grid{grid-template-columns:repeat(2,1fr)}}
     @media(min-width:960px){.grid{grid-template-columns:repeat(3,1fr)}}
-    .card{position:relative;overflow:hidden;border-radius:14px;background:var(--card);border:1px solid var(--border);box-shadow:0 2px 10px rgba(0,0,0,.06);transform:translateY(6px);opacity:0;animation:rise .45s ease forwards;transition:transform .18s ease, box-shadow .18s ease}
+
+    .card{position:relative;overflow:hidden;border-radius:14px;background:var(--card);border:1px solid var(--border);
+      box-shadow:0 2px 10px rgba(0,0,0,.06);transform:translateY(6px);opacity:0;animation:rise .45s ease forwards;
+      transition:transform .18s ease, box-shadow .18s ease;
+
+      /* ✅ 统一卡片高度结构 */
+      display:flex; flex-direction:column; height:100%;
+    }
     .card:hover{transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,.12)}
     @keyframes rise{to{transform:none;opacity:1}}
+
     .thumb{aspect-ratio:4/3;width:100%;display:block;object-fit:cover;background:#f1f3f5}
-    .body{padding:12px 14px 16px}
+
+    .body{padding:12px 14px 16px; flex:1;} /* ✅ body 吃掉剩余空间 */
     .title{font-weight:800;margin:2px 0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#111}
-    .desc{color:var(--muted);margin:0;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+    .desc{
+      color:var(--muted);margin:0;line-height:1.55;
+      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+
+      /* ✅ 即使没有 desc 也保留两行高度，避免产品卡变矮 */
+      min-height: calc(1.55em * 2);
+    }
+
     .badge{position:absolute;top:10px;left:10px;background:#111;color:#fff;padding:2px 8px;border-radius:999px;font-size:12px;opacity:.85}
-    .cardlink{display:block;text-decoration:none;color:inherit}
+
+    .cardlink{display:block;text-decoration:none;color:inherit; height:100%;}
+    .grid > a.cardlink{height:100%;} /* ✅ grid 里每个 a 都撑满 */
 
     .skeleton{position:relative;overflow:hidden;background:var(--skeleton)}
     .skeleton::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg, transparent, var(--skeleton-shimmer), transparent);animation:shimmer 1.2s infinite}
@@ -63,8 +85,15 @@
     footer{border-top:1px solid var(--border);text-align:center;padding:14px;color:var(--muted);margin-top:26px}
 
     /* Cookie banner */
-    .cookie-wrap{position:fixed;left:0;right:0;bottom:0;z-index:50;display:none}
-    .cookie-bar{max-width:1200px;margin:10px auto;background:#111;color:#fff;border-radius:12px;padding:14px;border:1px solid #000a;display:flex;flex-wrap:wrap;gap:10px;align-items:center;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+    .cookie-wrap{
+      position:fixed;left:0;right:0;bottom:0;
+      z-index:100000; /* ✅ 必须高于 FX */
+      display:none
+    }
+    .cookie-bar{
+      max-width:1200px;margin:10px auto;background:#111;color:#fff;border-radius:12px;padding:14px;border:1px solid #000a;
+      display:flex;flex-wrap:wrap;gap:10px;align-items:center;box-shadow:0 6px 24px rgba(0,0,0,.25)
+    }
     .cookie-bar p{margin:0;line-height:1.5;flex:1 1 320px;color:#e6e6e6}
     .cookie-bar a{color:#9ec5ff}
     .cookie-actions{display:flex;gap:8px}
@@ -100,7 +129,7 @@
 
   <!-- Cookie banner (only shows for EN/DE) -->
   <div class="cookie-wrap" id="cookieWrap" aria-live="polite">
-    <div class="cookie-bar">
+    <div class="cookie-bar" id="cookieBar">
       <p id="cookieText">
         We use cookies (only Google Analytics) to understand traffic and improve our site. You can accept or reject non-essential cookies.
         See our <a href="/privacy.html" target="_blank" rel="noopener">Privacy Notice</a>.
@@ -121,7 +150,6 @@
         groupTitle:'加入 WhatsApp 群组',
         groupDesc:'扫码二维码，进入我们的贸易 & 物流交流群。',
         email:'邮件',whats:'WhatsApp',phone:'电话',wechat:'微信',wuxing:'五星阀门官网',
-        /* 新增：资讯卡文案 */
         cbamTitle:'CBAM 2026：需交“碳证”，<50t/年或可免',
         cbamDesc:'时间线/默认值/成本与我们能提供的合规+低碳运价方案。',
         depTitle:'研究：美国对欧进口依赖超过对中国',
@@ -133,7 +161,6 @@
         groupTitle:'Join WhatsApp Group',
         groupDesc:'Scan the QR code to join our trade & logistics group.',
         email:'Email',whats:'WhatsApp',phone:'Phone',wechat:'WeChat',wuxing:'Wuxing Valve Website',
-        /* New: insight copy */
         cbamTitle:'CBAM 2026: Certificates required; <50t/year may be exempt',
         cbamDesc:'Timeline, default values, cost structure + our compliance & low-carbon offer.',
         depTitle:'Study: US import dependence on EU now exceeds China',
@@ -145,7 +172,6 @@
         groupTitle:'WhatsApp-Gruppe beitreten',
         groupDesc:'QR-Code scannen, um unserer Handels- & Logistik-Gruppe beizutreten.',
         email:'E-Mail',whats:'WhatsApp',phone:'Telefon',wechat:'WeChat',wuxing:'Wuxing Valve Webseite',
-        /* Neu: Insight-Texte */
         cbamTitle:'CBAM 2026: Zertifikate Pflicht; <50 t/Jahr evtl. befreit',
         cbamDesc:'Zeitplan, Default-Werte, Kostenstruktur + unser Compliance/Low-Carbon-Paket.',
         depTitle:'Studie: US-Importabhängigkeit von der EU überholt China',
@@ -184,7 +210,7 @@
     document.getElementById('contactBar').innerHTML=`
       <a href="mailto:${CONTACT.email}">📧 ${t.email}: ${CONTACT.email}</a>
       <a href="https://wa.me/${CONTACT.whatsapp.replace(/[^0-9]/g,'')}" target="_blank" rel="noopener">💬 ${t.whats}</a>
-      <a href="tel:${CONTACT.phone.replace(/\\s/g,'')}">📞 ${t.phone}: ${CONTACT.phone}</a>
+      <a href="tel:${CONTACT.phone.replace(/\s/g,'')}">📞 ${t.phone}: ${CONTACT.phone}</a>
       <span>🟩 ${t.wechat}: ${CONTACT.wechat}</span>
       <a href="wuxingvalve.html" target="_blank" rel="noopener">🔗 ${t.wuxing}</a>
     `;
@@ -208,19 +234,36 @@
     const consentKey='cookieConsent:v1';
     const saved = localStorage.getItem(consentKey);
 
+    /* ✅ cookie 出现时自动计算高度并顶起 FX */
+    const cookieWrap = document.getElementById('cookieWrap');
+    const cookieBar  = document.getElementById('cookieBar');
+    function setCookieOffset(px){
+      document.documentElement.style.setProperty('--cookie-offset', (px || 0) + 'px');
+    }
+    function calcCookieOffset(){
+      // cookieBar 高度 + 外边距（大约 20px）
+      const h = (cookieBar?.offsetHeight || 0) + 20;
+      return h;
+    }
+
     // zh: 不展示弹窗，直接启用 GA
     if(currentLang==='zh'){
       loadGA();
+      setCookieOffset(0);
     }else{
-      // 非中文：没有记录则显示；已记录则按选择执行
-      const wrap = document.getElementById('cookieWrap');
       const cTxt = COOKIE_TXT[currentLang] || COOKIE_TXT.en;
       document.getElementById('cookieText').innerHTML = cTxt.text;
       document.getElementById('cookieAccept').textContent = cTxt.accept;
       document.getElementById('cookieReject').textContent = cTxt.reject;
 
-      function show(){ wrap.style.display='block'; }
-      function hide(){ wrap.style.display='none'; }
+      function show(){
+        cookieWrap.style.display='block';
+        setCookieOffset(calcCookieOffset());
+      }
+      function hide(){
+        cookieWrap.style.display='none';
+        setCookieOffset(0);
+      }
 
       if(!saved){
         disableGA(); // 默认不加载
@@ -230,7 +273,9 @@
           const st = JSON.parse(saved);
           if(st.status==='accepted') loadGA(); else disableGA();
         }catch{ disableGA(); }
+        hide(); // 有记录就不显示，并确保 offset=0
       }
+
       document.getElementById('cookieAccept').onclick=()=>{
         localStorage.setItem(consentKey, JSON.stringify({status:'accepted',ts:Date.now()}));
         hide(); loadGA();
@@ -239,6 +284,13 @@
         localStorage.setItem(consentKey, JSON.stringify({status:'rejected',ts:Date.now()}));
         hide(); disableGA();
       };
+
+      // 视口变化时重新计算 cookie 高度（如果正在显示）
+      window.addEventListener('resize', ()=>{
+        if(cookieWrap.style.display==='block'){
+          setCookieOffset(calcCookieOffset());
+        }
+      });
     }
 
     /* ---------- content building ---------- */
@@ -251,22 +303,21 @@
       catch(e){}
       return null;
     }
-    async function existsPng(url){
-      try{ const r=await fetchWithTimeout(url,1200); if(r.ok) return true; }catch(e){}
-      try{ const r2=await fetchWithTimeout(url,1200); return r2.ok; }catch(e){ return false; }
+    async function existsAny(url){
+      try{ const r=await fetchWithTimeout(url,1200); return r.ok; }catch(e){ return false; }
     }
 
-    /* ---------- 新增：资讯卡配置 & 渲染 ---------- */
+    /* ---------- 资讯卡配置 & 渲染 ---------- */
     const INSIGHT_CARDS = [
       {
-        href: '/insights/cbam-2026.html',        // 你的 CBAM 一页文
-        img:  '/insights/1.png',        // 可选：没有也行
+        href: '/insights/cbam-2026.html',
+        img:  '/insights/1.png',
         badge:'EU·CBAM',
         titleKey:'cbamTitle', descKey:'cbamDesc'
       },
       {
-        href: '/insights/us-eu-dependency.html', // 你的 US-EU 研究一页文
-        img:  '/insights/2.png',       // 可选：没有也行
+        href: '/insights/us-eu-dependency.html',
+        img:  '/insights/2.png',
         badge:'Market',
         titleKey:'depTitle', descKey:'depDesc'
       }
@@ -279,7 +330,7 @@
 
         let thumb = `<div class="thumb" style="display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px">ℹ️</div>`;
         try{
-          if(c.img && await existsPng(c.img)){
+          if(c.img && await existsAny(c.img)){
             thumb = `<img class="thumb" src="${c.img}" alt="${tl}" loading="lazy" decoding="async">`;
           }
         }catch{}
@@ -304,14 +355,14 @@
     async function build(){
       const grid=document.getElementById('grid'); grid.innerHTML='';
 
-      /* 先渲染资讯卡 —— 打开首页就能看到 */
+      // 先渲染资讯卡
       await addInsightCards(grid);
 
-      /* 再渲染群二维码卡 */
+      // 再渲染群二维码卡
       try{
         const qrCandidates=['group.jpeg','group.jpg','group.png','group.webp'];
         for(const u of qrCandidates){
-          if(await existsPng(u)){
+          if(await existsAny(u)){
             const a=document.createElement('a'); a.className='cardlink'; a.href=u;
             a.onclick=()=>{ try{gtag('event','click_group');}catch(e){} };
             a.innerHTML=`<article class="card">
@@ -329,7 +380,7 @@
         }
       }catch{}
 
-      /* 产品卡渲染（保持原逻辑） */
+      // 产品卡渲染
       const mf = await (async()=>{
         for(const u of ['manifest.json','/manifest.json','./manifest.json']){
           const d = await tryJson(u); if(d) return d;
@@ -344,13 +395,17 @@
         const slug = `product-${id}`;
         const img = `assets/imgs/${slug}/1.png`;
 
-        if(!(await existsPng(img))) continue;
+        if(!(await existsAny(img))) continue;
 
         const title = it?.title?.[currentLang] || it?.title?.en || it?.title?.zh || `Product ${id}`;
         const hrefURL = new URL(it?.href || `products/${slug}.html`, location.href);
         hrefURL.searchParams.set('lang', currentLang);
 
-        const a = document.createElement('a'); a.className='cardlink'; a.href=hrefURL.toString();
+        const a = document.createElement('a');
+        a.className='cardlink';
+        a.href=hrefURL.toString();
+
+        // ✅ 产品卡即使没 desc，也会占两行高度（由 CSS min-height 保证）
         a.innerHTML = `<article class="card">
             <img class="thumb" src="${img}" alt="${title}" loading="lazy" decoding="async">
             <div class="body">
@@ -372,262 +427,225 @@
 
     build();
     document.getElementById('y').textContent=new Date().getFullYear();
-</script>
+  </script>
 
-<!-- ▼▼ 新增：多语言实时汇率（预览条 + 大号换算浮窗） ▼▼ -->
-<script>
-(() => {
-  /* ---------- config ---------- */
-  const CCY = ['CNY','USD','EUR','TWD'];              // 可自行增删
-  const SUMMARY_PAIRS = [                             // 预览条展示的三组
-    ['USD','CNY'],
-    ['EUR','USD'],
-    ['EUR','CNY'],
-  ];
-  const DEC = 4;                                      // 小数位
-  const POLL_MS = 5 * 60 * 1000;                      // 5 分钟自动刷新
-  const STORE = 'fxWidget:v2';
+  <!-- ▼▼ 多语言实时汇率（预览条 + 大号换算浮窗） ▼▼ -->
+  <script>
+  (() => {
+    /* ---------- config ---------- */
+    const CCY = ['CNY','USD','EUR','TWD'];
+    const SUMMARY_PAIRS = [
+      ['USD','CNY'],
+      ['EUR','USD'],
+      ['EUR','CNY'],
+    ];
+    const DEC = 4;
+    const POLL_MS = 5 * 60 * 1000;
+    const STORE = 'fxWidget:v2';
 
-  /* ---------- i18n (auto from URL/localStorage) ---------- */
-  const qs = new URLSearchParams(location.search);
-  const lang = (qs.get('lang') || localStorage.getItem('lang') || 'zh').toLowerCase();
-  const I18N = {
-    zh: {
-      title: '实时汇率换算',
-      amount: '金额',
-      swap: '交换',
-      refresh: '刷新',
-      source: '数据源：exchangerate.host',
-      loading: '加载中…',
-      error: '网络错误',
-      na: '不可用',
-      hint: '点击展开换算',
-    },
-    en: {
-      title: 'Live FX Converter',
-      amount: 'Amount',
-      swap: 'Swap',
-      refresh: 'Refresh',
-      source: 'Source: exchangerate.host',
-      loading: 'Loading…',
-      error: 'Network error',
-      na: 'N/A',
-      hint: 'Click to expand',
-    },
-    de: {
-      title: 'Live Wechselkursrechner',
-      amount: 'Betrag',
-      swap: 'Tauschen',
-      refresh: 'Aktualisieren',
-      source: 'Quelle: exchangerate.host',
-      loading: 'Laden…',
-      error: 'Netzwerkfehler',
-      na: 'Nicht verfügbar',
-      hint: 'Klicken zum Öffnen',
+    /* ---------- i18n ---------- */
+    const qs = new URLSearchParams(location.search);
+    const lang = (qs.get('lang') || localStorage.getItem('lang') || 'zh').toLowerCase();
+    const I18N = {
+      zh: { title:'实时汇率换算', amount:'金额', swap:'交换', refresh:'刷新', source:'数据源：exchangerate.host', loading:'加载中…', error:'网络错误', na:'不可用', hint:'点击展开换算' },
+      en: { title:'Live FX Converter', amount:'Amount', swap:'Swap', refresh:'Refresh', source:'Source: exchangerate.host', loading:'Loading…', error:'Network error', na:'N/A', hint:'Click to expand' },
+      de: { title:'Live Wechselkursrechner', amount:'Betrag', swap:'Tauschen', refresh:'Aktualisieren', source:'Quelle: exchangerate.host', loading:'Laden…', error:'Netzwerkfehler', na:'Nicht verfügbar', hint:'Klicken zum Öffnen' }
+    };
+    const T = I18N[lang] || I18N.zh;
+
+    /* ---------- styles ---------- */
+    const css = `
+    :root{--fx-bg:#111;--fx-fg:#fff;--fx-line:#333;--fx-shadow:0 14px 44px rgba(0,0,0,.4);}
+    .fx-mini{
+      position:fixed;right:16px;
+      bottom: calc(16px + var(--cookie-offset, 0px)); /* ✅ 被 cookie 顶起 */
+      z-index:99998;display:flex;gap:10px;align-items:center;
+      padding:12px 14px;border-radius:16px;background:var(--card,#fff);color:var(--text,#111);
+      border:1px solid var(--border,#ddd);box-shadow:0 6px 22px rgba(0,0,0,.12);cursor:pointer
     }
-  };
-  const T = I18N[lang] || I18N.zh;
+    .fx-pill{display:flex;gap:8px;align-items:center;font-weight:800;background:var(--primary,#2b7de9);color:#fff;border-radius:999px;padding:8px 12px}
+    .fx-rates{display:flex;gap:10px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+    .fx-rate{background:#f1f3f5;border:1px solid #e3e6ea;border-radius:10px;padding:6px 8px}
+    .fx-hint{font-size:12px;color:#888;margin-left:4px}
 
-  /* ---------- styles ---------- */
-  const css = `
-  :root{--fx-bg:#111;--fx-fg:#fff;--fx-line:#333;--fx-shadow:0 14px 44px rgba(0,0,0,.4);}
-  /* 预览条（默认显示） */
-  .fx-mini{position:fixed;right:16px;bottom:16px;z-index:99998;display:flex;gap:10px;align-items:center;
-    padding:12px 14px;border-radius:16px;background:var(--card,#fff);color:var(--text,#111);
-    border:1px solid var(--border,#ddd);box-shadow:0 6px 22px rgba(0,0,0,.12);cursor:pointer}
-  .fx-pill{display:flex;gap:8px;align-items:center;font-weight:800;
-    background:var(--primary,#2b7de9);color:#fff;border-radius:999px;padding:8px 12px}
-  .fx-rates{display:flex;gap:10px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
-  .fx-rate{background:#f1f3f5;border:1px solid #e3e6ea;border-radius:10px;padding:6px 8px}
-  .fx-hint{font-size:12px;color:#888;margin-left:4px}
-  /* 大号浮窗（点击展开） */
-  .fx-wrap{position:fixed;right:16px;bottom:84px;z-index:99999;background:var(--fx-bg);color:var(--fx-fg);
-    border:1px solid #000;border-radius:18px;box-shadow:var(--fx-shadow);width:420px;max-width:calc(100vw - 32px);display:none}
-  .fx-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--fx-line)}
-  .fx-title{font-weight:900;font-size:18px;letter-spacing:.2px}
-  .fx-close{all:unset;cursor:pointer;background:#222;border:1px solid var(--fx-line);padding:6px 10px;border-radius:10px}
-  .fx-body{padding:16px}
-  .fx-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:center}
-  .fx-input,.fx-select{width:100%;padding:12px;border-radius:12px;border:1px solid var(--fx-line);background:#222;color:#fff;font-size:16px}
-  .fx-arrow{color:#bbb;text-align:center;font-size:18px}
-  .fx-out{margin-top:12px;padding:12px;border:1px solid var(--fx-line);border-radius:12px;background:#1b1b1b;display:flex;align-items:center;justify-content:space-between;min-height:48px;font-size:16px}
-  .fx-tools{padding:12px;display:flex;gap:10px}
-  .fx-btn{cursor:pointer;border:1px solid var(--fx-line);background:#222;color:#fff;border-radius:10px;padding:8px 12px;font-weight:700}
-  .fx-foot{padding:12px;font-size:12px;color:#9aa;display:flex;justify-content:space-between;border-top:1px solid var(--fx-line)}
-  .fx-link{color:#9ec5ff;text-decoration:none}
-  `;
-  const style = document.createElement('style');
-  style.textContent = css;
-  document.head.appendChild(style);
+    .fx-wrap{
+      position:fixed;right:16px;
+      bottom: calc(84px + var(--cookie-offset, 0px)); /* ✅ 被 cookie 顶起 */
+      z-index:99999;background:var(--fx-bg);color:var(--fx-fg);
+      border:1px solid #000;border-radius:18px;box-shadow:var(--fx-shadow);width:420px;max-width:calc(100vw - 32px);display:none
+    }
+    .fx-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--fx-line)}
+    .fx-title{font-weight:900;font-size:18px;letter-spacing:.2px}
+    .fx-close{all:unset;cursor:pointer;background:#222;border:1px solid var(--fx-line);padding:6px 10px;border-radius:10px}
+    .fx-body{padding:16px}
+    .fx-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:center}
+    .fx-input,.fx-select{width:100%;padding:12px;border-radius:12px;border:1px solid var(--fx-line);background:#222;color:#fff;font-size:16px}
+    .fx-arrow{color:#bbb;text-align:center;font-size:18px}
+    .fx-out{margin-top:12px;padding:12px;border:1px solid var(--fx-line);border-radius:12px;background:#1b1b1b;display:flex;align-items:center;justify-content:space-between;min-height:48px;font-size:16px}
+    .fx-tools{padding:12px;display:flex;gap:10px}
+    .fx-btn{cursor:pointer;border:1px solid var(--fx-line);background:#222;color:#fff;border-radius:10px;padding:8px 12px;font-weight:700}
+    .fx-foot{padding:12px;font-size:12px;color:#9aa;display:flex;justify-content:space-between;border-top:1px solid var(--fx-line)}
+    .fx-link{color:#9ec5ff;text-decoration:none}
+    `;
+    const style = document.createElement('style');
+    style.textContent = css;
+    document.head.appendChild(style);
 
-  /* ---------- DOM: 预览条 ---------- */
-  const mini = document.createElement('div');
-  mini.className = 'fx-mini';
-  mini.innerHTML = `
-    <div class="fx-pill">FX</div>
-    <div class="fx-rates" id="fx-mini-rates">
-      <span class="fx-rate">—</span>
-      <span class="fx-rate">—</span>
-      <span class="fx-rate">—</span>
-    </div>
-    <span class="fx-hint">${T.hint}</span>
-  `;
-
-  /* ---------- DOM: 浮窗 ---------- */
-  const wrap = document.createElement('section');
-  wrap.className = 'fx-wrap';
-  wrap.setAttribute('role','dialog');
-  wrap.setAttribute('aria-modal','false');
-  wrap.innerHTML = `
-    <div class="fx-head">
-      <div class="fx-title">${T.title}</div>
-      <button class="fx-close" type="button" aria-label="Close">×</button>
-    </div>
-    <div class="fx-body">
-      <div class="fx-grid">
-        <input class="fx-input" id="fx-amt" type="number" min="0" step="0.01" placeholder="${T.amount}">
-        <select class="fx-select" id="fx-from"></select>
-        <div class="fx-arrow">→</div>
-        <select class="fx-select" id="fx-to"></select>
+    /* ---------- DOM: 预览条 ---------- */
+    const mini = document.createElement('div');
+    mini.className = 'fx-mini';
+    mini.innerHTML = `
+      <div class="fx-pill">FX</div>
+      <div class="fx-rates" id="fx-mini-rates">
+        <span class="fx-rate">—</span>
+        <span class="fx-rate">—</span>
+        <span class="fx-rate">—</span>
       </div>
-      <div class="fx-out">
-        <span id="fx-res">—</span>
-        <span id="fx-ts"></span>
+      <span class="fx-hint">${T.hint}</span>
+    `;
+
+    /* ---------- DOM: 浮窗 ---------- */
+    const wrap = document.createElement('section');
+    wrap.className = 'fx-wrap';
+    wrap.setAttribute('role','dialog');
+    wrap.setAttribute('aria-modal','false');
+    wrap.innerHTML = `
+      <div class="fx-head">
+        <div class="fx-title">${T.title}</div>
+        <button class="fx-close" type="button" aria-label="Close">×</button>
       </div>
-      <div class="fx-tools">
-        <button class="fx-btn" id="fx-swap" type="button">${T.swap}</button>
-        <button class="fx-btn" id="fx-refresh" type="button">${T.refresh}</button>
+      <div class="fx-body">
+        <div class="fx-grid">
+          <input class="fx-input" id="fx-amt" type="number" min="0" step="0.01" placeholder="${T.amount}">
+          <select class="fx-select" id="fx-from"></select>
+          <div class="fx-arrow">→</div>
+          <select class="fx-select" id="fx-to"></select>
+        </div>
+        <div class="fx-out">
+          <span id="fx-res">—</span>
+          <span id="fx-ts"></span>
+        </div>
+        <div class="fx-tools">
+          <button class="fx-btn" id="fx-swap" type="button">${T.swap}</button>
+          <button class="fx-btn" id="fx-refresh" type="button">${T.refresh}</button>
+        </div>
       </div>
-    </div>
-    <div class="fx-foot">
-      <span>${T.source}</span>
-      <a class="fx-link" href="https://exchangerate.host" target="_blank" rel="noopener">API</a>
-    </div>
-  `;
+      <div class="fx-foot">
+        <span>${T.source}</span>
+        <a class="fx-link" href="https://exchangerate.host" target="_blank" rel="noopener">API</a>
+      </div>
+    `;
 
-  document.body.appendChild(mini);
-  document.body.appendChild(wrap);
+    document.body.appendChild(mini);
+    document.body.appendChild(wrap);
 
-  const $ = sel => wrap.querySelector(sel);
-  const amt = $('#fx-amt'), fromSel = $('#fx-from'), toSel = $('#fx-to'), res = $('#fx-res'), ts = $('#fx-ts');
-  const miniRatesEl = mini.querySelector('#fx-mini-rates');
+    const $ = sel => wrap.querySelector(sel);
+    const amt = $('#fx-amt'), fromSel = $('#fx-from'), toSel = $('#fx-to'), res = $('#fx-res'), ts = $('#fx-ts');
+    const miniRatesEl = mini.querySelector('#fx-mini-rates');
 
-  /* ---------- 初始化下拉 ---------- */
-  (function initSelects(){
-    CCY.forEach(c=>{
-      const o1 = document.createElement('option'); o1.value=c; o1.textContent=c; fromSel.appendChild(o1);
-      const o2 = document.createElement('option'); o2.value=c; o2.textContent=c; toSel.appendChild(o2);
+    /* ---------- 初始化下拉 ---------- */
+    (function initSelects(){
+      CCY.forEach(c=>{
+        const o1 = document.createElement('option'); o1.value=c; o1.textContent=c; fromSel.appendChild(o1);
+        const o2 = document.createElement('option'); o2.value=c; o2.textContent=c; toSel.appendChild(o2);
+      });
+      try{
+        const saved = JSON.parse(localStorage.getItem(STORE) || '{}');
+        fromSel.value = saved.from || 'CNY';
+        toSel.value = saved.to || 'USD';
+        amt.value = saved.amt ?? 100;
+      }catch{ fromSel.value='CNY'; toSel.value='USD'; amt.value=100; }
+    })();
+
+    /* ---------- 汇率缓存与拉取（主源 + 备源） ---------- */
+    let cache = { base: null, ts: 0, rates: null, date: '' };
+    const now = () => Date.now();
+
+    async function fetchRates(base){
+      try{
+        const u = `https://api.exchangerate.host/latest?base=${encodeURIComponent(base)}`;
+        const r = await fetch(u, { cache: 'no-store' });
+        if(!r.ok) throw new Error('host http');
+        const j = await r.json();
+        if(!j || !j.rates) throw new Error('host json');
+        cache = { base: j.base || base, ts: now(), rates: j.rates, date: j.date || '' };
+        return;
+      }catch(e){}
+      const u2 = `https://open.er-api.com/v6/latest/${encodeURIComponent(base)}`;
+      const r2 = await fetch(u2, { cache: 'no-store' });
+      const j2 = await r2.json();
+      if(j2 && j2.rates){
+        cache = { base: j2.base_code || base, ts: now(), rates: j2.rates, date: (j2.time_last_update_utc || '').replace(' at','') };
+        return;
+      }
+      throw new Error('rate fetch failed');
+    }
+
+    function fmt(n){ return Number(n).toLocaleString(undefined,{ maximumFractionDigits: 4 }); }
+
+    async function compute(){
+      const a = parseFloat(amt.value || '0');
+      const from = fromSel.value, to = toSel.value;
+      localStorage.setItem(STORE, JSON.stringify({ amt: amt.value, from, to }));
+      try{
+        if(cache.base !== from || !cache.rates || (now() - cache.ts) > POLL_MS){
+          res.textContent = T.loading;
+          await fetchRates(from);
+        }
+        if(a){
+          const rate = cache.rates[to];
+          if(rate == null){ res.textContent = T.na; ts.textContent=''; }
+          else { res.textContent = `${from} ${fmt(a)} = ${to} ${fmt(a * rate)}`; ts.textContent = cache.date; }
+        }else{
+          res.textContent = '—'; ts.textContent = cache.date || '';
+        }
+        renderMiniRates();
+      }catch(e){
+        res.textContent = T.error;
+        miniRatesEl.innerHTML = `<span class="fx-rate">${T.error}</span>`;
+      }
+    }
+
+    function getCross(baseRates, from, to){
+      if(from === cache.base){ return baseRates[to]; }
+      if(to === cache.base){ return 1 / baseRates[from]; }
+      return (baseRates[to] != null && baseRates[from] != null) ? (baseRates[to] / baseRates[from]) : null;
+    }
+
+    function renderMiniRates(){
+      const out = [];
+      for(const [a,b] of SUMMARY_PAIRS){
+        const rate = getCross(cache.rates || {}, a, b);
+        out.push(`<span class="fx-rate">${a}/${b} ${rate != null ? fmt(rate) : T.na}</span>`);
+      }
+      miniRatesEl.innerHTML = out.join('');
+    }
+
+    [amt, fromSel, toSel].forEach(el => el.addEventListener('input', compute));
+    wrap.querySelector('.fx-close').addEventListener('click', () => { wrap.style.display='none'; });
+    document.getElementById('fx-refresh')?.addEventListener('click', () => { cache.base=null; compute(); });
+    document.getElementById('fx-swap')?.addEventListener('click', () => {
+      const f = fromSel.value; fromSel.value = toSel.value; toSel.value = f; compute();
     });
-    try{
-      const saved = JSON.parse(localStorage.getItem(STORE) || '{}');
-      fromSel.value = saved.from || 'CNY';
-      toSel.value = saved.to || 'USD';
-      amt.value = saved.amt ?? 100;
-    }catch{ fromSel.value='CNY'; toSel.value='USD'; amt.value=100; }
+
+    mini.addEventListener('click', () => {
+      const show = wrap.style.display !== 'block';
+      wrap.style.display = show ? 'block' : 'none';
+      if(show){ compute(); amt.focus(); }
+    });
+
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') wrap.style.display='none'; });
+
+    let timer = setInterval(() => {
+      if(wrap.style.display === 'block'){ cache.base=null; compute(); }
+    }, POLL_MS);
+    document.addEventListener('visibilitychange', () => {
+      if(document.hidden){ clearInterval(timer); timer=null; }
+      else if(!timer){ timer=setInterval(()=>{ if(wrap.style.display === 'block'){ cache.base=null; compute(); } }, POLL_MS); }
+    });
+
+    compute();
   })();
-
-  /* ---------- 汇率缓存与拉取（主源 + 备源） ---------- */
-  let cache = { base: null, ts: 0, rates: null, date: '' };
-  const now = () => Date.now();
-
-  async function fetchRates(base){
-    // 主源
-    try{
-      const u = `https://api.exchangerate.host/latest?base=${encodeURIComponent(base)}`;
-      const r = await fetch(u, { cache: 'no-store' });
-      if(!r.ok) throw new Error('host http');
-      const j = await r.json();
-      if(!j || !j.rates) throw new Error('host json');
-      cache = { base: j.base || base, ts: now(), rates: j.rates, date: j.date || '' };
-      return;
-    }catch(e){}
-    // 备源
-    const u2 = `https://open.er-api.com/v6/latest/${encodeURIComponent(base)}`;
-    const r2 = await fetch(u2, { cache: 'no-store' });
-    const j2 = await r2.json();
-    if(j2 && j2.rates){
-      cache = { base: j2.base_code || base, ts: now(), rates: j2.rates, date: (j2.time_last_update_utc || '').replace(' at','') };
-      return;
-    }
-    throw new Error('rate fetch failed');
-  }
-
-  function fmt(n){ return Number(n).toLocaleString(undefined,{ maximumFractionDigits: DEC }); }
-
-  /* ---------- 计算与渲染 ---------- */
-  async function compute(){
-    const a = parseFloat(amt.value || '0');
-    const from = fromSel.value, to = toSel.value;
-    localStorage.setItem(STORE, JSON.stringify({ amt: amt.value, from, to }));
-    try{
-      // 当缓存过期或基准变化时刷新（采用 from 作为基准）
-      if(cache.base !== from || !cache.rates || (now() - cache.ts) > POLL_MS){
-        res.textContent = T.loading;
-        await fetchRates(from);
-      }
-      // 浮窗结果
-      if(a){
-        const rate = cache.rates[to];
-        if(rate == null){ res.textContent = T.na; ts.textContent=''; }
-        else { res.textContent = `${from} ${fmt(a)} = ${to} ${fmt(a * rate)}`; ts.textContent = cache.date; }
-      }else{
-        res.textContent = '—'; ts.textContent = cache.date || '';
-      }
-      // 预览条三组
-      renderMiniRates();
-    }catch(e){
-      res.textContent = T.error;
-      miniRatesEl.innerHTML = `<span class="fx-rate">${T.error}</span>`;
-    }
-  }
-
-  function getCross(baseRates, from, to){
-    if(from === cache.base){ return baseRates[to]; }
-    if(to === cache.base){ return 1 / baseRates[from]; }
-    // 交叉： (to/base) / (from/base)
-    return (baseRates[to] != null && baseRates[from] != null) ? (baseRates[to] / baseRates[from]) : null;
-  }
-
-  function renderMiniRates(){
-    const out = [];
-    for(const [a,b] of SUMMARY_PAIRS){
-      // 使用当前 cache.base 的表，做交叉汇率
-      const rate = getCross(cache.rates || {}, a, b);
-      out.push(`<span class="fx-rate">${a}/${b} ${rate != null ? fmt(rate) : T.na}</span>`);
-    }
-    miniRatesEl.innerHTML = out.join('');
-  }
-
-  /* ---------- 交互 ---------- */
-  [amt, fromSel, toSel].forEach(el => el.addEventListener('input', compute));
-  wrap.querySelector('.fx-close').addEventListener('click', () => { wrap.style.display='none'; });
-  document.getElementById('fx-refresh')?.addEventListener('click', () => { cache.base=null; compute(); });
-  document.getElementById('fx-swap')?.addEventListener('click', () => {
-    const f = fromSel.value; fromSel.value = toSel.value; toSel.value = f; compute();
-  });
-
-  // 预览条点击 -> 展开/收起
-  mini.addEventListener('click', () => {
-    const show = wrap.style.display !== 'block';
-    wrap.style.display = show ? 'block' : 'none';
-    if(show){ compute(); amt.focus(); }
-  });
-
-  // ESC 关闭
-  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') wrap.style.display='none'; });
-
-  // 自动刷新（仅展开时）
-  let timer = setInterval(() => {
-    if(wrap.style.display === 'block'){ cache.base=null; compute(); }
-  }, POLL_MS);
-  document.addEventListener('visibilitychange', () => {
-    if(document.hidden){ clearInterval(timer); timer=null; }
-    else if(!timer){ timer=setInterval(()=>{ if(wrap.style.display === 'block'){ cache.base=null; compute(); } }, POLL_MS); }
-  });
-
-  // 首次渲染
-  compute();
-})();
-</script>
+  </script>
 </body>
 </html>
